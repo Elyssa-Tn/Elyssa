@@ -1,0 +1,69 @@
+[
+  {
+    "date": "2011",
+    "elections": [
+      {
+        "type": "Élections législatives",
+        "image": "29-1-23.png",
+        "description": "Élections législatives 2011 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sit amet vestibulum dolor. Phasellus nec metus ut nisl ornare venenatis eu ut nibh. Suspendisse condimentum felis vitae sollicitudin malesuada. Quisque congue augue eu ligula elementum bibendum. Etiam ut tortor et sapien interdum suscipit. Etiam vel finibus odio. Nullam laoreet malesuada felis nec tristique. Sed condimentum vulputate nisl. ",
+        "completude": 50
+      }
+    ]
+  },
+  {
+    "date": "2014",
+    "elections": [
+      {
+        "type": "Élections législatives",
+        "image": "17-12-22.png",
+        "description": "Élections législatives 2014 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sit amet vestibulum dolor. Phasellus nec metus ut nisl ornare venenatis eu ut nibh. Suspendisse condimentum felis vitae sollicitudin malesuada. Quisque congue augue eu ligula elementum bibendum. Etiam ut tortor et sapien interdum suscipit. Etiam vel finibus odio. Nullam laoreet malesuada felis nec tristique. Sed condimentum vulputate nisl. ",
+        "completude": 80
+      },
+      {
+        "type": "Élections présidentielles",
+        "image": "29-1-23.png",
+        "description": "Élections présidentielles 2014 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sit amet vestibulum dolor. Phasellus nec metus ut nisl ornare venenatis eu ut nibh. Suspendisse condimentum felis vitae sollicitudin malesuada. Quisque congue augue eu ligula elementum bibendum. Etiam ut tortor et sapien interdum suscipit. Etiam vel finibus odio. Nullam laoreet malesuada felis nec tristique. Sed condimentum vulputate nisl. ",
+        "completude": 90
+      }
+    ]
+  },
+  {
+    "date": "2018",
+    "elections": [
+      {
+        "type": "Élections municipales",
+        "image": "17-12-22.png",
+        "description": "Élections municipales 2018 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sit amet vestibulum dolor. Phasellus nec metus ut nisl ornare venenatis eu ut nibh. Suspendisse condimentum felis vitae sollicitudin malesuada. Quisque congue augue eu ligula elementum bibendum. Etiam ut tortor et sapien interdum suscipit. Etiam vel finibus odio. Nullam laoreet malesuada felis nec tristique. Sed condimentum vulputate nisl. ",
+        "completude": 50
+      }
+    ]
+  },
+  {
+    "date": "2019",
+    "elections": [
+      {
+        "type": "Élections législatives",
+        "image": "17-12-22.png",
+        "description": "Élections législatives 2019 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sit amet vestibulum dolor. Phasellus nec metus ut nisl ornare venenatis eu ut nibh. Suspendisse condimentum felis vitae sollicitudin malesuada. Quisque congue augue eu ligula elementum bibendum. Etiam ut tortor et sapien interdum suscipit. Etiam vel finibus odio. Nullam laoreet malesuada felis nec tristique. Sed condimentum vulputate nisl. ",
+        "completude": 100
+      },
+      {
+        "type": "Élections présidentielles",
+        "image": "29-1-23.png",
+        "description": "Élections présidentielles 2019 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sit amet vestibulum dolor. Phasellus nec metus ut nisl ornare venenatis eu ut nibh. Suspendisse condimentum felis vitae sollicitudin malesuada. Quisque congue augue eu ligula elementum bibendum. Etiam ut tortor et sapien interdum suscipit. Etiam vel finibus odio. Nullam laoreet malesuada felis nec tristique. Sed condimentum vulputate nisl. ",
+        "completude": 75
+      }
+    ]
+  },
+  {
+    "date": "2022",
+    "elections": [
+      {
+        "type": "Élections législatives",
+        "image": "17-12-22.png",
+        "description": "Élections législatives 2022 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sit amet vestibulum dolor. Phasellus nec metus ut nisl ornare venenatis eu ut nibh. Suspendisse condimentum felis vitae sollicitudin malesuada. Quisque congue augue eu ligula elementum bibendum. Etiam ut tortor et sapien interdum suscipit. Etiam vel finibus odio. Nullam laoreet malesuada felis nec tristique. Sed condimentum vulputate nisl. ",
+        "completude": 25
+      }
+    ]
+  }
+]

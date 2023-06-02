@@ -1,0 +1,99 @@
+.election-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.right-container {
+  flex: 7;
+}
+
+.buttons-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.buttons-container button {
+  background-color: #f44336;
+  margin-right: 10px;
+}
+
+.selection-container {
+  flex: 3;
+  background-color: #333;
+  padding: 10px;
+  border-radius: 12px;
+  text-align: left;
+  padding-bottom: 20px;
+}
+
+.year-selection {
+  background-color: #f44336;
+  text-align: center;
+  margin-left: 40px;
+  width: 80px;
+  margin-top: 10px;
+  padding-top: 4px;
+  border-radius: 4px;
+}
+
+.progress-bar-container {
+  background-color: #f2f2f2;
+  height: 10px;
+  margin-top: 4px;
+  border-radius: 4px 0px 4px 4px;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #4caf50;
+  border-radius: 0px 0px 4px 4px;
+}
+
+.paragraph-container {
+  flex: 7;
+  padding: 20px;
+  text-align: center;
+}
+
+.export-bar {
+  list-style-type: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.export-item {
+  position: relative;
+  margin: 0 10px;
+}
+
+.export-dropdown-content {
+  display: none;
+  border-radius: 4px;
+  position: absolute;
+  right: 10%;
+  background-color: #e53935;
+  text-align: center;
+  width: 100px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.export-dropdown-content button {
+  width: 100%;
+}
+
+.export-item:hover .export-dropdown-content {
+  display: block;
+}
+
+.export-link {
+  color: #fff;
+  text-decoration: none;
+}
+
+.export-dropdown-content button:hover {
+  background-color: #c62828;
+}

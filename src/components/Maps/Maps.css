@@ -1,0 +1,78 @@
+.maps-page-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.selection-menu-container {
+  flex: 4;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  padding: 10px;
+  margin-right: 10px;
+}
+
+.selection-menu-container button {
+  margin: 8px;
+  background-color: #f44336;
+}
+
+.selection-menu-container ul {
+  list-style-type: none;
+  display: flex;
+  flex-direction: column;
+  padding-left: 10px;
+  margin: 6px 0px;
+}
+
+.selection-menu-container ul {
+  margin-left: 20px;
+}
+
+.selection-menu-container label {
+  margin: 4px;
+  border-radius: 4px;
+  background-color: #f44336;
+  width: 120px;
+  text-align: left;
+}
+
+.map-controls {
+  position: absolute;
+  flex-direction: column;
+  display: flex;
+  top: 10px;
+  right: 10px;
+  z-index: 999;
+}
+
+.map-controls button {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  /* background-color: #ffffff; */
+  border: none;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 18px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.map-container {
+  position: relative;
+  background-color: grey;
+  border-radius: 25px;
+  width: 600px;
+  height: 600px;
+}
+.commentary-container {
+  flex: 7;
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  padding: 10px;
+  margin: 0px 10px;
+}

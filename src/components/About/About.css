@@ -1,0 +1,75 @@
+h2 {
+  text-align: center;
+}
+
+.container-a {
+  display: flex;
+  margin-top: 50px;
+}
+
+.container-b,
+.container-c {
+  flex: 1;
+  display: flex;
+}
+
+.container-b {
+  flex-direction: column;
+  align-items: center;
+  margin: 20px;
+}
+
+.container-c {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 30px;
+  justify-content: center;
+  align-items: center;
+}
+
+.container-q {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.container-q:hover {
+  transform: scale(1.1);
+}
+
+.container-q::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.container-q img {
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.container-q .text-overlay {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  color: #ffffff;
+  z-index: 2;
+}

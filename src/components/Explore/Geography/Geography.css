@@ -1,0 +1,41 @@
+.election-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.selection-container {
+  flex: 3;
+  background-color: #333;
+  padding: 10px;
+  border-radius: 12px;
+  text-align: left;
+  padding-bottom: 20px;
+}
+
+.geography-selection {
+  background-color: #f44336;
+  text-align: left;
+  margin-left: 40px;
+  width: 70%;
+  margin-top: 10px;
+  padding-top: 4px;
+  border-radius: 4px;
+}
+
+.progress-bar-container {
+  background-color: #f2f2f2;
+  height: 10px;
+  margin-top: 4px;
+  border-radius: 4px 0px 4px 4px;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #4caf50;
+  border-radius: 0px 0px 4px 4px;
+}
+
+.paragraph-container {
+  padding: 20px;
+  text-align: center;
+}
