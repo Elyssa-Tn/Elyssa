@@ -76,3 +76,23 @@
   padding: 10px;
   margin: 0px 10px;
 }
+
+@media (max-width: 768px) {
+  .maps-page-container {
+    flex-direction: column;
+  }
+
+  .selection-menu-container {
+    flex-direction: row;
+    margin: 0.5rem;
+  }
+
+  .map-container {
+    width: 100%;
+    height: 600px;
+  }
+
+  .commentary-container {
+    margin-top: 1rem;
+  }
+}

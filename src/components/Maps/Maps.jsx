@@ -4,6 +4,7 @@ import {
   Geography,
   ZoomableGroup,
 } from "react-simple-maps";
+import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
 import topojson from "../../assets/delegations-full.json";
 import "./Maps.css";
 import { useState } from "react";
@@ -33,6 +34,11 @@ const Maps = () => {
   const handleCheckboxChange = (event) => {
     setCheckedParty(
       event.target.value === checkedParty ? null : event.target.value
+    );
+  };
+  const handleElectionSelection = (event) => {
+    setSelectedElection(
+      event.Election === selectedElection.Election ? [] : event
     );
   };
 
@@ -93,7 +99,7 @@ const Maps = () => {
         <div className="selection-menu-container">
           {elections.map((election) => (
             <div key={election.Election}>
-              <button onClick={() => setSelectedElection(election)}>
+              <button onClick={() => handleElectionSelection(election)}>
                 {election.Election}
               </button>
               {election.Election === selectedElection.Election && (
@@ -116,7 +122,7 @@ const Maps = () => {
         </div>
         <div className="map-container">
           <ComposableMap
-            style={{ width: "600px", height: "600px" }}
+            style={{ width: "400px", height: "600px" }}
             projectionConfig={projectionConfig}
           >
             <ZoomableGroup
@@ -142,7 +148,9 @@ const Maps = () => {
           <div className="map-controls">
             <button onClick={handleZoomIn}>+</button>
             <button onClick={handleZoomOut}>-</button>
-            <button onClick={handleRecenter}>v</button>
+            <button onClick={handleRecenter}>
+              <LocationSearchingIcon />
+            </button>
           </div>
         </div>
         <div className="commentary-container">

@@ -39,3 +39,16 @@
   padding: 20px;
   text-align: center;
 }
+
+@media (max-width: 768px) {
+  .selection-container {
+    flex: 4;
+  }
+  .geography-selection {
+    width: 95%;
+    margin-left: 10px;
+  }
+  .buttons-container {
+    padding-top: 10px;
+  }
+}
