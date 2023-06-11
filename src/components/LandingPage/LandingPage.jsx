@@ -33,6 +33,7 @@ const LandingPage = () => {
               key={event.date}
               className="timeline-event"
               onMouseEnter={() => showDateDetails(event)}
+              onClick={() => showDateDetails(event)}
             >
               <div className="event-date">{event.date}</div>
             </div>

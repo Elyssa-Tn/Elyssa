@@ -8,7 +8,6 @@ import Project from "./components/About/Project/Project";
 import Teams from "./components/About/Teams/Teams";
 import Research from "./components/About/Research/Research";
 import Publications from "./components/About/Publications/Publications";
-import Guide from "./components/Guide/Guide";
 import Login from "./components/Login/Login";
 import Explore from "./components/Explore/Explore";
 import Elections from "./components/Explore/Elections/Elections";
@@ -30,8 +29,6 @@ function App() {
         <Route path="/about/teams" element={<Teams />} />
         <Route path="/about/research" element={<Research />} />
         <Route path="/about/publications" element={<Publications />} />
-
-        <Route path="/guide" element={<Guide />} />
 
         <Route path="/login" element={<Login />} />
 
