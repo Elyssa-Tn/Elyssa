@@ -1,166 +1,160 @@
-import {
-  ComposableMap,
-  Geographies,
-  Geography,
-  ZoomableGroup,
-} from "react-simple-maps";
-import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
 import topojson from "../../assets/delegations-full.json";
+import separation from "../../assets/example.json";
 import "./Maps.css";
 import { useState } from "react";
+import { MapComponent } from "./MapComponent/MapComponent";
+import { useEffect } from "react";
+import SelectionMenu from "./SelectionMenu/SelectionMenu";
+import DoDisturbAltIcon from "@mui/icons-material/DoDisturbAlt";
 
 const Maps = () => {
+  const [mapList, setMapList] = useState(["blank"]); //Ou "age_moyen" ou "analphabetisme" ou "chomage"
+
   const elections = [
     {
-      Election: "Election 1",
-      parties: ["Partie A", "Partie B", "Partie C"],
+      type: "Presidentielle",
+      elections: [
+        {
+          Election: "Election 1",
+          parties: ["Candidat A", "Candidat B", "Candidat C"],
+        },
+        {
+          Election: "Election 2",
+          parties: ["Candidat A", "Candidat B", "Candidat C"],
+        },
+      ],
     },
     {
-      Election: "Election 2",
-      parties: ["Partie X", "Partie Y", "Partie Z"],
-    },
-    {
-      Election: "Election 3",
-      parties: ["Partie M", "Partie N", "Partie O"],
+      type: "Legislative",
+      elections: [
+        {
+          Election: "Election 1",
+          parties: ["Partie A", "Partie B", "Partie C"],
+        },
+        {
+          Election: "Election 2",
+          parties: ["Partie A", "Partie B", "Partie C"],
+        },
+      ],
     },
   ];
 
   const TUNISIA_TOPO_JSON = topojson;
 
-  const [selectedElection, setSelectedElection] = useState([]);
-
-  const [checkedParty, setCheckedParty] = useState(null);
-
-  const handleCheckboxChange = (event) => {
-    setCheckedParty(
-      event.target.value === checkedParty ? null : event.target.value
-    );
-  };
-  const handleElectionSelection = (event) => {
-    setSelectedElection(
-      event.Election === selectedElection.Election ? [] : event
-    );
+  const removeMap = (map) => {
+    let state = [...mapList];
+    state.splice(state.indexOf(map), 1);
+    if (state.length === 0) {
+      setMapList(["blank"]);
+      return;
+    }
+    setMapList(state);
   };
 
-  const [position, setPosition] = useState({
-    coordinates: [9.925, 33.793],
-    zoom: 1,
-  });
+  function replaceSpecificNumber(jsonData, numberToReplace) {
+    // Recursive function to traverse the JSON object
+    function traverse(obj) {
+      for (let key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          if (typeof obj[key] === "object") {
+            traverse(obj[key]); // Recursively traverse nested objects
+          } else if (
+            typeof obj[key] === "number" &&
+            obj[key] === numberToReplace
+          ) {
+            obj[key] = getRandomNumber(); // Replace the specific number with a random one
+          }
+        }
+      }
+    }
 
-  const projectionConfig = {
-    scale: 6000,
-    center: [9.925, 33.793],
-  };
+    // Generate a new random number between 1 and 99, excluding numbers already used
+    function getRandomNumber() {
+      let randomNum;
+      do {
+        randomNum = Math.floor(Math.random() * 99) + 1;
+      } while (usedNumbers.has(randomNum));
+      usedNumbers.add(randomNum);
+      return randomNum;
+    }
 
-  const handleClick = (geo) => {
-    console.log(geo.properties);
-  };
+    // Create a deep copy of the JSON object
+    const updatedData = JSON.parse(JSON.stringify(jsonData));
 
-  const handleRecenter = () => {
-    setPosition({
-      coordinates: projectionConfig.center,
-      zoom: 1,
-    });
-  };
+    // Set to keep track of used numbers
+    const usedNumbers = new Set();
 
-  const handleZoomIn = () => {
-    if (position.zoom >= 4) return;
-    setPosition((pos) => ({ ...pos, zoom: pos.zoom * 2 }));
-  };
+    // Traverse the copied object and replace the specific number
+    traverse(updatedData);
 
-  const handleZoomOut = () => {
-    if (position.zoom <= 1) return;
-    setPosition((pos) => ({ ...pos, zoom: pos.zoom / 2 }));
-  };
+    return updatedData;
+  }
 
-  const handleMoveEnd = (position) => {
-    setPosition({
-      coordinates: [
-        Math.max(4, Math.min(16, position.coordinates[0])),
-        Math.max(36, Math.min(40, position.coordinates[1])),
-      ],
-      zoom: position.zoom,
-    });
-  };
-
-  const randomColor = () => {
-    const hue = (1 - (Math.random() * 100) / 100) * 120;
-    const saturation = "100%";
-    const lightness = "50%";
-    const color = `hsl(${hue}, ${saturation}, ${lightness})`;
-
-    return color;
-  };
+  // console.log(replaceSpecificNumber(separation, 67));
 
   return (
     <div>
       <h2>Carte Graphique</h2>
       <div className="maps-page-container">
         <div className="selection-menu-container">
-          {elections.map((election) => (
-            <div key={election.Election}>
-              <button onClick={() => handleElectionSelection(election)}>
-                {election.Election}
-              </button>
-              {election.Election === selectedElection.Election && (
-                <ul>
-                  {election.parties.map((party) => (
-                    <label key={party}>
-                      <input
-                        type="checkbox"
-                        value={party}
-                        checked={checkedParty === party}
-                        onChange={handleCheckboxChange}
+          <SelectionMenu
+            elections={elections}
+            setMapList={setMapList}
+            mapList={mapList}
+          />
+          <div className="map-browser">
+            {mapList[0] !== "blank" &&
+              mapList.map((map) => {
+                if (typeof map === "string") {
+                  return (
+                    <span key={map}>
+                      {map}
+                      <DoDisturbAltIcon
+                        className="close-icon"
+                        onClick={() => removeMap(map)}
                       />
-                      {party}
-                    </label>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ))}
-        </div>
-        <div className="map-container">
-          <ComposableMap
-            style={{ width: "400px", height: "600px" }}
-            projectionConfig={projectionConfig}
-          >
-            <ZoomableGroup
-              zoom={position.zoom}
-              center={position.coordinates}
-              onMoveEnd={handleMoveEnd}
-            >
-              <Geographies geography={TUNISIA_TOPO_JSON}>
-                {({ geographies }) =>
-                  geographies.map((geo) => (
-                    <Geography
-                      key={geo.rsmKey}
-                      geography={geo}
-                      fill={checkedParty ? randomColor() : "#0"}
-                      stroke="#ccc"
-                      onClick={() => handleClick(geo)}
-                    />
-                  ))
+                    </span>
+                  );
+                } else {
+                  return (
+                    <span key={`${map.type} - ${map.election}: ${map.partie}`}>
+                      {`${map.type} - ${map.election}: ${map.partie}`}
+                      <DoDisturbAltIcon
+                        className="close-icon"
+                        onClick={() =>
+                          removeMap(
+                            `${map.type} - ${map.election}: ${map.partie}`
+                          )
+                        }
+                      />
+                    </span>
+                  );
                 }
-              </Geographies>
-            </ZoomableGroup>
-          </ComposableMap>
-          <div className="map-controls">
-            <button onClick={handleZoomIn}>+</button>
-            <button onClick={handleZoomOut}>-</button>
-            <button onClick={handleRecenter}>
-              <LocationSearchingIcon />
-            </button>
+              })}
           </div>
         </div>
-        <div className="commentary-container">
-          <p>
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ratione
-            dicta quas quam consectetur vel dolor. Officiis ipsam quae saepe
-            odit sunt dignissimos quis, explicabo iure illo. Id excepturi
-            officia facilis.
-          </p>
+        <div className="map-collector">
+          {mapList &&
+            mapList.map((map) => (
+              <MapComponent
+                key={map}
+                topojson={TUNISIA_TOPO_JSON}
+                separation={separation}
+                data={map}
+              />
+            ))}
         </div>
+
+        {mapList.length < 2 && (
+          <div className="commentary-container">
+            <p>
+              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ratione
+              dicta quas quam consectetur vel dolor. Officiis ipsam quae saepe
+              odit sunt dignissimos quis, explicabo iure illo. Id excepturi
+              officia facilis.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
