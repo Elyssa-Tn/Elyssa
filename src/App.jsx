@@ -22,22 +22,22 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
 
-        <Route path="/legal" element={<MentionsLegales />} />
+        <Route path="/legal/" element={<MentionsLegales />} />
 
-        <Route path="/about" element={<About />} />
-        <Route path="/about/project" element={<Project />} />
-        <Route path="/about/teams" element={<Teams />} />
-        <Route path="/about/research" element={<Research />} />
-        <Route path="/about/publications" element={<Publications />} />
+        <Route path="/about/" element={<About />} />
+        <Route path="/about/project/" element={<Project />} />
+        <Route path="/about/teams/" element={<Teams />} />
+        <Route path="/about/research/" element={<Research />} />
+        <Route path="/about/publications/" element={<Publications />} />
 
         <Route path="/login" element={<Login />} />
 
         <Route path="/explore" element={<Explore />} />
-        <Route path="/explore/elections" element={<Elections />} />
-        <Route path="/explore/geography" element={<Geography />} />
-        <Route path="/explore/themes" element={<Themes />} />
+        <Route path="/explore/elections/" element={<Elections />} />
+        <Route path="/explore/geography/" element={<Geography />} />
+        <Route path="/explore/themes/" element={<Themes />} />
 
-        <Route path="/maps" element={<Maps />} />
+        <Route path="/maps/" element={<Maps />} />
       </Routes>
     </>
   );

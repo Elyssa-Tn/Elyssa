@@ -8,7 +8,7 @@ import SelectionMenu from "./SelectionMenu/SelectionMenu";
 import DoDisturbAltIcon from "@mui/icons-material/DoDisturbAlt";
 
 const Maps = () => {
-  const [mapList, setMapList] = useState(["blank"]); //Ou "age_moyen" ou "analphabetisme" ou "chomage"
+  const [mapList, setMapList] = useState(["blank"]);
 
   const elections = [
     {
@@ -50,47 +50,6 @@ const Maps = () => {
     }
     setMapList(state);
   };
-
-  function replaceSpecificNumber(jsonData, numberToReplace) {
-    // Recursive function to traverse the JSON object
-    function traverse(obj) {
-      for (let key in obj) {
-        if (obj.hasOwnProperty(key)) {
-          if (typeof obj[key] === "object") {
-            traverse(obj[key]); // Recursively traverse nested objects
-          } else if (
-            typeof obj[key] === "number" &&
-            obj[key] === numberToReplace
-          ) {
-            obj[key] = getRandomNumber(); // Replace the specific number with a random one
-          }
-        }
-      }
-    }
-
-    // Generate a new random number between 1 and 99, excluding numbers already used
-    function getRandomNumber() {
-      let randomNum;
-      do {
-        randomNum = Math.floor(Math.random() * 99) + 1;
-      } while (usedNumbers.has(randomNum));
-      usedNumbers.add(randomNum);
-      return randomNum;
-    }
-
-    // Create a deep copy of the JSON object
-    const updatedData = JSON.parse(JSON.stringify(jsonData));
-
-    // Set to keep track of used numbers
-    const usedNumbers = new Set();
-
-    // Traverse the copied object and replace the specific number
-    traverse(updatedData);
-
-    return updatedData;
-  }
-
-  // console.log(replaceSpecificNumber(separation, 67));
 
   return (
     <div>
