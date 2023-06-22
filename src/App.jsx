@@ -38,6 +38,8 @@ function App() {
         <Route path="/explore/themes/" element={<Themes />} />
 
         <Route path="/maps/" element={<Maps />} />
+
+        <Route path="/index.html" element={<LandingPage />} />
       </Routes>
     </>
   );
