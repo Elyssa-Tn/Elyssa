@@ -76,7 +76,7 @@ function MapCard({ map }) {
             timeout="auto"
             unmountOnExit
           >
-            {/* <ExpandedResults restults={data.data} /> */}
+            <ExpandedResults restults={data.data} />
           </Collapse>
         </CardContent>
       </Card>
