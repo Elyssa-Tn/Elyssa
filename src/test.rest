@@ -1,0 +1,13 @@
+POST https://elyssa.tsaas.tn/api
+Content-Type: application/json
+
+{
+"req":{
+  "type": "data",
+  "code_election": "tnmun2018",
+  "decoupage": "secteur",
+  "variables": [
+    {"code_variable":"prc","code_parti":"NAH"}
+  ]
+}
+} 

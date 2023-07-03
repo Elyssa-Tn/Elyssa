@@ -75,7 +75,7 @@
   right: 10px;
   z-index: 999;
 }
-
+/* 
 .map-controls {
   pointer-events: auto;
   margin-left: auto;
@@ -83,7 +83,8 @@
 .level-selection-button {
   pointer-events: auto;
   margin-left: auto;
-}
+  z-index: 99;
+} */
 
 .map-controls button {
   pointer-events: auto;

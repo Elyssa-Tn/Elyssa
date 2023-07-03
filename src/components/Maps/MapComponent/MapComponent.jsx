@@ -178,10 +178,6 @@ export const MapComponent = ({ topojson, data, separation }) => {
       };
       setSelectedDivision(locationData);
     }
-
-    // console.log(`Circo: ${geo.properties.circo_na_1}`);
-    // console.log(`Delegation: ${geo.properties.deleg_na_1}`);
-    // console.log(`Gouvernorat: ${geo.properties.gov_name_f}`);
   };
 
   const handleRecenter = () => {
