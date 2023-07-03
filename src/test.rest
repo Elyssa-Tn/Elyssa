@@ -6,8 +6,13 @@ Content-Type: application/json
   "type": "data",
   "code_election": "tnmun2018",
   "decoupage": "secteur",
+  "filtre":{
+    "decoupage":"circonscription",
+    "valeur":"1111"
+    },
   "variables": [
-    {"code_variable":"prc","code_parti":"NAH"}
+    {"code_variable":"prc","code_parti":"NAH"},
+    {"code_variable":"voix","code_parti":"NAH"}
   ]
 }
 } 
