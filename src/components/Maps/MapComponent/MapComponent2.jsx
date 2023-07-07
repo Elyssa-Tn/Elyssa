@@ -5,10 +5,15 @@ import { useRef, useState } from "react";
 import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
 import { Button, Menu, MenuItem } from "@mui/material";
 import MapLevelSelection from "./MapLevelSelection/MapLevelSelection";
+import Tooltip from "leaflet-tooltip";
 
-const MapComponent2 = ({ map, data, geojson }) => {
+const MapComponent2 = ({ naming, data, geojson, level, setLevel }) => {
   const [selectedDelegation, setSelectedDelegation] = useState(null);
   const mapRef = useRef(null);
+
+  const values = Object.values(data);
+  const minValue = Math.min(...values);
+  const maxValue = Math.max(...values);
 
   const pickColorInRange = (value, minValue, maxValue) => {
     const normalizedValue = (value - minValue) / (maxValue - minValue);
@@ -25,10 +30,9 @@ const MapComponent2 = ({ map, data, geojson }) => {
   };
 
   const getColor = (feature) => {
-    const value =
-      data.data.variables[0].resultat[Number(feature.properties.CODE_CIRCO)];
+    const value = data[Number(feature.properties[naming.code])];
 
-    if (value) return pickColorInRange(value, 0, 100);
+    if (value) return pickColorInRange(value, minValue, maxValue);
 
     return feature.properties.deleg_na_1 === selectedDelegation
       ? "red"
@@ -36,7 +40,8 @@ const MapComponent2 = ({ map, data, geojson }) => {
   };
 
   const handleDelegationClick = (feature) => {
-    const delegation = Number(feature.properties.CODE_CIRCO);
+    console.log(feature);
+    const delegation = Number(feature.properties[naming.code]);
     setSelectedDelegation(delegation);
     if (delegation) {
       const { coordinates } = feature.geometry;
@@ -44,8 +49,6 @@ const MapComponent2 = ({ map, data, geojson }) => {
       mapRef.current.flyToBounds(bounds);
     }
   };
-
-  const [level, setLevel] = useState("Delegation");
 
   return (
     <MapContainer
@@ -73,14 +76,14 @@ const MapComponent2 = ({ map, data, geojson }) => {
         })}
         onEachFeature={(feature, layer) => {
           layer.on("click", () => handleDelegationClick(feature));
-          layer.bindTooltip(feature.properties.NAME_FR, {
+          layer.bindTooltip(feature.properties[naming.name], {
             permanent: false,
             direction: "top",
             classname: "map-tooltip",
           });
         }}
       />
-      {/* <MapLevelSelection level={level} setLevel={setLevel} /> */}
+      <MapLevelSelection level={level} setLevel={setLevel} />
     </MapContainer>
   );
 };

@@ -7,28 +7,27 @@ import {
   TableRow,
 } from "@mui/material";
 
-function ExpandedResults(results) {
-  console.log(results.restults.variables[0].resultat);
+function ExpandedResults({ results, level, names }) {
   return (
     <TableContainer>
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Circonférence</TableCell>
+            <TableCell>{level}</TableCell>
             <TableCell align="right">Taux de participation</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {Object.keys(results.restults.variables[0].resultat).map((row) => (
+          {Object.keys(results.variables[0].resultat).map((row) => (
             <TableRow
               key={row}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
               <TableCell component="th" scope="row">
-                {row}
+                {[row] == "Total" ? "Total" : names[row]}
               </TableCell>
               <TableCell align="right">
-                {results.restults.variables[0].resultat[row]}
+                {results.variables[0].resultat[row]}
               </TableCell>
             </TableRow>
           ))}

@@ -22,17 +22,19 @@ const MapLevelSelection = ({ level, setLevel }) => {
                 transformOrigin={{ vertical: "top", horizontal: "left" }}
               >
                 <MenuItem
-                  onClick={() => handleLevelChange(popupState, "Delegation")}
+                  onClick={() => handleLevelChange(popupState, "delegation")}
                 >
                   Delegation
                 </MenuItem>
                 <MenuItem
-                  onClick={() => handleLevelChange(popupState, "Circonférence")}
+                  onClick={() =>
+                    handleLevelChange(popupState, "circonscription")
+                  }
                 >
-                  Circonférence
+                  Circonscription
                 </MenuItem>
                 <MenuItem
-                  onClick={() => handleLevelChange(popupState, "Gouvernorat")}
+                  onClick={() => handleLevelChange(popupState, "gouvernorat")}
                 >
                   Gouvernorat
                 </MenuItem>

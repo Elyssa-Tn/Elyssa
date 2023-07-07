@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./LandingPage.css";
-import data from "../../assets/data.json";
+import data from "../../assets/LandingPage.json";
 
 const LandingPage = () => {
   const [showDetails, setShowDetails] = useState(true);

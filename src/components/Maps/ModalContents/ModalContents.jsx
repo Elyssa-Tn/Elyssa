@@ -9,7 +9,7 @@ const ModalContents = forwardRef((props, ref) => {
   const [selectedType, setSelectedType] = useState(null);
   const [selectedElection, setSelectedElection] = useState(null);
 
-  const { data, loading, error, addMap } = props;
+  const { data, loading, addMap } = props;
 
   const style = {
     position: "absolute",
@@ -27,7 +27,11 @@ const ModalContents = forwardRef((props, ref) => {
     return <SyncLoader />;
   }
 
-  if (data) {
+  if (data.errors) {
+    return <span>Erreur: {data.errors[0].message}</span>;
+  }
+
+  if (data.data) {
     return (
       <Box style={style}>
         <SelectionMenu

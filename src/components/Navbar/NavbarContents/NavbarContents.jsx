@@ -76,29 +76,9 @@ const NavbarContents = () => {
           </React.Fragment>
         )}
       </PopupState>{" "}
-      <PopupState variant="popover" popupId="about-menu">
-        {(popupState) => (
-          <React.Fragment>
-            <Button
-              color="inherit"
-              variant="contained"
-              endIcon={<KeyboardArrowDownIcon />}
-              sx={buttonStyle}
-              {...bindTrigger(popupState)}
-            >
-              Cartes et Graphiques
-            </Button>
-            <Menu {...bindMenu(popupState)}>
-              <MenuItem component={Link} to="/maps/">
-                Cartographie Thématique
-              </MenuItem>
-              <MenuItem component={Link} to="/maps/">
-                Cartographie Socio-Électorale
-              </MenuItem>
-            </Menu>
-          </React.Fragment>
-        )}
-      </PopupState>
+      <Button component={Link} to="/maps" color="inherit">
+        Cartes Et Graphiques
+      </Button>
       <Button component={Link} to="/legal" color="inherit">
         Mentions Légales
       </Button>

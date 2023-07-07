@@ -125,10 +125,7 @@ Pour avoir les résultats par secteur dans la circonscription "Ariana ville" de 
 }
 /* resultat */
 "data": {"code_election": code_election,
-        "
-
-
-decoupage": "secteur",
+        "decoupage": "secteur",
         "filtre": {"decoupage":"circonscription",
                   "valeur": "1211"},
         variables:[
