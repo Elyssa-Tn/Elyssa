@@ -1,0 +1,182 @@
+
+Le langage de requête utilisé par le frontend:
+
+en envoi, un objet "req", en réception un objet "data"
+// requête initiale au  lancement du frontend
+"req":{
+  "type": "init"
+}
+//on reçoit le résultat suivant:
+"data": {
+    type_election:[{code: xxxxx, nom: xxxxx},..,],
+    elections:[
+      {donnée election 1}, {données election 2}, …,...,
+                ],
+    variables:{ "code_variable":{
+      "type":xxx /* generale, election, resultat */
+      "decoupage_disponible": xxxx /* gouvernorat, delegation,...*/
+    }}
+
+}
+
+// requête pour avoir les données générales d'une élection
+"req":{
+  "type": election, "code_election": <code_election>
+}
+
+// Résultat
+data: { type: 'election'
+        "code_election:<code_election>,
+        "circonscriptions": [
+        {
+        "code_circonscription": circonscription1, ...donnée circonscription...,
+        "candidats":[{candidat1}, {candidat2}, {...}]
+        },
+        {...}, {...}
+        ]
+        "partis":[{parti1}, {parti2}, ..]
+      }
+
+/* type de requête pour les résultats */
+"req": {"type": "data",
+      "code_election": <code_election>,
+      "tour": numéro tour //si l'élection a plus d'un tour, par défaut 1
+      "decoupage": <decoupage>  /* dans [circonscription, gouvernorat, delegation, commune,secteur,centre] */,
+      "filtre": {
+            "decoupage": <type decoupage>,
+            "code_decoupage": <code du découpage>
+            },
+      "variables": [
+      {
+      "code_variable": <code de la variable1>,
+      "parti": <code parti si on veut les résultats pour un parti>,
+      "candidat": <code candidat si on veut les résultats par candidat>}, {...}, ...
+      ]
+        // parti ou candidat sont des clés à mettre si le résultat demandé le demande
+}
+
+// il faudra indiquer "parti" ou "candidat" si le type de variable est de type resultat détaillé *
+
+/* Résultat:
+Le résultat est un tableau, en général à deux colonnes au format json.
+En ligne on aura un découpage (gouvernorat, circonscription,délégation, secteur, centre de vote).
+En colonne on aura une variable ou plusieurs. Ce tableau pourra être retreint à un découpage.
+*/
+
+
+"data": {
+  "code_election": <code_election>,
+  "tour": numéro tour si l'élection a plus d'un tour
+  "decoupage": <decoupage>  /* dans [code_circonscription, gouvernorat, delegation, secteur,centre] */,
+  "filtre": {
+    decoupage: <type decoupage>,
+    "code_decoupage": <code du découpage>
+            },
+  /* La clé tableau est un array dont chaque élément est le résultat d'une demande, dans l'ordre demandé.
+      chaque élément contient les clés
+                - resultat: qui est le résultat par découpage
+                - dans resultat on trouve une clé "total" qui est le total pour tous les découpages
+                - parti ou candidat sont les paramètres demandées et existent si requis
+  */
+  "variables": [{"code_variable":"code_variable1"
+                "resultat":{<code_decoupage1>: <resultat variable1>,<code_decoupage2>:<resultat>,...},
+                "total": <resultat total>,
+                "parti":<code_parti>,
+                "candidat":<code_candidat>},
+                {"code_variable":"code_variable2"
+                "resultat":{<code_decoupage1>: <resultat variable1>,<code_decoupage2>:<resultat>,...},
+                "parti":<code_parti>,
+                "candidat":<code_candidat>},
+                ....,...,...
+                ]
+ }
+
+
+
+
+
+exemples de requête data
+
+/* pour avoir le taux de participation par gouvernorat dans l'élection de code 'tnmun2018' */
+"req":{
+        "type":"data",
+        "code_election",'tnmun2018',
+        "decoupage": "gouvernorat",
+        "variables":[{"variable":"t_participation"}]
+}
+
+pour avoir le taux de participation, le chomage, et le résultat du parti "Ahlem" par gouvernorat
+
+"req":{"type":"data",
+        "code_election":
+        "decoupage": "gouvernorat"
+        "variables":[{"variable":"t_participation"},{"variable":"chomage"},
+        {"variable":"pourcentage","parti":"Ahlem"}]
+} 
+
+Pour avoir les résultats par secteur dans la circonscription "Ariana ville" de la participation et du taux de chomage
+
+"req":{"type":"data"
+        "decoupage": "secteur"
+        "filtre": {"decoupage":"circonscription",
+                  "valeur": "1211" /* 1211 est le code de la circonscription Ariana ville */}
+        "variables":[{"code_variable":"tp"},{"code_variable":"tc"},
+        {"code_variable":"prc","parti":"Ahlem"}]
+}
+/* resultat */
+"data": {"code_election": code_election,
+        "decoupage": "secteur",
+        "filtre": {"decoupage":"circonscription",
+                  "valeur": "1211"},
+        variables:[
+          {"tp":{"secteur1": resultat, "secteur2": resultat, ...,"Total":<total>}},
+          {"tc",{"secteur1": resultat, "secteur2": resultat,...,"Total":<total>}},
+{"prc",}
+                  ]
+          }
+
+Autre exemple requete data
+
+/* requête temporelle - trans élections - évolution historique ddes tendances à travers plusieurs scrutins
+consiste à donner des séries temporelles à travers plusieurs élections */
+"req":{"type":"trans"
+        "decoupage":<decoupage>,
+        "filtre":{
+          "decoupage":<valeur>}
+
+        "variables":[code_variable1,codevariable2,...]}
+/* les résultats */
+"data": {
+  "decoupage": <decoupage>  /* dans [code_circonscription, gouvernorat, delegation, secteur,centre] */,
+  "filtre": {
+    "decoupage": <type decoupage>,
+    "code_decoupage": <code du découpage>
+     "elections"["code_election 1, "code_election 2,...] // par défauit toutes les élections
+  },
+  "variables":[ {"code_variable1":[
+      {<code_decoupage 1>:[{"election":<code election 1>
+        "tour":<tour>,
+        "date":<date du tour>
+        "valeur":< valeur variable 1 >
+                },
+        {"election":<code election 2>
+        "tour":<tour>,
+        "date":<date du tour>
+        "valeur":< valeur variable 2 >
+                }, {..},{..},..]},
+        {<code découpage 2>:[...]},{..},{..},...
+        ],...},
+      { "code_variable 2" :[...],...},...
+        ]
+  }
+
+exemple requete "trans"
+/* résultats du l'evolution du taux de participation dans le gouvernorat de beja au niveau des délégations */
+"req":{
+
+  "type":"trans",
+  "decoupage":"delegation",
+  "filtre":{"decoupage":"gouvernorat","valeur":"1211"},
+  "variables":["tp"]
+}
+
