@@ -26,7 +26,9 @@ function App() {
               {maps &&
                 maps.map((mapObject) => {
                   const [ID, map] = Object.entries(mapObject)[0];
-                  return <MapCard key={ID} map={map} />;
+                  return (
+                    <MapCard key={ID} map={map[1]} electionInfo={map[0]} />
+                  );
                 })}
             </div>
           </div>

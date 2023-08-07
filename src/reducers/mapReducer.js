@@ -19,7 +19,7 @@ export const { createMap } = mapSlice.actions;
 export const fetchMapData = (map) => {
   return async (dispatch) => {
     const result = await electionServices.getRequestResults(map);
-    dispatch(createMap(result));
+    dispatch(createMap([map, result]));
   };
 };
 

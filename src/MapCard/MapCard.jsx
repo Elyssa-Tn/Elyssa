@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Card,
   IconButton,
@@ -21,6 +21,16 @@ import Legend from "./MapComponents/Legend";
 // import geojson from "../assets/Circonscripton2022-vfinal.json";
 // import geojson from "../assets/secteurs-2022.json";
 
+// import * as htmlToImage from "html-to-image";
+import DownloadIcon from "@mui/icons-material/Download";
+import InfoIcon from "@mui/icons-material/Info";
+import MapIcon from "@mui/icons-material/Map";
+import TableChartIcon from "@mui/icons-material/TableChart";
+import { toSvg } from "html-to-image";
+import { useSelector } from "react-redux";
+import { TabList, TabPanel, Tabs, Tab } from "@mui/joy";
+import InfoPanel from "./MapComponents/InfoPanel";
+
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
   return <IconButton {...other} />;
@@ -29,64 +39,66 @@ const ExpandMore = styled((props) => {
 }));
 
 // function MapCard({ map, removeMap, updateMaps }) {
-function MapCard({ map }) {
-  console.log(map);
+function MapCard({ map, electionInfo }) {
+  // const mapFiles = {
+  //   secteur: () => import("../assets/secteurs-2022.json"),
+  //   commune: () => import("../assets/commune.json"),
+  //   delegation: () => import("../assets/delegation.json"),
+  //   circonscription: (electioncode) => {
+  //     if (electioncode === "tnleg2022")
+  //       return import("../assets/circonscription2022.json");
+  //     if (electioncode === "TNAC2011")
+  //       return import("../assets/circonscription2011-2019.json");
+  //     else {
+  //       return import("../assets/commune.json");
+  //     }
+  //   },
+  //   // electioncode === "tnleg2022"
+  //   //   ? import("../assets/circonscription2022.json")
+  //   //   : import("../assets/circonscription2011-2019.json"),
+  //   // circonscription: () => import("../assets/commune.json"),
+  //   gouvernorat: () => import("../assets/gouvernorat.json"),
+  // };
 
-  const mapFiles = {
-    secteur: () => import("../assets/secteurs-2022.json"),
-    commune: () => import("../assets/commune.json"),
-    delegation: () => import("../assets/delegation.json"),
-    circonscription: (electioncode) => {
-      if (electioncode === "tnleg2022")
-        return import("../assets/circonscription2022.json");
-      if (electioncode === "TNAC2011")
-        return import("../assets/circonscription2011-2019.json");
-      else {
-        return import("../assets/commune.json");
-      }
-    },
-    // electioncode === "tnleg2022"
-    //   ? import("../assets/circonscription2022.json")
-    //   : import("../assets/circonscription2011-2019.json"),
-    // circonscription: () => import("../assets/commune.json"),
-    gouvernorat: () => import("../assets/gouvernorat.json"),
-  };
-
-  const colors = ["#fff12e", "#ff1900"];
+  const colors = ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"];
 
   const nomenclature = {
-    secteur: { code: "REF_TN_COD", name: "NAME_FR" },
-    commune: { code: "CODEMUN_2", name: "NAME_FR_2" },
-    delegation: { code: "CODEDELEGA", name: "NOMDELEGAT" },
-    circonscription: { code: "CODE_CIRCO", name: "NAME_FR" },
+    secteurs: { code: "REF_TN_COD", name: "NAME_FR" },
+    communes: { code: "CODEMUN_2", name: "NAME_FR_2" },
+    delegations: { code: "CODEDELEGA", name: "NOMDELEGAT" },
+    circonscriptions: { code: "CODE_CIRCO", name: "NAME_FR" },
     // circonscription: { code: "CODEMUN_2", name: "NAME_FR_2" },
-    gouvernorat: { code: "code_gouvernorat", name: "nom_gouvernorat" },
+    gouvernorats: { code: "code_gouvernorat", name: "nom_gouvernorat" },
   };
 
   const [expanded, setExpanded] = useState(false);
-  const [geojson, setGeojson] = useState(null);
+  // const [geojson, setGeojson] = useState(null);
   const [request, setRequest] = useState(null);
   // const [level, setLevel] = useState(
   //   map.decoupage ? map.decoupage : "gouvernorat"
   // );
-  const [level, setLevel] = useState(
-    map.level ? map.level.code : "gouvernorat"
-  );
+  // const [level, setLevel] = useState(
+  //   map.data ? map.data.decoupage : "gouvernorats"
+  // );
+  const [level, setLevel] = useState("gouvernorats");
 
-  useEffect(() => {
-    const loadGeojson = async () => {
-      if (level) {
-        const importFunction = mapFiles[level];
-        if (importFunction) {
-          const { default: geojson } = await importFunction(
-            map.data.code_election
-          );
-          setGeojson(geojson);
-        }
-      }
-    };
-    loadGeojson();
-  }, [level]);
+  const geojson = useSelector((state) => state.elections.init.maps[level]);
+
+  // useEffect(() => {
+  //   const loadGeojson = async () => {
+  //     if (level) {
+  //       const importFunction = mapFiles[level];
+  //       if (importFunction) {
+  //         setGeojson(null);
+  //         const { default: geojson } = await importFunction(
+  //           map.data.code_election
+  //         );
+  //         setGeojson(geojson);
+  //       }
+  //     }
+  //   };
+  //   loadGeojson();
+  // }, [level]);
 
   const getDivisionNames = (geojson) => {
     const divisionsMap = {};
@@ -214,6 +226,18 @@ function MapCard({ map }) {
   //   );
   // }
 
+  const mapRef = useRef(null);
+
+  const handleDownload = async () => {
+    if (mapRef.current) {
+      const mapImage = await toSvg(mapRef.current);
+      const link = document.createElement("a");
+      link.href = mapImage;
+      link.download = "map.svg";
+      link.click();
+    }
+  };
+
   if (geojson && map) {
     const names = getDivisionNames(geojson);
 
@@ -226,8 +250,8 @@ function MapCard({ map }) {
               margin: "4px",
               borderRadius: "16px",
               position: "relative",
-              paddingRight: "44px",
             }}
+            ref={mapRef}
           >
             <Box
               style={{
@@ -250,7 +274,7 @@ function MapCard({ map }) {
                 {/* <IconButton onClick={() => removeMap(map.key)}>
                   <HighlightOffIcon />
                 </IconButton> */}
-                <ExpandMore
+                {/* <ExpandMore
                   expand={expanded}
                   onClick={handleExpandClick}
                   aria-expanded={expanded}
@@ -262,17 +286,60 @@ function MapCard({ map }) {
                       // marginLeft: "auto",
                     }}
                   />
-                </ExpandMore>
+                </ExpandMore> */}
+                {/* <button onClick={handleDownload}>
+                  <DownloadIcon />
+                </button> */}
               </CardActions>
             </Box>
             <CardContent
               style={{
-                display: "flex",
+                // display: "flex",
                 paddingBottom: "8px",
               }}
             >
-              <Legend data={map.data.variables[0].resultat} colors={colors} />
-              <MapComponent2
+              <Tabs defaultValue={0}>
+                <TabList>
+                  <Tab>
+                    <InfoIcon />
+                  </Tab>
+                  <Tab>
+                    <MapIcon />
+                  </Tab>
+                  <Tab>
+                    <TableChartIcon />
+                  </Tab>
+                </TabList>
+                <TabPanel>
+                  <InfoPanel electionInfo={electionInfo.election} />
+                </TabPanel>
+                <TabPanel value={1}>
+                  <div>
+                    <MapComponent2
+                      naming={nomenclature[level]}
+                      data={map.data.variables[0].resultat}
+                      geojson={geojson}
+                      level={level}
+                      setLevel={setLevel}
+                      // filter={formatFilter}
+                      target={map.target}
+                      colors={colors}
+                    />
+                    <Legend
+                      data={map.data.variables[0].resultat}
+                      colors={colors}
+                    />
+                  </div>
+                </TabPanel>
+                <TabPanel value={2}>
+                  <ExpandedResults
+                    results={map.data}
+                    level={level}
+                    names={names}
+                  />
+                </TabPanel>
+              </Tabs>
+              {/* <MapComponent2
                 naming={nomenclature[level]}
                 data={map.data.variables[0].resultat}
                 geojson={geojson}
@@ -281,19 +348,7 @@ function MapCard({ map }) {
                 // filter={formatFilter}
                 target={map.target}
                 colors={colors}
-              />
-              <Collapse
-                orientation="horizontal"
-                in={expanded}
-                timeout="auto"
-                unmountOnExit
-              >
-                <ExpandedResults
-                  results={map.data}
-                  level={level}
-                  names={names}
-                />
-              </Collapse>
+              /> */}
             </CardContent>
           </Card>
         )}

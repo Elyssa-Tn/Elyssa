@@ -73,11 +73,11 @@ function ExpandedElectionMenu({ selectedElection }) {
   //     ];
 
   const levels = [
-    { code: "gouvernorat", nom: "Gouvernorat" },
-    { code: "delegation", nom: "Delegation" },
-    { code: "circonscription", nom: "Circonscription" },
-    { code: "commune", nom: "Commune" },
-    { code: "secteur", nom: "Secteur" },
+    { code: "gouvernorats", nom: "Gouvernorat" },
+    { code: "delegations", nom: "Delegation" },
+    // { code: "circonscriptions", nom: "Circonscription" },
+    { code: "communes", nom: "Commune" },
+    { code: "secteurs", nom: "Secteur" },
   ];
 
   const addMap = (mapObject) => {

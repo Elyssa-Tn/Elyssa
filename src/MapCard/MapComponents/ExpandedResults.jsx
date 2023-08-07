@@ -38,9 +38,7 @@ function ExpandedResults({ results, level, names }) {
       <TableContainer
         style={{
           height: 400,
-          left: "44px",
           position: "relative",
-          marginRight: "60px",
           border: "1px solid black",
           borderRadius: "8px",
         }}

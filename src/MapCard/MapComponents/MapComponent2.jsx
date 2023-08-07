@@ -3,7 +3,6 @@ import "leaflet/dist/leaflet.css";
 import { useEffect, useRef, useState } from "react";
 
 const FeatureTooltip = ({ feature }) => {
-  console.log(feature);
   return (
     <Tooltip direction="top" offset={[0, -10]}>
       <div>tes</div>
@@ -16,6 +15,7 @@ const MapComponent2 = ({
   data,
   geojson,
   level,
+  setLevel,
   target,
   filter,
   colors,
@@ -45,10 +45,11 @@ const MapComponent2 = ({
   const mapRef = useRef(null);
 
   const values = Object.values(data);
-  // const minValue = Math.min(...values);
-  const minValue = 0.1;
-  // const maxValue = Math.max(...values);
-  const maxValue = 100;
+  const minValue = Math.min(...values);
+  // const minValue = 0.1;
+  const maxValue = Math.max(...values);
+  // const maxValue = 100;
+  const singleColorRange = (maxValue - minValue) / 5;
 
   // const pickColorInRange = (value, minValue, maxValue) => {
   //   const normalizedValue = (value - minValue) / (maxValue - minValue);
@@ -72,29 +73,38 @@ const MapComponent2 = ({
     }
   }, [target]);
 
+  // useEffect(() => {
+  //   console.log(geojson);
+  // }, [geojson]);
+
+  // const getColorForValue = (value) => {
+  //   const normalizedValue = (value - minValue) / (maxValue - minValue);
+
+  //   const r = Math.floor(
+  //     normalizedValue *
+  //       (parseInt(maxValueColor.substr(1, 2), 16) -
+  //         parseInt(minValueColor.substr(1, 2), 16)) +
+  //       parseInt(minValueColor.substr(1, 2), 16)
+  //   );
+  //   const g = Math.floor(
+  //     normalizedValue *
+  //       (parseInt(maxValueColor.substr(3, 2), 16) -
+  //         parseInt(minValueColor.substr(3, 2), 16)) +
+  //       parseInt(minValueColor.substr(3, 2), 16)
+  //   );
+  //   const b = Math.floor(
+  //     normalizedValue *
+  //       (parseInt(maxValueColor.substr(5, 2), 16) -
+  //         parseInt(minValueColor.substr(5, 2), 16)) +
+  //       parseInt(minValueColor.substr(5, 2), 16)
+  //   );
+
+  //   return `rgb(${r}, ${g}, ${b},1)`;
+  // };
+
   const getColorForValue = (value) => {
-    const normalizedValue = (value - minValue) / (maxValue - minValue);
-
-    const r = Math.floor(
-      normalizedValue *
-        (parseInt(maxValueColor.substr(1, 2), 16) -
-          parseInt(minValueColor.substr(1, 2), 16)) +
-        parseInt(minValueColor.substr(1, 2), 16)
-    );
-    const g = Math.floor(
-      normalizedValue *
-        (parseInt(maxValueColor.substr(3, 2), 16) -
-          parseInt(minValueColor.substr(3, 2), 16)) +
-        parseInt(minValueColor.substr(3, 2), 16)
-    );
-    const b = Math.floor(
-      normalizedValue *
-        (parseInt(maxValueColor.substr(5, 2), 16) -
-          parseInt(minValueColor.substr(5, 2), 16)) +
-        parseInt(minValueColor.substr(5, 2), 16)
-    );
-
-    return `rgb(${r}, ${g}, ${b},1)`;
+    const interval = Math.floor((value - minValue) / singleColorRange);
+    return colors[Math.min(interval, 4)];
   };
 
   const getColor = (feature) => {
@@ -111,6 +121,7 @@ const MapComponent2 = ({
     // setTarget(delegation);
     const bounds = layer.getBounds();
     mapRef.current.flyToBounds(bounds);
+    // setLevel("circonscription");
     // if (delegation && level === "sector") {
     //   mapRef.current.flyToBounds(bounds);
     // }
