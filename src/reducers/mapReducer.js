@@ -11,10 +11,20 @@ const mapSlice = createSlice({
 
       return { counter: ID + 1, maps: [...state.maps, newMap] };
     },
+    deleteMap(state, action) {
+      console.log(state);
+      const filteredMaps = Object.keys(state.maps)
+        .filter((id) => id !== action.payload)
+        .reduce((result, id) => {
+          result[id] = { ...state.maps[id] };
+          return result;
+        }, {});
+      return { ...state, maps: [...filteredMaps] };
+    },
   },
 });
 
-export const { createMap } = mapSlice.actions;
+export const { createMap, deleteMap } = mapSlice.actions;
 
 export const fetchMapData = (map) => {
   return async (dispatch) => {

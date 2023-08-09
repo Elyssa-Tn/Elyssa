@@ -14,11 +14,12 @@ const ModalContents = (props) => {
 
   const style = {
     position: "relative",
-    width: 300,
+    width: "300px",
+    minWidth: "300px",
     backgroundColor: "rgb(250, 235, 215)",
     border: "2px solid #000",
-    margin: 4,
-    padding: 8,
+    margin: "4px",
+    padding: "8px",
   };
 
   // useEffect(() => {

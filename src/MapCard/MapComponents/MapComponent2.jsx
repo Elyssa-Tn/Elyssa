@@ -19,6 +19,7 @@ const MapComponent2 = ({
   target,
   filter,
   colors,
+  displayMode,
 }) => {
   // const MapComponent2 = ({ naming, data, level, target, filter }) => {
   const [tooltipContent, setTooltipContent] = useState(null);
@@ -28,6 +29,12 @@ const MapComponent2 = ({
 
   const minValueColor = colors[0];
   const maxValueColor = colors[1];
+
+  const [singleValue, setSingleValue] = useState(false);
+
+  useEffect(() => {
+    if (Object.keys(data).length === 2) setSingleValue(true);
+  }, [data]);
 
   const mapFiles = {
     secteur: "../../assets/secteurs-2022.json",
@@ -77,30 +84,19 @@ const MapComponent2 = ({
   //   console.log(geojson);
   // }, [geojson]);
 
-  // const getColorForValue = (value) => {
-  //   const normalizedValue = (value - minValue) / (maxValue - minValue);
-
-  //   const r = Math.floor(
-  //     normalizedValue *
-  //       (parseInt(maxValueColor.substr(1, 2), 16) -
-  //         parseInt(minValueColor.substr(1, 2), 16)) +
-  //       parseInt(minValueColor.substr(1, 2), 16)
-  //   );
-  //   const g = Math.floor(
-  //     normalizedValue *
-  //       (parseInt(maxValueColor.substr(3, 2), 16) -
-  //         parseInt(minValueColor.substr(3, 2), 16)) +
-  //       parseInt(minValueColor.substr(3, 2), 16)
-  //   );
-  //   const b = Math.floor(
-  //     normalizedValue *
-  //       (parseInt(maxValueColor.substr(5, 2), 16) -
-  //         parseInt(minValueColor.substr(5, 2), 16)) +
-  //       parseInt(minValueColor.substr(5, 2), 16)
-  //   );
-
-  //   return `rgb(${r}, ${g}, ${b},1)`;
-  // };
+  const getColorForPercentileValue = (value) => {
+    if (value >= 50) {
+      const red = 189 + ((value - 50) * (253 - 189)) / 50;
+      const green = 0 + ((value - 50) * (141 - 0)) / 50;
+      const blue = 38 + ((value - 50) * (60 - 38)) / 50;
+      return `rgb(${red}, ${green}, ${blue})`;
+    } else {
+      const red = 253 + ((value - 0) * (255 - 253)) / 50;
+      const green = 141 + ((value - 0) * (255 - 141)) / 50;
+      const blue = 60 + ((value - 0) * (178 - 60)) / 50;
+      return `rgb(${red}, ${green}, ${blue})`;
+    }
+  };
 
   const getColorForValue = (value) => {
     const interval = Math.floor((value - minValue) / singleColorRange);
@@ -110,9 +106,12 @@ const MapComponent2 = ({
   const getColor = (feature) => {
     const value = data[Number(feature.properties[naming.code])];
 
-    if (value) return getColorForValue(value);
+    if (!value) return "#d3d3d3";
 
-    return "#fff";
+    if (singleValue) return colors[4];
+
+    if (value && displayMode === 1) return getColorForValue(value);
+    if (value && displayMode === 2) return getColorForPercentileValue(value);
   };
 
   const handleDelegationClick = (feature, layer) => {
@@ -196,10 +195,10 @@ const MapComponent2 = ({
       ]}
       noWrap={true}
       style={{
-        width: 280,
-        height: 400,
+        width: 340,
+        height: 480,
         backgroundColor: "#add8e6",
-        left: "24px",
+        left: "84px",
       }}
       attributionControl={false}
     >
@@ -214,7 +213,7 @@ const MapComponent2 = ({
           fillColor: getColor(feature),
           color: "#000",
           weight: 0.5,
-          fillOpacity: 1,
+          fillOpacity: 0.9,
         })}
         // onEachFeature={onEachFeature}
         // onEachFeature={(feature, layer) => {

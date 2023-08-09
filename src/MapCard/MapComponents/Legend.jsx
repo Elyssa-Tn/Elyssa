@@ -5,6 +5,7 @@ const Legend = ({ data, colors }) => {
   const minValueColor = colors[0];
   const maxValueColor = colors[1];
 
+
   const getColorScale = (maxValue, minValue) => {
     const colorScale = [];
 

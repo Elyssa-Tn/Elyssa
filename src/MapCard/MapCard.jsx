@@ -8,14 +8,14 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
-// import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+// import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import styled from "@emotion/styled";
 import MapComponent2 from "./MapComponents/MapComponent2";
 import ExpandedResults from "./MapComponents/ExpandedResults";
 // import useDataFetch from "../Utility/useDataFetch";
 // import { SyncLoader } from "react-spinners";
-import Legend from "./MapComponents/Legend";
+import Legend from "./MapComponents/Legend2";
 // import ChartElement from "./ChartElement";
 // import ExpandedChartResults from "./MapComponents/ExpandedChartResults";
 // import geojson from "../assets/Circonscripton2022-vfinal.json";
@@ -27,9 +27,10 @@ import InfoIcon from "@mui/icons-material/Info";
 import MapIcon from "@mui/icons-material/Map";
 import TableChartIcon from "@mui/icons-material/TableChart";
 import { toSvg } from "html-to-image";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { TabList, TabPanel, Tabs, Tab } from "@mui/joy";
 import InfoPanel from "./MapComponents/InfoPanel";
+import { deleteMap } from "../reducers/mapReducer";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -39,7 +40,9 @@ const ExpandMore = styled((props) => {
 }));
 
 // function MapCard({ map, removeMap, updateMaps }) {
-function MapCard({ map, electionInfo }) {
+function MapCard({ id, map, electionInfo }) {
+  const [displayMode, setDisplayMode] = useState(1);
+  const dispatch = useDispatch();
   // const mapFiles = {
   //   secteur: () => import("../assets/secteurs-2022.json"),
   //   commune: () => import("../assets/commune.json"),
@@ -120,6 +123,10 @@ function MapCard({ map, electionInfo }) {
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
+  };
+
+  const removeMap = (id) => {
+    dispatch(deleteMap(id));
   };
 
   // const formatFilter = ({ bounds, delegation }) => {
@@ -247,6 +254,7 @@ function MapCard({ map, electionInfo }) {
           <Card
             key={(map, level)}
             style={{
+              width: "460px",
               margin: "4px",
               borderRadius: "16px",
               position: "relative",
@@ -261,9 +269,13 @@ function MapCard({ map, electionInfo }) {
               }}
             >
               <Typography style={{ padding: 8, marginTop: 8, maxWidth: 240 }}>
-                {map.data.code_election}{" "}
-                {map.parti ? `- ${map.parti.denomination_fr}` : null}
-                {map.variable ? `- ${map.variable.nom}` : null}
+                {electionInfo.election.nom}
+                {electionInfo.parti
+                  ? ` - ${electionInfo.parti.denomination_fr}`
+                  : null}
+                {electionInfo.variable
+                  ? `- ${electionInfo.variable.nom}`
+                  : null}
               </Typography>
               <CardActions
                 style={{
@@ -271,7 +283,7 @@ function MapCard({ map, electionInfo }) {
                 }}
                 disableSpacing
               >
-                {/* <IconButton onClick={() => removeMap(map.key)}>
+                {/* <IconButton onClick={() => dispatch(deleteMap(id))}>
                   <HighlightOffIcon />
                 </IconButton> */}
                 {/* <ExpandMore
@@ -315,6 +327,28 @@ function MapCard({ map, electionInfo }) {
                 </TabPanel>
                 <TabPanel value={1}>
                   <div>
+                    <button
+                      onClick={() => setDisplayMode(1)}
+                      style={{
+                        position: "absolute",
+                        top: "120px",
+                        left: "0px",
+                        borderRadius: "5px",
+                      }}
+                    >
+                      1
+                    </button>
+                    <button
+                      onClick={() => setDisplayMode(2)}
+                      style={{
+                        position: "absolute",
+                        top: "180px",
+                        left: "0px",
+                        borderRadius: "5px",
+                      }}
+                    >
+                      2
+                    </button>
                     <MapComponent2
                       naming={nomenclature[level]}
                       data={map.data.variables[0].resultat}
@@ -324,6 +358,7 @@ function MapCard({ map, electionInfo }) {
                       // filter={formatFilter}
                       target={map.target}
                       colors={colors}
+                      displayMode={displayMode}
                     />
                     <Legend
                       data={map.data.variables[0].resultat}

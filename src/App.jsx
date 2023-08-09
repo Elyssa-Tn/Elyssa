@@ -11,7 +11,7 @@ function App() {
   const init = useSelector((state) => state.elections.init);
 
   const maps = useSelector((state) => state.maps.maps);
-
+  console.log(maps);
   useEffect(() => {
     dispatch(initializeElections());
   }, [dispatch]);
@@ -27,7 +27,12 @@ function App() {
                 maps.map((mapObject) => {
                   const [ID, map] = Object.entries(mapObject)[0];
                   return (
-                    <MapCard key={ID} map={map[1]} electionInfo={map[0]} />
+                    <MapCard
+                      key={ID}
+                      id={ID}
+                      map={map[1]}
+                      electionInfo={map[0]}
+                    />
                   );
                 })}
             </div>
