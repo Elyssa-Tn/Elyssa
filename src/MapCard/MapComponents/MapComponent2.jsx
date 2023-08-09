@@ -19,6 +19,7 @@ const MapComponent2 = ({
   target,
   filter,
   colors,
+  colors2,
   displayMode,
 }) => {
   // const MapComponent2 = ({ naming, data, level, target, filter }) => {
@@ -84,19 +85,38 @@ const MapComponent2 = ({
   //   console.log(geojson);
   // }, [geojson]);
 
-  const getColorForPercentileValue = (value) => {
-    if (value >= 50) {
-      const red = 189 + ((value - 50) * (253 - 189)) / 50;
-      const green = 0 + ((value - 50) * (141 - 0)) / 50;
-      const blue = 38 + ((value - 50) * (60 - 38)) / 50;
-      return `rgb(${red}, ${green}, ${blue})`;
-    } else {
-      const red = 253 + ((value - 0) * (255 - 253)) / 50;
-      const green = 141 + ((value - 0) * (255 - 141)) / 50;
-      const blue = 60 + ((value - 0) * (178 - 60)) / 50;
-      return `rgb(${red}, ${green}, ${blue})`;
-    }
-  };
+  // const getColorForPercentileValue = (value) => {
+  //   if (value >= 50) {
+  //     const red = 189 + ((value - 50) * (253 - 189)) / 50;
+  //     const green = 0 + ((value - 50) * (141 - 0)) / 50;
+  //     const blue = 38 + ((value - 50) * (60 - 38)) / 50;
+  //     return `rgb(${red}, ${green}, ${blue})`;
+  //   } else {
+  //     const red = 253 + ((value - 0) * (255 - 253)) / 50;
+  //     const green = 141 + ((value - 0) * (255 - 141)) / 50;
+  //     const blue = 60 + ((value - 0) * (178 - 60)) / 50;
+  //     return `rgb(${red}, ${green}, ${blue})`;
+  //   }
+  // };
+
+  function getColorForPercentileValue(value) {
+    const color1 = colors2[0];
+    const color2 = colors2[1];
+    const factor = value / 100;
+    const r1 = parseInt(color1.slice(1, 3), 16);
+    const g1 = parseInt(color1.slice(3, 5), 16);
+    const b1 = parseInt(color1.slice(5, 7), 16);
+
+    const r2 = parseInt(color2.slice(1, 3), 16);
+    const g2 = parseInt(color2.slice(3, 5), 16);
+    const b2 = parseInt(color2.slice(5, 7), 16);
+
+    const r = Math.round(r1 + factor * (r2 - r1));
+    const g = Math.round(g1 + factor * (g2 - g1));
+    const b = Math.round(b1 + factor * (b2 - b1));
+
+    return `rgb(${r}, ${g}, ${b})`;
+  }
 
   const getColorForValue = (value) => {
     const interval = Math.floor((value - minValue) / singleColorRange);

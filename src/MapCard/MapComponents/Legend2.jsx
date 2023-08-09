@@ -1,4 +1,4 @@
-const Legend = ({ colors, data }) => {
+const Legend2 = ({ colors, data }) => {
   const values = Object.values(data);
   const minValue = Math.min(...values);
   const maxValue = Math.max(...values);
@@ -55,4 +55,4 @@ const Legend = ({ colors, data }) => {
   );
 };
 
-export default Legend;
+export default Legend2;

@@ -15,7 +15,8 @@ import MapComponent2 from "./MapComponents/MapComponent2";
 import ExpandedResults from "./MapComponents/ExpandedResults";
 // import useDataFetch from "../Utility/useDataFetch";
 // import { SyncLoader } from "react-spinners";
-import Legend from "./MapComponents/Legend2";
+import Legend2 from "./MapComponents/Legend2";
+import Legend from "./MapComponents/Legend";
 // import ChartElement from "./ChartElement";
 // import ExpandedChartResults from "./MapComponents/ExpandedChartResults";
 // import geojson from "../assets/Circonscripton2022-vfinal.json";
@@ -24,7 +25,7 @@ import Legend from "./MapComponents/Legend2";
 // import * as htmlToImage from "html-to-image";
 import DownloadIcon from "@mui/icons-material/Download";
 import InfoIcon from "@mui/icons-material/Info";
-import MapIcon from "@mui/icons-material/Map";
+import ExploreIcon from "@mui/icons-material/Explore";
 import TableChartIcon from "@mui/icons-material/TableChart";
 import { toSvg } from "html-to-image";
 import { useDispatch, useSelector } from "react-redux";
@@ -64,6 +65,8 @@ function MapCard({ id, map, electionInfo }) {
   // };
 
   const colors = ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"];
+  const colors2 = ["#ffffff", "#a8281e"];
+  const colors3 = ["#00ffd5", "#00806b", "#3f4540", "#663d14", "#bf6100"];
 
   const nomenclature = {
     secteurs: { code: "REF_TN_COD", name: "NAME_FR" },
@@ -316,7 +319,7 @@ function MapCard({ id, map, electionInfo }) {
                     <InfoIcon />
                   </Tab>
                   <Tab>
-                    <MapIcon />
+                    <ExploreIcon />
                   </Tab>
                   <Tab>
                     <TableChartIcon />
@@ -358,12 +361,21 @@ function MapCard({ id, map, electionInfo }) {
                       // filter={formatFilter}
                       target={map.target}
                       colors={colors}
+                      colors2={colors2}
                       displayMode={displayMode}
                     />
-                    <Legend
-                      data={map.data.variables[0].resultat}
-                      colors={colors}
-                    />
+                    {displayMode === 1 && (
+                      <Legend2
+                        data={map.data.variables[0].resultat}
+                        colors={colors}
+                      />
+                    )}
+                    {displayMode === 2 && (
+                      <Legend
+                        data={map.data.variables[0].resultat}
+                        colors={colors2}
+                      />
+                    )}
                   </div>
                 </TabPanel>
                 <TabPanel value={2}>
