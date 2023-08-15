@@ -1,0 +1,81 @@
+POST https://elyssa.tsaas.tn/api
+Content-Type: application/json
+
+# {
+# "req":{
+#   "type":"data",
+#   "code_election": "tnac2011",
+#   "decoupage":"commune",
+#    "variables": [
+#      {"code_variable":"tp"}
+#    ]
+# }
+# }
+
+# {
+# "req":{
+#   "type": "data",
+#   "code_election": "tnmun2018",
+#   "decoupage": "gouvernorat",
+#   "variables": [
+#     {"code_variable":"prc","code_parti":"*"},
+#     {"code_variable":"voix","code_parti":"*"}
+#   ]
+# }
+# } 
+
+# {
+# "req":{
+#   "type": "data",
+#   "code_election": "tnmun2018",
+#   "decoupage": "secteur",
+#   "variables": [
+#     {"code_variable":"prc","code_parti":"NIDA"},
+#      {"code_variable":"voix","code_parti":"NIDA"}
+#   ]
+# }
+# } 
+
+
+# {
+# "req":{
+#   "type": "data",
+#   "code_election": "tnac2011",
+#   "decoupage": "gouvernorat",
+#   "variables": [
+#     {"code_variable":"prc","code_parti":"ARD"},
+#      {"code_variable":"voix","code_parti":"ARD"}
+#   ]
+# }
+# } 
+
+# {
+# "req":{
+#   "type": "data",
+#   "code_election": "tnmun2018",
+#   "decoupage": "gouvernorat",
+#   "variables": [
+#     {"code_variable":"voix"}
+#   ]
+# }
+# }
+
+# {
+#   "req":{
+#     "type":"election",
+#     "code_election":"tnac2011"
+#   }
+# }
+
+# {
+#   "req":{
+#     "type":"map_decoupage",
+#     "decoupages":["gouvernorat"]
+#   }
+# }
+
+{
+  "req":{
+    "type":"init"
+  }
+}
