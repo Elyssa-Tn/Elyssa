@@ -102,3 +102,20 @@ const getRequestResults = async (map) => {
 const electionServices = { init, getElectionInfo, getRequestResults };
 
 export default electionServices;
+
+export const fetchGeojson = async (level) => {
+  const req = {
+    req: {
+      type: "map_decoupage",
+      decoupages: [level],
+    },
+  };
+  try {
+    const response = await axios.post(url, req, {
+      cache: { interpretHeader: false, methods: ["get", "post"] },
+    });
+    return response.data;
+  } catch (error) {
+    return error;
+  }
+};

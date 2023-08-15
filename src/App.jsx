@@ -11,7 +11,7 @@ function App() {
   const init = useSelector((state) => state.elections.init);
 
   const maps = useSelector((state) => state.maps.maps);
-  console.log(maps);
+
   useEffect(() => {
     dispatch(initializeElections());
   }, [dispatch]);

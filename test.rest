@@ -67,6 +67,13 @@ Content-Type: application/json
 #   }
 # }
 
+# {
+#   "req":{
+#     "type":"map_decoupage",
+#     "decoupages":["gouvernorat"]
+#   }
+# }
+
 {
   "req":{
     "type":"init"

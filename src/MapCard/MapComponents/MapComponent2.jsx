@@ -16,11 +16,12 @@ const MapComponent2 = ({
   geojson,
   level,
   setLevel,
-  target,
   filter,
   colors,
   colors2,
   displayMode,
+  target,
+  setTarget,
 }) => {
   // const MapComponent2 = ({ naming, data, level, target, filter }) => {
   const [tooltipContent, setTooltipContent] = useState(null);
@@ -37,17 +38,17 @@ const MapComponent2 = ({
     if (Object.keys(data).length === 2) setSingleValue(true);
   }, [data]);
 
-  const mapFiles = {
-    secteur: "../../assets/secteurs-2022.json",
-    commune: "../../assets/commune.json",
-    delegation: "../../assets/delegation.json",
-    // circonscription: (electioncode) =>
-    //   electioncode === "tnleg2022"
-    //     ? import("../../assets/circonscription2022.json")
-    //     : import("../../assets/circonscription2011-2019.json"),
-    circonscription: "../../assets/commune.json",
-    gouvernorat: "../../assets/gouvernorat.json",
-  };
+  // const mapFiles = {
+  //   secteur: "../../assets/secteurs-2022.json",
+  //   commune: "../../assets/commune.json",
+  //   delegation: "../../assets/delegation.json",
+  //   // circonscription: (electioncode) =>
+  //   //   electioncode === "tnleg2022"
+  //   //     ? import("../../assets/circonscription2022.json")
+  //   //     : import("../../assets/circonscription2011-2019.json"),
+  //   circonscription: "../../assets/commune.json",
+  //   gouvernorat: "../../assets/gouvernorat.json",
+  // };
 
   const [zoomLevel, setZoomLevel] = useState(6);
   const mapRef = useRef(null);
@@ -79,7 +80,7 @@ const MapComponent2 = ({
         mapRef.current.flyToBounds(target);
       });
     }
-  }, [target]);
+  }, []);
 
   // useEffect(() => {
   //   console.log(geojson);

@@ -32,6 +32,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { TabList, TabPanel, Tabs, Tab } from "@mui/joy";
 import InfoPanel from "./MapComponents/InfoPanel";
 import { deleteMap } from "../reducers/mapReducer";
+import { getGeoJSON } from "../services/geojson";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -44,6 +45,7 @@ const ExpandMore = styled((props) => {
 function MapCard({ id, map, electionInfo }) {
   const [displayMode, setDisplayMode] = useState(1);
   const dispatch = useDispatch();
+  const mapRef = useRef(null);
   // const mapFiles = {
   //   secteur: () => import("../assets/secteurs-2022.json"),
   //   commune: () => import("../assets/commune.json"),
@@ -69,16 +71,17 @@ function MapCard({ id, map, electionInfo }) {
   const colors3 = ["#00ffd5", "#00806b", "#3f4540", "#663d14", "#bf6100"];
 
   const nomenclature = {
-    secteurs: { code: "REF_TN_COD", name: "NAME_FR" },
-    communes: { code: "CODEMUN_2", name: "NAME_FR_2" },
-    delegations: { code: "CODEDELEGA", name: "NOMDELEGAT" },
-    circonscriptions: { code: "CODE_CIRCO", name: "NAME_FR" },
+    secteur: { code: "REF_TN_COD", name: "NAME_FR" },
+    commune: { code: "CODEMUN_2", name: "NAME_FR_2" },
+    // delegation: { code: "CODEDELEGA", name: "NOMDELEGAT" },
+    delegation: { code: "circo_id", name: "Kebili" },
+    circonscription: { code: "CODE_CIRCO", name: "NAME_FR" },
     // circonscription: { code: "CODEMUN_2", name: "NAME_FR_2" },
-    gouvernorats: { code: "code_gouvernorat", name: "nom_gouvernorat" },
+    gouvernorat: { code: "code_gouvernorat", name: "nom_gouvernorat" },
   };
 
   const [expanded, setExpanded] = useState(false);
-  // const [geojson, setGeojson] = useState(null);
+  const [geojson, setGeojson] = useState(null);
   const [request, setRequest] = useState(null);
   // const [level, setLevel] = useState(
   //   map.decoupage ? map.decoupage : "gouvernorat"
@@ -86,9 +89,26 @@ function MapCard({ id, map, electionInfo }) {
   // const [level, setLevel] = useState(
   //   map.data ? map.data.decoupage : "gouvernorats"
   // );
-  const [level, setLevel] = useState("gouvernorats");
+  const [level, setLevel] = useState(map.data.decoupage);
 
-  const geojson = useSelector((state) => state.elections.init.maps[level]);
+  // const geojson = useSelector((state) => state.elections.init.maps[level]);
+  useEffect(() => {
+    const fetchAndUseGeoJSON = async () => {
+      try {
+        const map = await getGeoJSON(level);
+        setGeojson(map);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    fetchAndUseGeoJSON();
+  }, [level]);
+
+  if (!geojson) {
+    console.log(geojson);
+    return <span>lol</span>;
+  }
 
   // useEffect(() => {
   //   const loadGeojson = async () => {
@@ -235,8 +255,6 @@ function MapCard({ id, map, electionInfo }) {
   //     </Card>
   //   );
   // }
-
-  const mapRef = useRef(null);
 
   const handleDownload = async () => {
     if (mapRef.current) {
