@@ -1,48 +1,45 @@
-import { Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { initializeElections } from "./reducers/electionReducer";
+import ModalContents from "./ModalContents/ModalContents";
+import MapCard from "./MapCard/MapCard";
 import "./App.css";
-import LandingPage from "./components/LandingPage/LandingPage";
-import Navbar from "./components/Navbar/Navbar";
-import MentionsLegales from "./components/Mentions Legales/MentionsLegales";
-import About from "./components/About/About";
-import Project from "./components/About/Project/Project";
-import Teams from "./components/About/Teams/Teams";
-import Research from "./components/About/Research/Research";
-import Publications from "./components/About/Publications/Publications";
-import Login from "./components/Login/Login";
-import Explore from "./components/Explore/Explore";
-import Elections from "./components/Explore/Elections/Elections";
-import Geography from "./components/Explore/Geography/Geography";
-import Themes from "./components/Explore/Themes/Themes";
-import Maps from "./components/Maps/Maps";
 
 function App() {
-  return (
-    <>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
+  const dispatch = useDispatch();
 
-        <Route path="/legal/" element={<MentionsLegales />} />
+  const init = useSelector((state) => state.elections.init);
 
-        <Route path="/about/" element={<About />} />
-        <Route path="/about/project/" element={<Project />} />
-        <Route path="/about/teams/" element={<Teams />} />
-        <Route path="/about/research/" element={<Research />} />
-        <Route path="/about/publications/" element={<Publications />} />
+  const maps = useSelector((state) => state.maps.maps);
 
-        <Route path="/login" element={<Login />} />
+  useEffect(() => {
+    dispatch(initializeElections());
+  }, [dispatch]);
 
-        <Route path="/explore" element={<Explore />} />
-        <Route path="/explore/elections/" element={<Elections />} />
-        <Route path="/explore/geography/" element={<Geography />} />
-        <Route path="/explore/themes/" element={<Themes />} />
-
-        <Route path="/maps/" element={<Maps />} />
-
-        <Route path="/index.html" element={<LandingPage />} />
-      </Routes>
-    </>
-  );
+  if (init)
+    return (
+      <>
+        <div>
+          <div className="maps-page-container">
+            <ModalContents />
+            <div className="map-collector">
+              {maps &&
+                maps.map((mapObject) => {
+                  const [ID, map] = Object.entries(mapObject)[0];
+                  return (
+                    <MapCard
+                      key={ID}
+                      id={ID}
+                      map={map[1]}
+                      electionInfo={map[0]}
+                    />
+                  );
+                })}
+            </div>
+          </div>
+        </div>
+      </>
+    );
 }
 
 export default App;
