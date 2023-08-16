@@ -15,6 +15,7 @@ import MapComponent2 from "./MapComponents/MapComponent2";
 import ExpandedResults from "./MapComponents/ExpandedResults";
 // import useDataFetch from "../Utility/useDataFetch";
 // import { SyncLoader } from "react-spinners";
+import CircularProgress from "@mui/material/CircularProgress";
 import Legend2 from "./MapComponents/Legend2";
 import Legend from "./MapComponents/Legend";
 // import ChartElement from "./ChartElement";
@@ -106,8 +107,16 @@ function MapCard({ id, map, electionInfo }) {
   }, [level]);
 
   if (!geojson) {
-    console.log(geojson);
-    return <span>lol</span>;
+    return (
+      <CircularProgress
+        style={{
+          position: "relative",
+          bottom: "20%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+        }}
+      />
+    );
   }
 
   // useEffect(() => {
@@ -173,14 +182,14 @@ function MapCard({ id, map, electionInfo }) {
 
   // if (loading) {
   //   return (
-  //     <SyncLoader
-  //       style={{
-  //         position: "absolute",
-  //         bottom: "20%",
-  //         left: "50%",
-  //         transform: "translate(-50%, -50%)",
-  //       }}
-  //     />
+  // <SyncLoader
+  //   style={{
+  //     position: "absolute",
+  //     bottom: "20%",
+  //     left: "50%",
+  //     transform: "translate(-50%, -50%)",
+  //   }}
+  // />
   //   );
   // }
 
