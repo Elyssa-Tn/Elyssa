@@ -123,6 +123,7 @@ function ExpandedElectionMenu({ selectedElection }) {
         </Button>
       );
     }
+
     if (parti && circonscription) {
       return (
         <Button onClick={addMapButton}>

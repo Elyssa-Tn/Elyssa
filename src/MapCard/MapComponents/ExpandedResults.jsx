@@ -29,6 +29,7 @@ function ExpandedResults({ results, level, names }) {
     prc: "Pourcentage de votes",
     voix: "Voix obtenus",
   };
+
   const placeHolderFormatter = () => {
     return decoupage.charAt(0).toUpperCase() + decoupage.slice(1);
   };

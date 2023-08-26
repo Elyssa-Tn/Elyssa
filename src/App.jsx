@@ -4,6 +4,8 @@ import { initializeElections } from "./reducers/electionReducer";
 import ModalContents from "./ModalContents/ModalContents";
 import MapCard from "./MapCard/MapCard";
 import "./App.css";
+import Navbar from "./Navbar";
+import { Box } from "@mui/joy";
 
 function App() {
   const dispatch = useDispatch();
@@ -18,27 +20,26 @@ function App() {
 
   if (init)
     return (
-      <>
-        <div>
-          <div className="maps-page-container">
-            <ModalContents />
-            <div className="map-collector">
-              {maps &&
-                maps.map((mapObject) => {
-                  const [ID, map] = Object.entries(mapObject)[0];
-                  return (
-                    <MapCard
-                      key={ID}
-                      id={ID}
-                      map={map[1]}
-                      electionInfo={map[0]}
-                    />
-                  );
-                })}
-            </div>
+      <Box sx={{ display: "flex", flexDirection: "column" }}>
+        <Navbar />
+        <div className="maps-page-container">
+          <ModalContents />
+          <div className="map-collector">
+            {maps &&
+              maps.map((mapObject) => {
+                const [ID, map] = Object.entries(mapObject)[0];
+                return (
+                  <MapCard
+                    key={ID}
+                    id={ID}
+                    map={map[1]}
+                    electionInfo={map[0]}
+                  />
+                );
+              })}
           </div>
         </div>
-      </>
+      </Box>
     );
 }
 
