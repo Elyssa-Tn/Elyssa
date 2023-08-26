@@ -1,6 +1,7 @@
 import { MapContainer, TileLayer, GeoJSON, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef, useState } from "react";
+import custom from "../../assets/custom(3).json";
 
 const FeatureTooltip = ({ feature }) => {
   return (
@@ -80,7 +81,7 @@ const MapComponent2 = ({
         mapRef.current.flyToBounds(target);
       });
     }
-  }, []);
+  }, [target]);
 
   // useEffect(() => {
   //   console.log(geojson);
@@ -140,7 +141,8 @@ const MapComponent2 = ({
     setSelectedDelegation(delegation);
     // setTarget(delegation);
     const bounds = layer.getBounds();
-    mapRef.current.flyToBounds(bounds);
+    // mapRef.current.flyToBounds(bounds);
+    setTarget(bounds);
     // setLevel("circonscription");
     // if (delegation && level === "sector") {
     //   mapRef.current.flyToBounds(bounds);
@@ -182,7 +184,7 @@ const MapComponent2 = ({
   const formatTooltip = (feature) => {
     return `${feature.properties[naming.name]}: ${
       data[Number(feature.properties[naming.code])]
-        ? data[Number(feature.properties[naming.code])]
+        ? `${data[Number(feature.properties[naming.code])]}%`
         : 0
     }`;
   };
@@ -219,13 +221,15 @@ const MapComponent2 = ({
         width: 340,
         height: 480,
         backgroundColor: "#add8e6",
-        left: "84px",
+        // left: "84px",
       }}
       attributionControl={false}
     >
       {/* <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" /> */}
       {/* <TileLayer url="https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /> */}
       {/* <TileLayer url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png" /> */}
+
+      <GeoJSON data={custom} style={{ fillColor: "#333", weight: 0.1 }} />
 
       <GeoJSON
         data={geojson}

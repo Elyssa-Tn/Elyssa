@@ -75,7 +75,7 @@ function MapCard({ id, map, electionInfo }) {
     secteur: { code: "REF_TN_COD", name: "NAME_FR" },
     commune: { code: "CODEMUN_2", name: "NAME_FR_2" },
     // delegation: { code: "CODEDELEGA", name: "NOMDELEGAT" },
-    delegation: { code: "circo_id", name: "Kebili" },
+    delegation: { code: "circo_id", name: "NOMDELEGAT" },
     circonscription: { code: "CODE_CIRCO", name: "NAME_FR" },
     // circonscription: { code: "CODEMUN_2", name: "NAME_FR_2" },
     gouvernorat: { code: "code_gouvernorat", name: "nom_gouvernorat" },
@@ -84,6 +84,7 @@ function MapCard({ id, map, electionInfo }) {
   const [expanded, setExpanded] = useState(false);
   const [geojson, setGeojson] = useState(null);
   const [request, setRequest] = useState(null);
+  const [target, setTarget] = useState(null);
   // const [level, setLevel] = useState(
   //   map.decoupage ? map.decoupage : "gouvernorat"
   // );
@@ -298,7 +299,7 @@ function MapCard({ id, map, electionInfo }) {
                 justifyContent: "space-between",
               }}
             >
-              <Typography style={{ padding: 8, marginTop: 8, maxWidth: 240 }}>
+              <Typography style={{ padding: 8, marginTop: 8 }}>
                 {electionInfo.election.nom}
                 {electionInfo.parti
                   ? ` - ${electionInfo.parti.denomination_fr}`
@@ -336,7 +337,8 @@ function MapCard({ id, map, electionInfo }) {
             </Box>
             <CardContent
               style={{
-                // display: "flex",
+                display: "flex",
+                flexDirection: "column",
                 paddingBottom: "8px",
               }}
             >
@@ -356,8 +358,8 @@ function MapCard({ id, map, electionInfo }) {
                   <InfoPanel electionInfo={electionInfo.election} />
                 </TabPanel>
                 <TabPanel value={1}>
-                  <div>
-                    <button
+                  {/* <div style={{ display: "flex", flexDirection: "column" }}> */}
+                  {/* <button
                       onClick={() => setDisplayMode(1)}
                       style={{
                         position: "absolute",
@@ -378,32 +380,33 @@ function MapCard({ id, map, electionInfo }) {
                       }}
                     >
                       2
-                    </button>
-                    <MapComponent2
-                      naming={nomenclature[level]}
+                    </button> */}
+                  <MapComponent2
+                    naming={nomenclature[level]}
+                    data={map.data.variables[0].resultat}
+                    geojson={geojson}
+                    level={level}
+                    setLevel={setLevel}
+                    // filter={formatFilter}
+                    target={target}
+                    setTarget={setTarget}
+                    colors={colors}
+                    colors2={colors2}
+                    displayMode={displayMode}
+                  />
+                  {displayMode === 1 && (
+                    <Legend2
                       data={map.data.variables[0].resultat}
-                      geojson={geojson}
-                      level={level}
-                      setLevel={setLevel}
-                      // filter={formatFilter}
-                      target={map.target}
                       colors={colors}
-                      colors2={colors2}
-                      displayMode={displayMode}
                     />
-                    {displayMode === 1 && (
-                      <Legend2
-                        data={map.data.variables[0].resultat}
-                        colors={colors}
-                      />
-                    )}
-                    {displayMode === 2 && (
-                      <Legend
-                        data={map.data.variables[0].resultat}
-                        colors={colors2}
-                      />
-                    )}
-                  </div>
+                  )}
+                  {displayMode === 2 && (
+                    <Legend
+                      data={map.data.variables[0].resultat}
+                      colors={colors2}
+                    />
+                  )}
+                  {/* </div> */}
                 </TabPanel>
                 <TabPanel value={2}>
                   <ExpandedResults
