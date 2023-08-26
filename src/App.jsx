@@ -5,6 +5,7 @@ import ModalContents from "./ModalContents/ModalContents";
 import MapCard from "./MapCard/MapCard";
 import "./App.css";
 import Navbar from "./Navbar";
+import { Box } from "@mui/joy";
 
 function App() {
   const dispatch = useDispatch();
@@ -19,7 +20,7 @@ function App() {
 
   if (init)
     return (
-      <>
+      <Box sx={{ display: "flex", flexDirection: "column" }}>
         <Navbar />
         <div className="maps-page-container">
           <ModalContents />
@@ -38,7 +39,7 @@ function App() {
               })}
           </div>
         </div>
-      </>
+      </Box>
     );
 }
 

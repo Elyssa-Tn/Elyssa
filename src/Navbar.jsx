@@ -14,7 +14,7 @@ const Navbar = () => {
   return (
     <Box
       sx={{
-        position: "absolute",
+        position: "relative",
         top: "10px",
         backgroundColor: "#0000FF",
         display: "flex",
