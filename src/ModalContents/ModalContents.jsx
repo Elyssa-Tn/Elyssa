@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Autocomplete, Box, IconButton, TextField } from "@mui/material";
+// import { Autocomplete, Box, TextField } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 // import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 // import CircularProgress from "@mui/material/CircularProgress";
 import ExpandedElectionMenu from "./ExpandedElectionMenu";
+import { Autocomplete, Box, TextField } from "@mui/joy";
 
 const ModalContents = (props) => {
   const dispatch = useDispatch();

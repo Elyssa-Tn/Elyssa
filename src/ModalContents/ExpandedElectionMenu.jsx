@@ -1,19 +1,16 @@
-import {
-  Autocomplete,
-  Box,
-  Button,
-  Menu,
-  MenuItem,
-  Tab,
-  Tabs,
-  TextField,
-} from "@mui/material";
+// import {
+//   Autocomplete,
+//   Box,
+//   Button,
+//   TextField,
+// } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 // import SelectionMenu from "./SelectionMenu";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchElectionData } from "../reducers/electionReducer";
 import { fetchMapData } from "../reducers/mapReducer";
+import { Autocomplete, Box, Button, TextField } from "@mui/joy";
 
 function ExpandedElectionMenu({ selectedElection }) {
   const style = {
