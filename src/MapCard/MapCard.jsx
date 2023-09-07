@@ -312,7 +312,6 @@ function MapCard({ id, map, electionInfo }) {
                 style={{
                   padding: 0,
                 }}
-                disableSpacing
               >
                 {/* <IconButton onClick={() => dispatch(deleteMap(id))}>
                   <HighlightOffIcon />

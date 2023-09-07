@@ -1,11 +1,15 @@
-import { createTheme } from "@mui/material/styles";
+import { extendTheme } from "@mui/joy";
 
-const PrimaryMainTheme = createTheme({
-  palette: {
-    primary: {
-      main: "#f44336",
+const theme = extendTheme({
+  colorSchemes: {
+    light: {
+      palette: {
+        primary: {
+          50: "#FFFDD0",
+        },
+      },
     },
   },
 });
 
-export { PrimaryMainTheme };
+export default theme;
