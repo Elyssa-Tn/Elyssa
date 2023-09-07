@@ -7,13 +7,13 @@ import ExpandedElectionMenu from "./ExpandedElectionMenu";
 import {
   Accordion,
   AccordionDetails,
-  AccordionGroup,
   AccordionSummary,
   Autocomplete,
   Box,
   TextField,
   accordionClasses,
 } from "@mui/joy";
+import AccordionGroup from "@mui/joy/AccordionGroup";
 import { fetchElectionData } from "../reducers/electionReducer";
 
 const ModalContents = (props) => {
