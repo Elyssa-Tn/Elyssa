@@ -23,6 +23,9 @@ const MapComponent2 = ({
   displayMode,
   target,
   setTarget,
+  toggleLayer,
+  fillValue,
+  classNumber,
 }) => {
   // const MapComponent2 = ({ naming, data, level, target, filter }) => {
   const [tooltipContent, setTooltipContent] = useState(null);
@@ -39,18 +42,6 @@ const MapComponent2 = ({
     if (Object.keys(data).length === 2) setSingleValue(true);
   }, [data]);
 
-  // const mapFiles = {
-  //   secteur: "../../assets/secteurs-2022.json",
-  //   commune: "../../assets/commune.json",
-  //   delegation: "../../assets/delegation.json",
-  //   // circonscription: (electioncode) =>
-  //   //   electioncode === "tnleg2022"
-  //   //     ? import("../../assets/circonscription2022.json")
-  //   //     : import("../../assets/circonscription2011-2019.json"),
-  //   circonscription: "../../assets/commune.json",
-  //   gouvernorat: "../../assets/gouvernorat.json",
-  // };
-
   const [zoomLevel, setZoomLevel] = useState(6);
   const mapRef = useRef(null);
 
@@ -59,47 +50,22 @@ const MapComponent2 = ({
   // const minValue = 0.1;
   const maxValue = Math.max(...values);
   // const maxValue = 100;
-  const singleColorRange = (maxValue - minValue) / 5;
-
-  // const pickColorInRange = (value, minValue, maxValue) => {
-  //   const normalizedValue = (value - minValue) / (maxValue - minValue);
-
-  //   const red = Math.round(255 * normalizedValue);
-  //   const green = Math.round(255 * (1 - normalizedValue));
-  //   const blue = 0;
-
-  //   const color = `#${red.toString(16).padStart(2, "0")}${green
-  //     .toString(16)
-  //     .padStart(2, "0")}${blue.toString(16).padStart(2, "0")}`;
-
-  //   return color;
-  // };
+  // const singleColorRange = (maxValue - minValue) / 5;
+  const singleColorRange = (maxValue - minValue) / classNumber;
+  const stepSize = Math.floor(colors.length / classNumber);
+  const selectedColors = [];
+  for (var i = 0; i < classNumber; i++) {
+    var index = i * stepSize;
+    selectedColors.push(colors[index]);
+  }
 
   useEffect(() => {
-    if (mapRef.current && target) {
+    if (mapRef.current && target && geojson) {
       mapRef.current.whenReady(() => {
         mapRef.current.flyToBounds(target);
       });
     }
-  }, [target]);
-
-  // useEffect(() => {
-  //   console.log(geojson);
-  // }, [geojson]);
-
-  // const getColorForPercentileValue = (value) => {
-  //   if (value >= 50) {
-  //     const red = 189 + ((value - 50) * (253 - 189)) / 50;
-  //     const green = 0 + ((value - 50) * (141 - 0)) / 50;
-  //     const blue = 38 + ((value - 50) * (60 - 38)) / 50;
-  //     return `rgb(${red}, ${green}, ${blue})`;
-  //   } else {
-  //     const red = 253 + ((value - 0) * (255 - 253)) / 50;
-  //     const green = 141 + ((value - 0) * (255 - 141)) / 50;
-  //     const blue = 60 + ((value - 0) * (178 - 60)) / 50;
-  //     return `rgb(${red}, ${green}, ${blue})`;
-  //   }
-  // };
+  }, [target, geojson]);
 
   function getColorForPercentileValue(value) {
     const color1 = colors2[0];
@@ -122,7 +88,8 @@ const MapComponent2 = ({
 
   const getColorForValue = (value) => {
     const interval = Math.floor((value - minValue) / singleColorRange);
-    return colors[Math.min(interval, 4)];
+    // return colors[Math.min(interval, 4)];
+    return selectedColors[Math.min(interval, classNumber - 1)];
   };
 
   const getColor = (feature) => {
@@ -138,12 +105,12 @@ const MapComponent2 = ({
 
   const handleDelegationClick = (feature, layer) => {
     const delegation = Number(feature.properties[naming.code]);
-    setSelectedDelegation(delegation);
+    // setSelectedDelegation(delegation);
     // setTarget(delegation);
     const bounds = layer.getBounds();
     // mapRef.current.flyToBounds(bounds);
     setTarget(bounds);
-    // setLevel("circonscription");
+    setLevel("delegation");
     // if (delegation && level === "sector") {
     //   mapRef.current.flyToBounds(bounds);
     // }
@@ -166,14 +133,12 @@ const MapComponent2 = ({
       mouseover: (e) => {
         const properties = e.target.feature.properties;
         const content = <div>{properties.name}</div>;
-        // you can generate the content of tooltip dynamically based on the properties of the hovered feature
 
         const tooltipInstance = e.target.getTooltip();
         tooltipInstance.setContent(content);
         tooltipInstance.update();
       },
       mouseout: (e) => {
-        // reset the tooltip content when the mouse moves away from the feature
         const tooltipInstance = e.target.getTooltip();
         tooltipInstance.setContent(tooltipContent);
         tooltipInstance.update();
@@ -204,13 +169,14 @@ const MapComponent2 = ({
 
   return (
     <MapContainer
+      key={geojson.features.length}
       ref={mapRef}
       className="map-container "
       center={[33.9989, 10.1658]}
       // zoom={6}
       zoom={zoomLevel}
       onZoomend={handleZoomEnd}
-      maxZoom={19}
+      maxZoom={16}
       minZoom={6}
       maxBounds={[
         [37.624276, 7.177274],
@@ -218,18 +184,26 @@ const MapComponent2 = ({
       ]}
       noWrap={true}
       style={{
-        width: 340,
-        height: 480,
+        width: 560,
+        height: 520,
         backgroundColor: "#add8e6",
         // left: "84px",
       }}
       attributionControl={false}
     >
-      {/* <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" /> */}
-      {/* <TileLayer url="https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" /> */}
-      {/* <TileLayer url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png" /> */}
+      {toggleLayer && (
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      )}
+      {/* {toggleLayer && (
+        <TileLayer url="https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" />
+      )} */}
+      {/* {toggleLayer && (
+        <TileLayer url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png" />
+      )} */}
 
-      <GeoJSON data={custom} style={{ fillColor: "#333", weight: 0.1 }} />
+      {!toggleLayer && (
+        <GeoJSON data={custom} style={{ fillColor: "#333", weight: 0.1 }} />
+      )}
 
       <GeoJSON
         data={geojson}
@@ -238,7 +212,7 @@ const MapComponent2 = ({
           fillColor: getColor(feature),
           color: "#000",
           weight: 0.5,
-          fillOpacity: 0.9,
+          fillOpacity: fillValue * 0.1,
         })}
         // onEachFeature={onEachFeature}
         // onEachFeature={(feature, layer) => {

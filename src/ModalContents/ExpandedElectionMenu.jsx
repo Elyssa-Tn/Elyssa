@@ -1,19 +1,16 @@
-import {
-  Autocomplete,
-  Box,
-  Button,
-  Menu,
-  MenuItem,
-  Tab,
-  Tabs,
-  TextField,
-} from "@mui/material";
+// import {
+//   Autocomplete,
+//   Box,
+//   Button,
+//   TextField,
+// } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 // import SelectionMenu from "./SelectionMenu";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchElectionData } from "../reducers/electionReducer";
 import { fetchMapData } from "../reducers/mapReducer";
+import { Autocomplete, Box, Button, TextField } from "@mui/joy";
 
 function ExpandedElectionMenu({ selectedElection }) {
   const style = {
@@ -182,9 +179,9 @@ function ExpandedElectionMenu({ selectedElection }) {
             getOptionLabel={(option) => option["nom"]}
             value={variable}
             onChange={(event, newValue) => setVariable(newValue)}
-            renderInput={(params) => (
-              <TextField {...params} label="Selectionnez une variable" />
-            )}
+            // renderInput={(params) => (
+            //   <TextField {...params} label="Selectionnez une variable" />
+            // )}
             sx={{
               width: "90%",
               backgroundColor: "rgb(250, 235, 215)",
@@ -196,9 +193,9 @@ function ExpandedElectionMenu({ selectedElection }) {
             getOptionLabel={(option) => option["denomination_fr"]}
             value={parti}
             onChange={(event, newValue) => setParti(newValue)}
-            renderInput={(params) => (
-              <TextField {...params} label="Selectionnez un parti" />
-            )}
+            // renderInput={(params) => (
+            //   <TextField {...params} label="Selectionnez un parti" />
+            // )}
             sx={{
               width: "90%",
               backgroundColor: "rgb(250, 235, 215)",
@@ -222,12 +219,12 @@ function ExpandedElectionMenu({ selectedElection }) {
                   ? setLevel(levels[3])
                   : setLevel(newValue)
               }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Filtrez par niveau geographique"
-                />
-              )}
+              // renderInput={(params) => (
+              //   <TextField
+              //     {...params}
+              //     label="Filtrez par niveau geographique"
+              //   />
+              // )}
             />
             {/* <SelectionMenu
               placeholder="Filtrez par niveau geographique"

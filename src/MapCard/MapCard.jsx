@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+// import {  Card,  IconButton,  CardActions,  CardContent,  Box,  Typography,} from "@mui/material";
 import {
   Card,
   IconButton,
   CardActions,
   CardContent,
-  Collapse,
   Box,
   Typography,
-} from "@mui/material";
+} from "@mui/joy";
 // import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import styled from "@emotion/styled";
@@ -312,7 +312,6 @@ function MapCard({ id, map, electionInfo }) {
                 style={{
                   padding: 0,
                 }}
-                disableSpacing
               >
                 {/* <IconButton onClick={() => dispatch(deleteMap(id))}>
                   <HighlightOffIcon />

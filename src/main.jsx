@@ -6,12 +6,16 @@ import "./index.css";
 import { Provider } from "react-redux";
 import { BrowserRouter as Router } from "react-router-dom";
 import store from "./store.js";
+// import { StyledEngineProvider } from "@mui/material";
+import { StyledEngineProvider } from "@mui/joy";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <Router>
       <React.StrictMode>
-        <App />
+        <StyledEngineProvider>
+          <App />
+        </StyledEngineProvider>
       </React.StrictMode>
     </Router>
   </Provider>
