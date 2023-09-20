@@ -49,7 +49,7 @@ const Header = (props) => {
   );
 };
 
-function SidePanel(props) {
+const SidePanel = (props) => {
   return (
     <Box
       component="nav"
@@ -70,7 +70,30 @@ function SidePanel(props) {
       ]}
     />
   );
-}
+};
+
+const TopPanel = (props) => {
+  return (
+    <Box
+      component="top"
+      className="TopPanel"
+      {...props}
+      sx={[
+        {
+          p: 2,
+          bgcolor: "background.surface",
+          borderRight: "1px solid",
+          borderColor: "divider",
+          display: {
+            xs: "none",
+            sm: "initial",
+          },
+        },
+        ...(Array.isArray(props.sx) ? props.sx : [props.sx]),
+      ]}
+    />
+  );
+};
 
 function Main(props) {
   return (
