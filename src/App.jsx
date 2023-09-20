@@ -5,7 +5,6 @@ import { initializeElections } from "./reducers/electionReducer";
 import Layout from "./Layout";
 import ModalContents from "./ModalContents/ModalContents";
 import MapCard from "./MapCard/MapCard2";
-import "./App.css";
 import Navbar from "./Navbar";
 import {
   Box,
@@ -162,7 +161,8 @@ function App() {
   if (init)
     return (
       // <CssVarsProvider theme={theme}>
-      <CssVarsProvider>
+      <CssVarsProvider disableTransitionOnChange>
+        <CssBaseline />
         <Layout.Root
           sx={{
             gridTemplateColumns: {
@@ -172,7 +172,6 @@ function App() {
             },
           }}
         >
-          <CssBaseline />
           <Layout.Header>
             <Navbar />
           </Layout.Header>
