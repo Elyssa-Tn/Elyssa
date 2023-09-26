@@ -2,6 +2,7 @@ import { MapContainer, TileLayer, GeoJSON, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef, useState } from "react";
 import custom from "../../assets/custom(3).json";
+import { Button } from "@mui/joy";
 
 const FeatureTooltip = ({ feature }) => {
   return (
@@ -24,13 +25,14 @@ const MapComponent2 = ({
   target,
   setTarget,
   toggleLayer,
-  fillValue,
   classNumber,
 }) => {
   // const MapComponent2 = ({ naming, data, level, target, filter }) => {
   const [tooltipContent, setTooltipContent] = useState(null);
+  const centerCoords = [33.9989, 10.1658];
 
-  const [selectedDelegation, setSelectedDelegation] = useState(null);
+  const [targetCode, setTargetCode] = useState(null);
+
   const [selectedDivision, setSelectedDivision] = useState("delegation");
 
   const minValueColor = colors[0];
@@ -42,7 +44,7 @@ const MapComponent2 = ({
     if (Object.keys(data).length === 2) setSingleValue(true);
   }, [data]);
 
-  const [zoomLevel, setZoomLevel] = useState(6);
+  const [zoomLevel, setZoomLevel] = useState(0);
   const mapRef = useRef(null);
 
   const values = Object.values(data);
@@ -93,6 +95,7 @@ const MapComponent2 = ({
   };
 
   const getColor = (feature) => {
+    console.log(feature.properties);
     const value = data[Number(feature.properties[naming.code])];
 
     if (!value) return "#d3d3d3";
@@ -104,13 +107,14 @@ const MapComponent2 = ({
   };
 
   const handleDelegationClick = (feature, layer) => {
-    const delegation = Number(feature.properties[naming.code]);
-    // setSelectedDelegation(delegation);
+    const code = Number(feature.properties[naming.code]);
+    setTargetCode(code);
     // setTarget(delegation);
     const bounds = layer.getBounds();
     // mapRef.current.flyToBounds(bounds);
     setTarget(bounds);
     setLevel("delegation");
+    // setLevel("delegation");
     // if (delegation && level === "sector") {
     //   mapRef.current.flyToBounds(bounds);
     // }
@@ -119,32 +123,32 @@ const MapComponent2 = ({
     // }
   };
 
-  const onEachFeature = (feature, layer) => {
-    layer.bindTooltip(tooltipContent, {
-      className: "custom-tooltip",
-      permanent: true,
-      direction: "top",
-    });
+  // const onEachFeature = (feature, layer) => {
+  //   layer.bindTooltip(tooltipContent, {
+  //     className: "custom-tooltip",
+  //     permanent: true,
+  //     direction: "top",
+  //   });
 
-    layer.on({
-      click: () => {
-        handleDelegationClick(feature);
-      },
-      mouseover: (e) => {
-        const properties = e.target.feature.properties;
-        const content = <div>{properties.name}</div>;
+  //   layer.on({
+  //     click: () => {
+  //       handleDelegationClick(feature);
+  //     },
+  //     mouseover: (e) => {
+  //       const properties = e.target.feature.properties;
+  //       const content = <div>{properties.name}</div>;
 
-        const tooltipInstance = e.target.getTooltip();
-        tooltipInstance.setContent(content);
-        tooltipInstance.update();
-      },
-      mouseout: (e) => {
-        const tooltipInstance = e.target.getTooltip();
-        tooltipInstance.setContent(tooltipContent);
-        tooltipInstance.update();
-      },
-    });
-  };
+  //       const tooltipInstance = e.target.getTooltip();
+  //       tooltipInstance.setContent(content);
+  //       tooltipInstance.update();
+  //     },
+  //     mouseout: (e) => {
+  //       const tooltipInstance = e.target.getTooltip();
+  //       tooltipInstance.setContent(tooltipContent);
+  //       tooltipInstance.update();
+  //     },
+  //   });
+  // };
 
   const formatTooltip = (feature) => {
     return `${feature.properties[naming.name]}: ${
@@ -154,30 +158,26 @@ const MapComponent2 = ({
     }`;
   };
 
-  const handleZoomEnd = (event) => {
-    const newZoomLevel = event.target.getZoom();
-    setZoomLevel(newZoomLevel);
-
-    // Switch GeoJSON based on zoom level
-    if (newZoomLevel >= 10 && newZoomLevel < 15) {
-      setSelectedDivision("division1");
-    } else if (newZoomLevel >= 15) {
-      setSelectedDivision("division2");
-    }
-    // Add more conditions for other zoom levels and divisions as needed
+  const handleResetClick = () => {
+    setLevel("gouvernorat");
+    setTargetCode(null);
+    setZoomLevel(0);
+    mapRef.current.setView(centerCoords, 6);
   };
 
   return (
     <MapContainer
-      key={geojson.features.length}
+      zoomControl={false}
+      boxZoom={false}
+      doubleClickZoom={false}
+      dragging={false}
+      scrollWheelZoom={false}
+      key={geojson.length}
       ref={mapRef}
       className="map-container "
-      center={[33.9989, 10.1658]}
+      center={centerCoords}
       // zoom={6}
-      zoom={zoomLevel}
-      onZoomend={handleZoomEnd}
-      maxZoom={16}
-      minZoom={6}
+      zoom={6}
       maxBounds={[
         [37.624276, 7.177274],
         [30.192062, 12.880537],
@@ -187,7 +187,7 @@ const MapComponent2 = ({
         width: 560,
         height: 520,
         backgroundColor: "#add8e6",
-        // left: "84px",
+        borderRadius: "1rem",
       }}
       attributionControl={false}
     >
@@ -206,13 +206,22 @@ const MapComponent2 = ({
       )}
 
       <GeoJSON
-        data={geojson}
+        data={geojson["delegation"]}
+        style={(feature) => ({
+          fillColor: level === "delegation" ? getColor(feature) : null,
+          fillOpacity: level === "delegation" ? 0.9 : 0,
+          weight: level === "delegation" ? 0.4 : 0.1,
+        })}
+      />
+
+      <GeoJSON
+        data={geojson["gouvernorat"]}
         // data={mapFiles[selectedDivision]}
         style={(feature) => ({
-          fillColor: getColor(feature),
+          fillColor: level === "gouvernorat" ? getColor(feature) : null,
           color: "#000",
           weight: 0.5,
-          fillOpacity: fillValue * 0.1,
+          fillOpacity: zoomLevel === 0 ? 0.9 : 0,
         })}
         // onEachFeature={onEachFeature}
         // onEachFeature={(feature, layer) => {
@@ -242,6 +251,9 @@ const MapComponent2 = ({
         }}
       />
 
+      <Button sx={{ zIndex: 1000 }} onClick={handleResetClick}>
+        Retour
+      </Button>
       {/* <Legend maxValue={maxValue} minValue={minValue} /> */}
       {/* <MapLevelSelection level={level} setLevel={setLevel} /> */}
     </MapContainer>
