@@ -43,14 +43,7 @@ const ExpandMore = styled((props) => {
   marginLeft: "auto",
 }));
 
-function MapCard({
-  id,
-  map,
-  electionInfo,
-  toggleLayer,
-  fillValue,
-  classNumber,
-}) {
+function MapCard({ id, map, electionInfo, toggleLayer, classNumber }) {
   const [displayMode, setDisplayMode] = useState(1);
 
   const dispatch = useDispatch();
@@ -88,24 +81,53 @@ function MapCard({
   };
 
   const [expanded, setExpanded] = useState(false);
-  const [geojson, setGeojson] = useState(null);
+  const [geojson, setGeojson] = useState({});
   const [request, setRequest] = useState(null);
   const [target, setTarget] = useState(null);
 
-  const [level, setLevel] = useState(map.data.decoupage);
+  const [level, setLevel] = useState("gouvernorat");
+
+  // useEffect(() => {
+  //   const fetchAndUseGeoJSON = async (level) => {
+  //     try {
+  //       const map = await getGeoJSON(level);
+  //       const mapObject = { [level]: map };
+  //       setGeojson([...geojson, mapObject]);
+  //     } catch (error) {
+  //       console.error("Error:", error);
+  //     }
+  //   };
+
+  //   fetchAndUseGeoJSON("gouvernorat");
+  //   fetchAndUseGeoJSON("delegation");
+  // }, []);
 
   useEffect(() => {
-    const fetchAndUseGeoJSON = async () => {
+    const fetchAndUseGeoJSON = async (level) => {
       try {
         const map = await getGeoJSON(level);
-        setGeojson(map);
+        return { [level]: map };
       } catch (error) {
         console.error("Error:", error);
+        throw error;
       }
     };
 
-    fetchAndUseGeoJSON();
-  }, [level]);
+    const levelsToFetch = ["gouvernorat", "delegation"];
+
+    Promise.all(levelsToFetch.map(fetchAndUseGeoJSON))
+      .then((results) => {
+        const formattedResults = {};
+        results.forEach((entry) => {
+          const key = Object.keys(entry)[0];
+          formattedResults[key] = entry[key];
+        });
+        setGeojson(formattedResults);
+      })
+      .catch((error) => {
+        console.error("An error occurred:", error);
+      });
+  }, []);
 
   if (!geojson) {
     console.log("loading");
@@ -144,30 +166,30 @@ function MapCard({
       link.click();
     }
   };
+  console.log(map[level]);
 
-  if (geojson && map) {
+  if (Object.keys(geojson).length === 2 && map) {
     // const names = getDivisionNames(geojson);
 
     return (
       <>
         {geojson && map && (
           <Card
-            key={(map, level)}
+            // key={(map, level)}
+            key={map}
             style={{
-              width: "auto",
-              margin: "4px",
+              display: "flex",
+              flexDirection: "column",
+              width: "66rem",
+              margin: "0.25rem 8rem",
               borderRadius: "16px",
               position: "relative",
+              justifyContent: "center",
+              alignItems: "center",
             }}
             ref={mapRef}
           >
-            <Box
-              style={{
-                display: "flex",
-                flex: "row",
-                justifyContent: "space-between",
-              }}
-            >
+            <Box style={{ display: "inline-block" }}>
               <Typography style={{ padding: 8, marginTop: 8 }}>
                 {electionInfo.election.nom}
                 {electionInfo.parti
@@ -180,14 +202,12 @@ function MapCard({
             </Box>
             <CardContent
               style={{
-                display: "flex",
-                flexDirection: "column",
                 paddingBottom: "8px",
               }}
             >
               <MapComponent2
                 naming={nomenclature[level]}
-                data={map.data.variables[0].resultat}
+                data={map[level].data.variables[0].resultat}
                 geojson={geojson}
                 level={level}
                 setLevel={setLevel}
@@ -199,7 +219,6 @@ function MapCard({
                 colors2={colors2}
                 displayMode={displayMode}
                 toggleLayer={toggleLayer}
-                fillValue={fillValue}
                 classNumber={classNumber}
               />
               {/* {displayMode === 1 && (
