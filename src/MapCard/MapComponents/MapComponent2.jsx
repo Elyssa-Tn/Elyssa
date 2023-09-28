@@ -251,9 +251,11 @@ const MapComponent2 = ({
         }}
       />
 
-      <Button sx={{ zIndex: 1000 }} onClick={handleResetClick}>
-        Retour
-      </Button>
+      {level !== "gouvernorat" && (
+        <Button sx={{ zIndex: 1000 }} onClick={handleResetClick}>
+          Retour
+        </Button>
+      )}
       {/* <Legend maxValue={maxValue} minValue={minValue} /> */}
       {/* <MapLevelSelection level={level} setLevel={setLevel} /> */}
     </MapContainer>
