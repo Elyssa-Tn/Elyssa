@@ -95,7 +95,6 @@ const MapComponent2 = ({
   };
 
   const getColor = (feature) => {
-    console.log(feature.properties);
     const value = data[Number(feature.properties[naming.code])];
 
     if (!value) return "#d3d3d3";
