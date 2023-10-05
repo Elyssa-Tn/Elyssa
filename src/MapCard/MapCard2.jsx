@@ -43,8 +43,9 @@ const ExpandMore = styled((props) => {
   marginLeft: "auto",
 }));
 
-function MapCard({ id, map, electionInfo, toggleLayer, classNumber }) {
+function MapCard({ id, map, toggleLayer, classNumber }) {
   const [displayMode, setDisplayMode] = useState(1);
+  const [hoveredGeo, setHoveredGeo] = useState(null);
 
   const dispatch = useDispatch();
   const mapRef = useRef(null);
@@ -52,8 +53,7 @@ function MapCard({ id, map, electionInfo, toggleLayer, classNumber }) {
   const colors = ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"];
   const colors2 = ["#ffffff", "#a8281e"];
   const colors3 = ["#00ffd5", "#00806b", "#3f4540", "#663d14", "#bf6100"];
-  // Esri color ramps - Heatmap 4
-  // #0022c8,#2b1ca7,#551785,#801164,#aa0b43,#d50621,#ff0000,#ff3900,#ff7100,#ffaa00,#ffc655,#ffe3aa,#ffffff
+
   const Heatmap4 = [
     "#ffffff",
     "#ffe3aa",
@@ -86,21 +86,6 @@ function MapCard({ id, map, electionInfo, toggleLayer, classNumber }) {
   const [target, setTarget] = useState(null);
 
   const [level, setLevel] = useState("gouvernorat");
-
-  // useEffect(() => {
-  //   const fetchAndUseGeoJSON = async (level) => {
-  //     try {
-  //       const map = await getGeoJSON(level);
-  //       const mapObject = { [level]: map };
-  //       setGeojson([...geojson, mapObject]);
-  //     } catch (error) {
-  //       console.error("Error:", error);
-  //     }
-  //   };
-
-  //   fetchAndUseGeoJSON("gouvernorat");
-  //   fetchAndUseGeoJSON("delegation");
-  // }, []);
 
   useEffect(() => {
     const fetchAndUseGeoJSON = async (level) => {
@@ -143,6 +128,22 @@ function MapCard({ id, map, electionInfo, toggleLayer, classNumber }) {
     );
   }
 
+  const normalizeData = (data) => {
+    const result = {};
+
+    data.forEach((item) => {
+      const { code_variable, resultat } = item;
+      result[code_variable] = {};
+      for (const key in resultat) {
+        result[code_variable][key] = resultat[key];
+      }
+    });
+
+    return result;
+  };
+
+  const data = normalizeData(map.data.variables);
+
   const getDivisionNames = (geojson) => {
     const divisionsMap = {};
 
@@ -166,7 +167,6 @@ function MapCard({ id, map, electionInfo, toggleLayer, classNumber }) {
       link.click();
     }
   };
-  console.log(map[level]);
 
   if (Object.keys(geojson).length === 2 && map) {
     // const names = getDivisionNames(geojson);
@@ -189,29 +189,30 @@ function MapCard({ id, map, electionInfo, toggleLayer, classNumber }) {
             }}
             ref={mapRef}
           >
-            <Box style={{ display: "inline-block" }}>
-              <Typography style={{ padding: 8, marginTop: 8 }}>
-                {electionInfo.election.nom}
-                {electionInfo.parti
-                  ? ` - ${electionInfo.parti.denomination_fr}`
-                  : null}
-                {electionInfo.variable
-                  ? `- ${electionInfo.variable.nom}`
-                  : null}
-              </Typography>
-            </Box>
             <CardContent
               style={{
                 paddingBottom: "8px",
               }}
             >
+              {displayMode === 1 && (
+                <Legend2
+                  data={map.data.variables[0].resultat}
+                  colors={colors}
+                  hover={hoveredGeo}
+                />
+              )}
+              {displayMode === 2 && (
+                <Legend
+                  data={map.data.variables[0].resultat}
+                  colors={colors2}
+                />
+              )}
               <MapComponent2
                 naming={nomenclature[level]}
-                data={map[level].data.variables[0].resultat}
+                data={map.data.variables[0].resultat}
                 geojson={geojson}
                 level={level}
                 setLevel={setLevel}
-                // filter={formatFilter}
                 target={target}
                 setTarget={setTarget}
                 // colors={colors}
@@ -220,19 +221,8 @@ function MapCard({ id, map, electionInfo, toggleLayer, classNumber }) {
                 displayMode={displayMode}
                 toggleLayer={toggleLayer}
                 classNumber={classNumber}
+                setHover={setHoveredGeo}
               />
-              {/* {displayMode === 1 && (
-                <Legend2
-                  data={map.data.variables[0].resultat}
-                  colors={colors}
-                />
-              )}
-              {displayMode === 2 && (
-                <Legend
-                  data={map.data.variables[0].resultat}
-                  colors={colors2}
-                />
-              )} */}
             </CardContent>
           </Card>
         )}

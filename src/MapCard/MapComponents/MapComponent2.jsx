@@ -26,6 +26,7 @@ const MapComponent2 = ({
   setTarget,
   toggleLayer,
   classNumber,
+  setHover,
 }) => {
   // const MapComponent2 = ({ naming, data, level, target, filter }) => {
   const [tooltipContent, setTooltipContent] = useState(null);
@@ -164,6 +165,10 @@ const MapComponent2 = ({
     mapRef.current.setView(centerCoords, 6);
   };
 
+  const onGeoHover = ({ properties }) => {
+    setHover(properties.code_gouvernorat);
+  };
+
   return (
     <MapContainer
       zoomControl={false}
@@ -247,6 +252,9 @@ const MapComponent2 = ({
               direction: "top",
               classname: "map-tooltip",
             });
+          layer.on({
+            mouseover: () => onGeoHover(feature),
+          });
         }}
       />
 
