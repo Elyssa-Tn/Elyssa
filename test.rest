@@ -12,17 +12,17 @@ Content-Type: application/json
 # }
 # }
 
-{
-"req":{
-  "type": "data",
-  "code_election": "tnmun2018",
-  "decoupage": "delegation",
-  "variables": [
-    {"code_variable":"prc","code_parti":"NIDA"},
-    {"code_variable":"voix","code_parti":"NIDA"}
-  ]
-}
-} 
+# {
+# "req":{
+#   "type": "data",
+#   "code_election": "tnmun2018",
+#   "decoupage": "delegation",
+#   "variables": [
+#     {"code_variable":"prc","code_parti":"NIDA"},
+#     {"code_variable":"voix","code_parti":"NIDA"}
+#   ]
+# }
+# } 
 
 # {
 # "req":{
@@ -67,12 +67,12 @@ Content-Type: application/json
 #   }
 # }
 
-# {
-#   "req":{
-#     "type":"map_decoupage",
-#     "decoupages":["gouvernorat"]
-#   }
-# }
+{
+  "req":{
+    "type":"map_decoupage",
+    "decoupages":["secteur"]
+  }
+}
 
 # {
 #   "req":{

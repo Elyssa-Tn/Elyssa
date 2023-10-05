@@ -6,15 +6,8 @@ import Layout from "./Layout";
 import ModalContents from "./ModalContents/ModalContents";
 import MapCard from "./MapCard/MapCard2";
 import Navbar from "./Navbar";
-import {
-  Box,
-  CssBaseline,
-  CssVarsProvider,
-  Sheet,
-  Slider,
-  Switch,
-  Typography,
-} from "@mui/joy";
+import MapTitle from "./MapTitle";
+import { CssBaseline, CssVarsProvider } from "@mui/joy";
 import theme from "./theme";
 
 function App() {
@@ -23,8 +16,8 @@ function App() {
   const init = useSelector((state) => state.elections.init);
 
   // const maps = useSelector((state) => state.maps.maps);
-  const map = [
-    {
+  const map = {
+    1: {
       election: {
         pays: "Tunisie",
         type_election: "TNMUN",
@@ -60,7 +53,6 @@ function App() {
         decoupages_consultables: null,
         version_administratif: null,
       },
-      level: null,
       parti: {
         code_parti: "NIDA",
         denomination: null,
@@ -76,8 +68,7 @@ function App() {
         denomination_ar: "حركة نداء تونس",
         denomination_fr: "Nidaa Tounes",
       },
-    },
-    {
+
       gouvernorat: {
         data: {
           type: "data",
@@ -695,7 +686,7 @@ function App() {
         },
       },
     },
-  ];
+  };
 
   const [toggleLayer, setToggleLayer] = useState(false);
   const [classNumber, setclassNumber] = useState(5);
@@ -706,8 +697,8 @@ function App() {
 
   if (init)
     return (
-      // <CssVarsProvider theme={theme}>
-      <CssVarsProvider disableTransitionOnChange>
+      <CssVarsProvider theme={theme}>
+        {/* <CssVarsProvider disableTransitionOnChange> */}
         <CssBaseline />
         <Layout.Root
         // sx={{
@@ -721,6 +712,12 @@ function App() {
           <Layout.Header>
             <Navbar />
           </Layout.Header>
+          <Layout.TopPanel>
+            <MapTitle
+              electionInfo={map[1]["election"]}
+              parti={map[1]["parti"]}
+            />
+          </Layout.TopPanel>
           {/* <Layout.SidePanel>
             <ModalContents />
           </Layout.SidePanel> */}
@@ -738,8 +735,8 @@ function App() {
                 );
               })} */}
             <MapCard
-              map={map[1]}
-              electionInfo={map[0]}
+              map={map[1]["gouvernorat"]}
+              electionInfo={map[1]["election"]}
               toggleLayer={toggleLayer}
               classNumber={classNumber}
             />

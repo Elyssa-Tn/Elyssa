@@ -26,6 +26,7 @@ const MapComponent2 = ({
   setTarget,
   toggleLayer,
   classNumber,
+  setHover,
 }) => {
   // const MapComponent2 = ({ naming, data, level, target, filter }) => {
   const [tooltipContent, setTooltipContent] = useState(null);
@@ -95,7 +96,6 @@ const MapComponent2 = ({
   };
 
   const getColor = (feature) => {
-    console.log(feature.properties);
     const value = data[Number(feature.properties[naming.code])];
 
     if (!value) return "#d3d3d3";
@@ -163,6 +163,10 @@ const MapComponent2 = ({
     setTargetCode(null);
     setZoomLevel(0);
     mapRef.current.setView(centerCoords, 6);
+  };
+
+  const onGeoHover = ({ properties }) => {
+    setHover(properties.code_gouvernorat);
   };
 
   return (
@@ -248,12 +252,17 @@ const MapComponent2 = ({
               direction: "top",
               classname: "map-tooltip",
             });
+          layer.on({
+            mouseover: () => onGeoHover(feature),
+          });
         }}
       />
 
-      <Button sx={{ zIndex: 1000 }} onClick={handleResetClick}>
-        Retour
-      </Button>
+      {level !== "gouvernorat" && (
+        <Button sx={{ zIndex: 1000 }} onClick={handleResetClick}>
+          Retour
+        </Button>
+      )}
       {/* <Legend maxValue={maxValue} minValue={minValue} /> */}
       {/* <MapLevelSelection level={level} setLevel={setLevel} /> */}
     </MapContainer>

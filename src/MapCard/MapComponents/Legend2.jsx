@@ -1,64 +1,94 @@
-const Legend2 = ({ colors, data }) => {
-  console.log(data);
+import { Box, Typography } from "@mui/joy";
+
+const Legend2 = ({ colors, data, hover }) => {
   const values = Object.values(data);
   const minValue = Math.min(...values);
   const maxValue = Math.max(...values);
   const singleColorRange = (maxValue - minValue) / 5;
 
+  const calculateIndicatorPosition = (value) => {
+    const indicatorPosition =
+      ((value - minValue) / (maxValue - minValue)) * 100;
+    return indicatorPosition;
+  };
+
   const containerStyle = {
-    // position: "absolute",
-    // bottom: "10px",
-    // left: "20px",
+    position: "relative",
     display: "flex",
     flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: "10px 0 0 0",
-    borderRadius: "5px",
-    // boxShadow: "0 0 tpx rgba(0,0,0,0.2)",
   };
 
   const rangeStyle = {
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
-    marginBottom: "5px",
+    // alignItems: "center",
+    marginBottom: "0.75rem",
   };
 
   return (
-    <div style={containerStyle}>
-      <div style={rangeStyle}>
-        <span style={{ fontSize: "12px" }}>N/A</span>
-        <span
+    <Box
+      sx={{
+        position: "relative",
+        display: "inline-block",
+        maxWidth: "50%",
+      }}
+    >
+      <Box
+        sx={{
+          display: `${hover ? "inline-block" : "none"}`,
+          position: "absolute",
+          top: "2.5rem",
+          borderLeft: "0.5rem solid transparent",
+          borderRight: "0.5rem solid transparent",
+          borderBottom: "0.5rem solid blue",
+          transform: "translate(-50%,-75%)",
+          left: `${calculateIndicatorPosition(data[hover])}%`,
+          zIndex: 2,
+        }}
+      ></Box>
+      <Box className="legendContainer" sx={containerStyle}>
+        <Box
           style={{
-            background: "#d3d3d3",
-            display: "inline-block",
-            width: "40px",
-            height: "20px",
-            marginRight: "5px",
-            border: "1px solid #fff",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            marginBottom: "0.75rem",
+            marginRight: "0.75rem",
           }}
-        ></span>
-      </div>
-      {colors.map((color, index) => (
-        <div key={index} style={rangeStyle}>
-          <span style={{ fontSize: "12px" }}>
-            {(singleColorRange * index + minValue).toFixed(1)}
-            {/* {(singleColorRange * (index + 1) + minValue).toFixed(1)} */}
-          </span>
-          <span
+        >
+          <Typography style={{ fontSize: "0.75rem" }}>N/A</Typography>
+          <Typography
             style={{
-              background: color,
+              background: "#d3d3d3",
               display: "inline-block",
-              width: "40px",
-              height: "20px",
+              width: "2.5rem",
+              height: "1.25rem",
+              marginRight: "0.25rem",
               border: "1px solid #fff",
-              // marginRight: "5px",
             }}
-          ></span>
-        </div>
-      ))}
-    </div>
+          ></Typography>
+        </Box>
+        {colors.map((color, index) => (
+          <Box key={index} style={rangeStyle}>
+            <Typography
+              style={{ fontSize: "0.75rem", transform: "translateX(-25%)" }}
+            >
+              {(singleColorRange * index + minValue).toFixed(1)}
+              {/* {(singleColorRange * (index + 1) + minValue).toFixed(1)} */}
+            </Typography>
+            <Typography
+              style={{
+                background: color,
+                display: "inline-block",
+                width: "40px",
+                height: "20px",
+                border: `1px solid #fff`,
+              }}
+            ></Typography>
+          </Box>
+        ))}
+      </Box>
+    </Box>
   );
 };
 
