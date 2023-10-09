@@ -196,7 +196,7 @@ function MapCard({ id, map, toggleLayer, classNumber }) {
             >
               {displayMode === 1 && (
                 <Legend2
-                  data={map.data.variables[0].resultat}
+                  data={data["prc"]}
                   colors={colors}
                   hover={hoveredGeo}
                 />
@@ -209,7 +209,7 @@ function MapCard({ id, map, toggleLayer, classNumber }) {
               )}
               <MapComponent2
                 naming={nomenclature[level]}
-                data={map.data.variables[0].resultat}
+                data={data}
                 geojson={geojson}
                 level={level}
                 setLevel={setLevel}
@@ -221,6 +221,7 @@ function MapCard({ id, map, toggleLayer, classNumber }) {
                 displayMode={displayMode}
                 toggleLayer={toggleLayer}
                 classNumber={classNumber}
+                hover={hoveredGeo}
                 setHover={setHoveredGeo}
               />
             </CardContent>
