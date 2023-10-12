@@ -21,8 +21,6 @@ const Legend2 = ({ colors, data, hover }) => {
   const rangeStyle = {
     display: "flex",
     flexDirection: "column",
-    // alignItems: "center",
-    marginBottom: "0.75rem",
   };
 
   return (
@@ -52,7 +50,6 @@ const Legend2 = ({ colors, data, hover }) => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            marginBottom: "0.75rem",
             marginRight: "0.75rem",
           }}
         >
@@ -87,6 +84,11 @@ const Legend2 = ({ colors, data, hover }) => {
             ></Typography>
           </Box>
         ))}
+        <Typography
+          style={{ fontSize: "0.75rem", transform: "translateX(-50%)" }}
+        >
+          {maxValue.toFixed(1)}
+        </Typography>
       </Box>
     </Box>
   );

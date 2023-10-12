@@ -95,7 +95,15 @@ function Main(props) {
       className="Main"
       {...props}
       sx={[
-        { padding: "0 1rem" },
+        {
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "minmax(64px, 200px) minmax(450px, 1fr)",
+            md: "minmax(40rem, 60rem)",
+          },
+          margin: "auto",
+        },
         ...(Array.isArray(props.sx) ? props.sx : [props.sx]),
       ]}
     />

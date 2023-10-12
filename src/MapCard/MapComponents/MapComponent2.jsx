@@ -1,8 +1,9 @@
-import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef, useState } from "react";
 import custom from "../../assets/custom(3).json";
 import { Box, Button, Divider, Sheet, Typography } from "@mui/joy";
+import mapDeletaion from "../../assets/delegation.json";
 
 const MapComponent2 = ({
   naming,
@@ -23,6 +24,7 @@ const MapComponent2 = ({
 }) => {
   const [tooltipContent, setTooltipContent] = useState(null);
   const [tooltipPosition, setTooltipPosition] = useState(null);
+  const [interactive, setInteractive] = useState(true);
   const centerCoords = [33.9989, 10.1658];
 
   const [targetCode, setTargetCode] = useState(null);
@@ -87,6 +89,7 @@ const MapComponent2 = ({
   };
 
   const getColor = (feature) => {
+    // console.log(feature.properties[naming.code]);
     const value = data["prc"][feature.properties[naming.code]];
 
     if (!value) return "#d3d3d3";
@@ -103,6 +106,7 @@ const MapComponent2 = ({
     const bounds = layer.getBounds();
     setTarget(bounds);
     setLevel("delegation");
+    setInteractive(false);
   };
 
   const handleResetClick = () => {
@@ -130,14 +134,31 @@ const MapComponent2 = ({
     setTooltipContent(null);
   };
 
+  const onEachFeature = (feature, layer) => {
+    layer.on("click", () => {
+      handleDelegationClick(feature, layer);
+    });
+    if (level === "gouvernorat") {
+      layer.on("mouseover", handleMousover);
+      layer.on("mouseout", handleMouseout);
+    }
+  };
+
+  const onEachFeature2 = (feature, layer) => {
+    if (level === "delegation") {
+      layer.on("mouseover", handleMousover);
+      layer.on("mouseout", handleMouseout);
+    }
+  };
+
   return (
     <MapContainer
+      key={1}
       zoomControl={false}
       boxZoom={false}
       doubleClickZoom={false}
       dragging={false}
       scrollWheelZoom={false}
-      key={geojson.length}
       ref={mapRef}
       className="map-container "
       center={centerCoords}
@@ -152,49 +173,68 @@ const MapComponent2 = ({
         height: 520,
         backgroundColor: "#add8e6",
         borderRadius: "1rem",
+        marginTop: "0.25rem",
       }}
       attributionControl={false}
     >
       {toggleLayer && (
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       )}
-      {/* {toggleLayer && (
-        <TileLayer url="https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" />
-      )} */}
-      {/* {toggleLayer && (
-        <TileLayer url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png" />
-      )} */}
 
       {!toggleLayer && (
-        <GeoJSON data={custom} style={{ fillColor: "#333", weight: 0.1 }} />
+        <GeoJSON
+          key={"Africa"}
+          data={custom}
+          style={{ fillColor: "#333", weight: 0.1, interactive: false }}
+        />
       )}
 
       <GeoJSON
-        data={geojson["delegation"]}
+        // data={geojson["delegation"]}
+        key={"delegation"}
+        data={mapDeletaion}
         style={(feature) => ({
           fillColor: level === "delegation" ? getColor(feature) : null,
           fillOpacity: level === "delegation" ? 0.9 : 0,
           weight: level === "delegation" ? 0.4 : 0.1,
         })}
+        onEachFeature={onEachFeature2}
       />
 
       <GeoJSON
+        key={"gouvernorat"}
         data={geojson["gouvernorat"]}
         style={(feature) => ({
+          interactive: interactive,
           fillColor: level === "gouvernorat" ? getColor(feature) : null,
           color: "#000",
-          weight: 0.5,
-          fillOpacity: zoomLevel === 0 ? 0.9 : 0,
+          weight:
+            feature.properties[naming.code] === hover || level === "delegation"
+              ? 2
+              : 0.5,
+          // fillOpacity:
+          //   zoomLevel === 0
+          //     ? feature.properties[naming.code] === hover
+          //       ? 1.2
+          //       : 0.8
+          //     : 0,
+          fillOpacity:
+            level === "gouvernorat"
+              ? feature.properties[naming.code] === hover
+                ? 1.2
+                : 0.8
+              : 0,
         })}
-        onEachFeature={(feature, layer) => {
-          layer.on("click", () => {
-            handleDelegationClick(feature, layer);
-          });
-          layer.on({
-            mouseover: handleMousover,
-            mouseout: handleMouseout,
-          });
-        }}
+        // onEachFeature={(feature, layer) => {
+        //   layer.on("click", () => {
+        //     handleDelegationClick(feature, layer);
+        //   });
+        //   layer.on({
+        //     mouseover: handleMousover,
+        //     mouseout: handleMouseout,
+        //   });
+        // }}
+        onEachFeature={onEachFeature}
       />
 
       {tooltipContent && (
@@ -224,7 +264,6 @@ const MapComponent2 = ({
               <Typography
                 style={{
                   background: getColorForValue(tooltipContent.prc),
-                  // display: "inline-block",
                   width: "1.5rem",
                   height: "1.5rem",
                   border: "1px solid #fff",

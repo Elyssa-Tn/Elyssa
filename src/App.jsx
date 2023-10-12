@@ -7,7 +7,7 @@ import ModalContents from "./ModalContents/ModalContents";
 import MapCard from "./MapCard/MapCard2";
 import Navbar from "./Navbar";
 import MapTitle from "./MapTitle";
-import { CssBaseline, CssVarsProvider } from "@mui/joy";
+import { CssBaseline, CssVarsProvider, Divider } from "@mui/joy";
 import theme from "./theme";
 
 function App() {
@@ -68,7 +68,6 @@ function App() {
         denomination_ar: "حركة نداء تونس",
         denomination_fr: "Nidaa Tounes",
       },
-
       gouvernorat: {
         data: {
           type: "data",
@@ -735,7 +734,7 @@ function App() {
                 );
               })} */}
             <MapCard
-              map={map[1]["gouvernorat"]}
+              map={map[1]}
               electionInfo={map[1]["election"]}
               toggleLayer={toggleLayer}
               classNumber={classNumber}

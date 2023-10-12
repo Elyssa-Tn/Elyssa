@@ -49,16 +49,17 @@ Content-Type: application/json
 # }
 # } 
 
-# {
-# "req":{
-#   "type": "data",
-#   "code_election": "tnmun2018",
-#   "decoupage": "gouvernorat",
-#   "variables": [
-#     {"code_variable":"voix"}
-#   ]
-# }
-# }
+{
+"req":{
+  "type": "data",
+  "code_election": "tnmun2018",
+  "decoupage": "gouvernorat",
+  "variables": [
+    {"code_variable":"voix"},
+    {"code_variable":"tp"}
+  ]
+}
+}
 
 # {
 #   "req":{
@@ -67,12 +68,12 @@ Content-Type: application/json
 #   }
 # }
 
-{
-  "req":{
-    "type":"map_decoupage",
-    "decoupages":["secteur"]
-  }
-}
+# {
+#   "req":{
+#     "type":"map_decoupage",
+#     "decoupages":["secteur"]
+#   }
+# }
 
 # {
 #   "req":{

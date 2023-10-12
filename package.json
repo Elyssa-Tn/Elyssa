@@ -17,6 +17,7 @@
     "@mui/joy": "^5.0.0-beta.0",
     "@mui/material": "^5.14.1",
     "@reduxjs/toolkit": "^1.9.5",
+    "@turf/turf": "^6.5.0",
     "axios": "^1.4.0",
     "axios-cache-interceptor": "^1.2.0",
     "html-to-image": "^1.11.11",
