@@ -1,16 +1,9 @@
-import { MapContainer, TileLayer, GeoJSON, Tooltip } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef, useState } from "react";
 import custom from "../../assets/custom(3).json";
-import { Button } from "@mui/joy";
-
-const FeatureTooltip = ({ feature }) => {
-  return (
-    <Tooltip direction="top" offset={[0, -10]}>
-      <div>tes</div>
-    </Tooltip>
-  );
-};
+import { Box, Button, Divider, Sheet, Typography } from "@mui/joy";
+import mapDeletaion from "../../assets/delegation.json";
 
 const MapComponent2 = ({
   naming,
@@ -26,10 +19,12 @@ const MapComponent2 = ({
   setTarget,
   toggleLayer,
   classNumber,
+  hover,
   setHover,
 }) => {
-  // const MapComponent2 = ({ naming, data, level, target, filter }) => {
   const [tooltipContent, setTooltipContent] = useState(null);
+  const [tooltipPosition, setTooltipPosition] = useState(null);
+  const [interactive, setInteractive] = useState(true);
   const centerCoords = [33.9989, 10.1658];
 
   const [targetCode, setTargetCode] = useState(null);
@@ -41,22 +36,21 @@ const MapComponent2 = ({
 
   const [singleValue, setSingleValue] = useState(false);
 
-  useEffect(() => {
-    if (Object.keys(data).length === 2) setSingleValue(true);
-  }, [data]);
+  // useEffect(() => {
+  //   if (Object.keys(data["prc"]).length === 2) setSingleValue(true);
+  // }, [data]);
+  // console.log(singleValue);
 
   const [zoomLevel, setZoomLevel] = useState(0);
   const mapRef = useRef(null);
 
-  const values = Object.values(data);
+  const values = Object.values(data["prc"]);
   const minValue = Math.min(...values);
-  // const minValue = 0.1;
   const maxValue = Math.max(...values);
-  // const maxValue = 100;
-  // const singleColorRange = (maxValue - minValue) / 5;
   const singleColorRange = (maxValue - minValue) / classNumber;
   const stepSize = Math.floor(colors.length / classNumber);
   const selectedColors = [];
+
   for (var i = 0; i < classNumber; i++) {
     var index = i * stepSize;
     selectedColors.push(colors[index]);
@@ -91,12 +85,12 @@ const MapComponent2 = ({
 
   const getColorForValue = (value) => {
     const interval = Math.floor((value - minValue) / singleColorRange);
-    // return colors[Math.min(interval, 4)];
     return selectedColors[Math.min(interval, classNumber - 1)];
   };
 
   const getColor = (feature) => {
-    const value = data[Number(feature.properties[naming.code])];
+    // console.log(feature.properties[naming.code]);
+    const value = data["prc"][feature.properties[naming.code]];
 
     if (!value) return "#d3d3d3";
 
@@ -109,53 +103,10 @@ const MapComponent2 = ({
   const handleDelegationClick = (feature, layer) => {
     const code = Number(feature.properties[naming.code]);
     setTargetCode(code);
-    // setTarget(delegation);
     const bounds = layer.getBounds();
-    // mapRef.current.flyToBounds(bounds);
     setTarget(bounds);
     setLevel("delegation");
-    // setLevel("delegation");
-    // if (delegation && level === "sector") {
-    //   mapRef.current.flyToBounds(bounds);
-    // }
-    // if (delegation) {
-    //   filter({ bounds, delegation });
-    // }
-  };
-
-  // const onEachFeature = (feature, layer) => {
-  //   layer.bindTooltip(tooltipContent, {
-  //     className: "custom-tooltip",
-  //     permanent: true,
-  //     direction: "top",
-  //   });
-
-  //   layer.on({
-  //     click: () => {
-  //       handleDelegationClick(feature);
-  //     },
-  //     mouseover: (e) => {
-  //       const properties = e.target.feature.properties;
-  //       const content = <div>{properties.name}</div>;
-
-  //       const tooltipInstance = e.target.getTooltip();
-  //       tooltipInstance.setContent(content);
-  //       tooltipInstance.update();
-  //     },
-  //     mouseout: (e) => {
-  //       const tooltipInstance = e.target.getTooltip();
-  //       tooltipInstance.setContent(tooltipContent);
-  //       tooltipInstance.update();
-  //     },
-  //   });
-  // };
-
-  const formatTooltip = (feature) => {
-    return `${feature.properties[naming.name]}: ${
-      data[Number(feature.properties[naming.code])]
-        ? `${data[Number(feature.properties[naming.code])]}%`
-        : 0
-    }`;
+    setInteractive(false);
   };
 
   const handleResetClick = () => {
@@ -165,22 +116,52 @@ const MapComponent2 = ({
     mapRef.current.setView(centerCoords, 6);
   };
 
-  const onGeoHover = ({ properties }) => {
-    setHover(properties.code_gouvernorat);
+  const handleMousover = (e) => {
+    const { target, layerPoint } = e;
+    const code = target.feature.properties[naming.code];
+    const name = target.feature.properties[naming.name];
+    setHover(code);
+    setTooltipContent({
+      name,
+      prc: data["prc"][code],
+      voix: data["voix"][code],
+    });
+    setTooltipPosition(layerPoint);
+  };
+
+  const handleMouseout = () => {
+    setHover(null);
+    setTooltipContent(null);
+  };
+
+  const onEachFeature = (feature, layer) => {
+    layer.on("click", () => {
+      handleDelegationClick(feature, layer);
+    });
+    if (level === "gouvernorat") {
+      layer.on("mouseover", handleMousover);
+      layer.on("mouseout", handleMouseout);
+    }
+  };
+
+  const onEachFeature2 = (feature, layer) => {
+    if (level === "delegation") {
+      layer.on("mouseover", handleMousover);
+      layer.on("mouseout", handleMouseout);
+    }
   };
 
   return (
     <MapContainer
+      key={1}
       zoomControl={false}
       boxZoom={false}
       doubleClickZoom={false}
       dragging={false}
       scrollWheelZoom={false}
-      key={geojson.length}
       ref={mapRef}
       className="map-container "
       center={centerCoords}
-      // zoom={6}
       zoom={6}
       maxBounds={[
         [37.624276, 7.177274],
@@ -192,79 +173,113 @@ const MapComponent2 = ({
         height: 520,
         backgroundColor: "#add8e6",
         borderRadius: "1rem",
+        marginTop: "0.25rem",
       }}
       attributionControl={false}
     >
       {toggleLayer && (
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       )}
-      {/* {toggleLayer && (
-        <TileLayer url="https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png" />
-      )} */}
-      {/* {toggleLayer && (
-        <TileLayer url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png" />
-      )} */}
 
       {!toggleLayer && (
-        <GeoJSON data={custom} style={{ fillColor: "#333", weight: 0.1 }} />
+        <GeoJSON
+          key={"Africa"}
+          data={custom}
+          style={{ fillColor: "#333", weight: 0.1, interactive: false }}
+        />
       )}
 
       <GeoJSON
-        data={geojson["delegation"]}
+        // data={geojson["delegation"]}
+        key={"delegation"}
+        data={mapDeletaion}
         style={(feature) => ({
           fillColor: level === "delegation" ? getColor(feature) : null,
           fillOpacity: level === "delegation" ? 0.9 : 0,
           weight: level === "delegation" ? 0.4 : 0.1,
         })}
+        onEachFeature={onEachFeature2}
       />
 
       <GeoJSON
+        key={"gouvernorat"}
         data={geojson["gouvernorat"]}
-        // data={mapFiles[selectedDivision]}
         style={(feature) => ({
+          interactive: interactive,
           fillColor: level === "gouvernorat" ? getColor(feature) : null,
           color: "#000",
-          weight: 0.5,
-          fillOpacity: zoomLevel === 0 ? 0.9 : 0,
+          weight:
+            feature.properties[naming.code] === hover || level === "delegation"
+              ? 2
+              : 0.5,
+          // fillOpacity:
+          //   zoomLevel === 0
+          //     ? feature.properties[naming.code] === hover
+          //       ? 1.2
+          //       : 0.8
+          //     : 0,
+          fillOpacity:
+            level === "gouvernorat"
+              ? feature.properties[naming.code] === hover
+                ? 1.2
+                : 0.8
+              : 0,
         })}
-        // onEachFeature={onEachFeature}
         // onEachFeature={(feature, layer) => {
-        //   layer.on({
-        // click: () => {
-        //   handleDelegationClick(feature);
-        // },
-        //     mouseover: () => {
-        //       layer.openTooltip();
-        //     },
+        //   layer.on("click", () => {
+        //     handleDelegationClick(feature, layer);
         //   });
-        //   layer.bindTooltip(<FeatureTooltip properties={feature.properties} />);
+        //   layer.on({
+        //     mouseover: handleMousover,
+        //     mouseout: handleMouseout,
+        //   });
         // }}
-        onEachFeature={(feature, layer) => {
-          // layer.on("click", (e) => {
-          //   var bounds = layer.getBounds();
-          //   mapRef.current.flyToBounds(bounds);
-          // });
-          layer.on("click", () => {
-            handleDelegationClick(feature, layer);
-          }),
-            layer.bindTooltip(formatTooltip(feature), {
-              permanent: false,
-              direction: "top",
-              classname: "map-tooltip",
-            });
-          layer.on({
-            mouseover: () => onGeoHover(feature),
-          });
-        }}
+        onEachFeature={onEachFeature}
       />
+
+      {tooltipContent && (
+        <Sheet
+          style={{
+            position: "absolute",
+            left: tooltipPosition.x,
+            transform: "translateX(-50%)",
+            top: tooltipPosition.y - 100,
+            borderRadius: "0.25rem",
+            padding: "0.25rem",
+            zIndex: 999,
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              padding: "0.25rem",
+            }}
+          >
+            <Typography>{tooltipContent.name}</Typography>
+            <Divider />
+            <Box sx={{ display: "flex", flexDirection: "row" }}>
+              <Typography>{tooltipContent.voix} voix</Typography>
+              <Divider sx={{ margin: "0 0.25rem" }} orientation="vertical" />
+              <Typography
+                style={{
+                  background: getColorForValue(tooltipContent.prc),
+                  width: "1.5rem",
+                  height: "1.5rem",
+                  border: "1px solid #fff",
+                }}
+              ></Typography>
+              <Typography>{tooltipContent.prc}%</Typography>
+            </Box>
+          </Box>
+        </Sheet>
+      )}
 
       {level !== "gouvernorat" && (
         <Button sx={{ zIndex: 1000 }} onClick={handleResetClick}>
           Retour
         </Button>
       )}
-      {/* <Legend maxValue={maxValue} minValue={minValue} /> */}
-      {/* <MapLevelSelection level={level} setLevel={setLevel} /> */}
     </MapContainer>
   );
 };

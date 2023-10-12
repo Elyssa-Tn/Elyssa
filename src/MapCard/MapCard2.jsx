@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-// import {  Card,  IconButton,  CardActions,  CardContent,  Box,  Typography,} from "@mui/material";
 import {
   Card,
   IconButton,
@@ -8,21 +7,21 @@ import {
   Box,
   Typography,
   Switch,
+  Divider,
+  Chip,
+  Sheet,
+  Input,
+  Button,
 } from "@mui/joy";
 // import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import styled from "@emotion/styled";
-import MapComponent2 from "./MapComponents/MapComponent2";
+// import MapComponent2 from "./MapComponents/MapComponent2";
+import MapComponent2 from "./MapComponents/MapComponent";
 import ExpandedResults from "./MapComponents/ExpandedResults";
-// import useDataFetch from "../Utility/useDataFetch";
-// import { SyncLoader } from "react-spinners";
 import CircularProgress from "@mui/material/CircularProgress";
 import Legend2 from "./MapComponents/Legend2";
 import Legend from "./MapComponents/Legend";
-// import ChartElement from "./ChartElement";
-// import ExpandedChartResults from "./MapComponents/ExpandedChartResults";
-// import geojson from "../assets/Circonscripton2022-vfinal.json";
-// import geojson from "../assets/secteurs-2022.json";
 
 // import * as htmlToImage from "html-to-image";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -73,8 +72,8 @@ function MapCard({ id, map, toggleLayer, classNumber }) {
   const nomenclature = {
     secteur: { code: "REF_TN_COD", name: "NAME_FR" },
     commune: { code: "CODEMUN_2", name: "NAME_FR_2" },
-    // delegation: { code: "CODEDELEGA", name: "NOMDELEGAT" },
-    delegation: { code: "circo_id", name: "NOMDELEGAT" },
+    delegation: { code: "CODEDELEGA", name: "NOMDELEGAT" },
+    // delegation: { code: "circo_id", name: "NOMDELEGAT" },
     circonscription: { code: "CODE_CIRCO", name: "NAME_FR" },
     // circonscription: { code: "CODEMUN_2", name: "NAME_FR_2" },
     gouvernorat: { code: "code_gouvernorat", name: "nom_gouvernorat" },
@@ -86,6 +85,20 @@ function MapCard({ id, map, toggleLayer, classNumber }) {
   const [target, setTarget] = useState(null);
 
   const [level, setLevel] = useState("gouvernorat");
+
+  const normalizeData = (data) => {
+    const result = {};
+
+    data.forEach((item) => {
+      const { code_variable, resultat } = item;
+      result[code_variable] = {};
+      for (const key in resultat) {
+        result[code_variable][key] = resultat[key];
+      }
+    });
+
+    return result;
+  };
 
   useEffect(() => {
     const fetchAndUseGeoJSON = async (level) => {
@@ -128,21 +141,7 @@ function MapCard({ id, map, toggleLayer, classNumber }) {
     );
   }
 
-  const normalizeData = (data) => {
-    const result = {};
-
-    data.forEach((item) => {
-      const { code_variable, resultat } = item;
-      result[code_variable] = {};
-      for (const key in resultat) {
-        result[code_variable][key] = resultat[key];
-      }
-    });
-
-    return result;
-  };
-
-  const data = normalizeData(map.data.variables);
+  const data = normalizeData(map[level].data.variables);
 
   const getDivisionNames = (geojson) => {
     const divisionsMap = {};
@@ -169,61 +168,121 @@ function MapCard({ id, map, toggleLayer, classNumber }) {
   };
 
   if (Object.keys(geojson).length === 2 && map) {
-    // const names = getDivisionNames(geojson);
-
     return (
       <>
         {geojson && map && (
           <Card
-            // key={(map, level)}
+            variant="soft"
             key={map}
             style={{
               display: "flex",
-              flexDirection: "column",
-              width: "66rem",
-              margin: "0.25rem 8rem",
-              borderRadius: "16px",
+              flexDirection: "row",
+              // width: "60rem",
+              // margin: "0 8rem",
               position: "relative",
               justifyContent: "center",
               alignItems: "center",
+              borderRadius: 0,
+              borderTop: "none",
+              borderBottom: "none",
             }}
             ref={mapRef}
           >
-            <CardContent
+            <Box
               style={{
-                paddingBottom: "8px",
+                paddingBottom: "0.5rem",
               }}
             >
-              {displayMode === 1 && (
-                <Legend2
-                  data={map.data.variables[0].resultat}
-                  colors={colors}
-                  hover={hoveredGeo}
-                />
-              )}
-              {displayMode === 2 && (
-                <Legend
-                  data={map.data.variables[0].resultat}
-                  colors={colors2}
-                />
-              )}
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                {displayMode === 1 && (
+                  <Legend2
+                    data={data["prc"]}
+                    colors={colors}
+                    hover={hoveredGeo}
+                  />
+                )}
+                {displayMode === 2 && (
+                  <Legend
+                    data={map.data.variables[0].resultat}
+                    colors={colors2}
+                  />
+                )}
+                <Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignContent: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography>Moyenne Nationale: </Typography>{" "}
+                    <Chip>{data["prc"]["Total"]}%</Chip>
+                  </Box>
+                  <Divider />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignContent: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography>Total des voix: </Typography>{" "}
+                    <Chip>{data["voix"]["Total"]}</Chip>
+                  </Box>
+                </Box>
+              </Box>
+              <Divider />
               <MapComponent2
                 naming={nomenclature[level]}
-                data={map.data.variables[0].resultat}
+                data={data}
                 geojson={geojson}
                 level={level}
                 setLevel={setLevel}
                 target={target}
                 setTarget={setTarget}
                 // colors={colors}
-                colors={Heatmap4}
+                colors={colors}
                 colors2={colors2}
                 displayMode={displayMode}
                 toggleLayer={toggleLayer}
                 classNumber={classNumber}
+                hover={hoveredGeo}
                 setHover={setHoveredGeo}
               />
-            </CardContent>
+            </Box>
+            <Divider orientation="vertical" />
+            <Sheet
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                alignContent: "center",
+                height: "100%",
+                maxWidth: "16rem",
+              }}
+            >
+              <Box>
+                <Typography>Rechercher un gouvernorat:</Typography>
+                <Input placeholder="ex: Ariana" color="primary" />
+              </Box>
+              <Divider />
+              <Box>
+                <Typography>Comparez avec un autre indicateur:</Typography>
+                <Button endDecorator={"+"}>Comparez</Button>
+              </Box>
+              <Divider />
+              <Box>
+                <Button endDecorator={"+"}>Méthodologie</Button>
+                <Button endDecorator={"+"}>Télécharger les données</Button>
+                <Button endDecorator={"+"}>Télécharger la carte</Button>
+              </Box>
+            </Sheet>
           </Card>
         )}
       </>
