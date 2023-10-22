@@ -27,8 +27,6 @@ const MapComponent = ({
   const [tooltipPosition, setTooltipPosition] = useState(null);
   const centerCoords = [33.9989, 10.1658];
 
-  const [targetCode, setTargetCode] = useState(null);
-
   const [selectedDivision, setSelectedDivision] = useState("delegation");
 
   const minValueColor = colors[0];
@@ -44,7 +42,7 @@ const MapComponent = ({
   const [zoomLevel, setZoomLevel] = useState(0);
   const mapRef = useRef(null);
 
-  const values = Object.values(data["prc"]);
+  const values = Object.values(data[level]["prc"]);
   const minValue = Math.min(...values);
   const maxValue = Math.max(...values);
   const singleColorRange = (maxValue - minValue) / classNumber;
@@ -89,7 +87,7 @@ const MapComponent = ({
   };
 
   const getColor = (feature) => {
-    const value = data["prc"][feature.properties[`code_${level}`]];
+    const value = data[level]["prc"][feature.properties[`code_${level}`]];
 
     if (!value) return "#d3d3d3";
 
@@ -98,40 +96,66 @@ const MapComponent = ({
     if (value && displayMode === 2) return getColorForPercentileValue(value);
   };
 
-  const handleDelegationClick = (feature, layer) => {
-    const code = Number(feature.properties[naming.code]);
-    const expCode = Number(feature.properties[`code_${level}`]);
+  const handleClick = (feature, layer) => {
+    const code = Number(feature.properties[`code_${level}`]);
 
-    setTargetCode(code);
-    const bounds = layer.getBounds();
+    const targetFeature = fullMap.features.find(
+      (feature) =>
+        feature.properties.level === level &&
+        feature.properties[`code_${level}`] === code
+    );
+    const geometryType = targetFeature.geometry.type;
+    let bounds;
+
+    const polygons =
+      geometryType === "Polygon"
+        ? [targetFeature.geometry.coordinates]
+        : targetFeature.geometry.coordinates;
+
+    const latLngs = [];
+    for (const polygon of polygons) {
+      for (const ring of polygon) {
+        latLngs.push(...ring.map((coord) => L.latLng(coord[1], coord[0])));
+      }
+    }
+    bounds = L.latLngBounds(latLngs);
+
     setTarget(bounds);
+
+    // setTarget(bounds);
     setLevel("delegation");
   };
 
   const handleResetClick = () => {
     setLevel("gouvernorat");
-    setTargetCode(null);
     setZoomLevel(0);
+    setTarget(null);
     mapRef.current.setView(centerCoords, 6);
   };
 
   const handleMousover = (e) => {
     const { target, layerPoint, latlng } = e;
-    console.log(latlng);
-    const clickedPoint = [latlng.lng, latlng.lat];
-    console.log(clickedPoint);
-    const feature = fullMap.features.find((feature) =>
-      turf.booleanPointInPolygon(clickedPoint, feature.geometry)
-    );
-    console.log(feature.properties);
 
-    const code = target.feature.properties[naming.code];
-    const name = target.feature.properties[naming.name];
+    const clickedPoint = [latlng.lng, latlng.lat];
+
+    const overlappingFeatures = [];
+    fullMap.features.forEach((feature) => {
+      if (turf.booleanPointInPolygon(clickedPoint, feature.geometry)) {
+        overlappingFeatures.push(feature);
+      }
+    });
+
+    const code = target.feature.properties[`code_${level}`];
+    const name = target.feature.properties[`nom_${level}`];
     setHover(code);
     setTooltipContent({
       name,
-      prc: data["prc"][code],
-      voix: data["voix"][code],
+      prc: data[level]["prc"][code],
+      voix: data[level]["voix"][code],
+      gouvernorat:
+        level === "gouvernorat"
+          ? null
+          : target.feature.properties["nom_gouvernorat"],
     });
     setTooltipPosition(layerPoint);
   };
@@ -143,80 +167,37 @@ const MapComponent = ({
 
   const onEachFeature = (feature, layer) => {
     layer.on("click", () => {
-      handleDelegationClick(feature, layer);
+      handleClick(feature, layer);
     });
 
     layer.on("mouseover", handleMousover);
     layer.on("mouseout", handleMouseout);
   };
 
+  const getWeightValue = (feature) => {
+    if (level === "gouvernorat")
+      return feature.properties.level === "gouvernorat" ? 0.8 : 0.1;
+    if (level !== "gouvernorat")
+      return feature.properties.level === "gouvernorat" ? 5 : 0.5;
+  };
+  const georef = useRef();
+  const [ready, setReady] = useState(false);
+
+  // useEffect(() => {
+  //   if (ready) {
+  //     georef.current.getContainer().style.setProperty("filter", `blur('20px')`);
+  //   }
+  // }, [ready]);
+
   return (
-    <MapContainer
-      key={1}
-      zoomControl={false}
-      boxZoom={false}
-      doubleClickZoom={false}
-      dragging={false}
-      scrollWheelZoom={false}
-      ref={mapRef}
-      className="map-container "
-      center={centerCoords}
-      zoom={6}
-      maxBounds={[
-        [37.624276, 7.177274],
-        [30.192062, 12.880537],
-      ]}
-      noWrap={true}
-      style={{
-        width: 560,
-        height: 520,
-        backgroundColor: "#add8e6",
-        borderRadius: "1rem",
-        marginTop: "0.25rem",
-      }}
-      attributionControl={false}
-    >
-      {toggleLayer && (
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-      )}
-
-      {!toggleLayer && (
-        <GeoJSON
-          key={"Africa"}
-          data={custom}
-          style={{ fillColor: "#333", weight: 0.1, interactive: false }}
-        />
-      )}
-
-      <GeoJSON
-        key={"gouvernorat"}
-        data={fullMap}
-        style={(feature) => ({
-          color: "#000",
-          weight:
-            feature.properties[naming.code] === hover ||
-            feature.properties.level === "gouvernorat"
-              ? 1
-              : 0.5,
-          fillColor: getColor(feature),
-          //   fillOpacity:
-          //     level === "gouvernorat"
-          //       ? feature.properties[naming.code] === hover
-          //         ? 1.2
-          //         : 0.8
-          //       : 0,
-          fillOpacity: feature.properties.level === level ? 0.9 : 0,
-        })}
-        onEachFeature={onEachFeature}
-      />
-
+    <Box>
       {tooltipContent && (
         <Sheet
           style={{
             position: "absolute",
             left: tooltipPosition.x,
-            transform: "translateX(-50%)",
-            top: tooltipPosition.y - 100,
+            transform: "translateX(-25%)",
+            top: tooltipPosition.y - 50,
             borderRadius: "0.25rem",
             padding: "0.25rem",
             zIndex: 999,
@@ -229,7 +210,12 @@ const MapComponent = ({
               padding: "0.25rem",
             }}
           >
-            <Typography>{tooltipContent.name}</Typography>
+            <Typography>
+              {tooltipContent.name}
+              {tooltipContent.gouvernorat
+                ? ` - ${tooltipContent.gouvernorat}`
+                : null}
+            </Typography>
             <Divider />
             <Box sx={{ display: "flex", flexDirection: "row" }}>
               <Typography>{tooltipContent.voix} voix</Typography>
@@ -247,13 +233,81 @@ const MapComponent = ({
           </Box>
         </Sheet>
       )}
+      <MapContainer
+        // key={target}
+        zoomControl={false}
+        boxZoom={false}
+        doubleClickZoom={false}
+        dragging={false}
+        scrollWheelZoom={false}
+        ref={mapRef}
+        className="map-container "
+        center={centerCoords}
+        zoom={6}
+        maxBounds={[
+          [37.624276, 7.177274],
+          [30.192062, 12.880537],
+        ]}
+        noWrap={true}
+        style={{
+          width: 560,
+          height: 520,
+          backgroundColor: "#add8e6",
+          borderRadius: "1rem",
+          marginTop: "0.25rem",
+        }}
+        attributionControl={false}
+      >
+        {toggleLayer && (
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        )}
 
-      {level !== "gouvernorat" && (
-        <Button sx={{ zIndex: 1000 }} onClick={handleResetClick}>
-          Retour
-        </Button>
-      )}
-    </MapContainer>
+        {!toggleLayer && (
+          <GeoJSON
+            key={"Africa"}
+            data={custom}
+            style={{ fillColor: "#333", weight: 0.1, interactive: false }}
+          />
+        )}
+
+        <GeoJSON
+          key={level}
+          ref={georef}
+          data={fullMap}
+          style={(feature) => ({
+            color: "#000",
+            dashArray: feature.properties.level === "gouvernorat" ? null : 4,
+            // weight:
+            //   feature.properties[naming.code] === hover ||
+            //   feature.properties.level === "gouvernorat"
+            //     ? 1
+            //     : 0.1,
+            weight:
+              feature.properties[`code_${level}`] === hover
+                ? getWeightValue(feature) + 1
+                : getWeightValue(feature),
+            opacity: feature.properties.level === "gouvernorat" ? 1 : 0.5,
+            fillColor: getColor(feature),
+            //   fillOpacity:
+            //     level === "gouvernorat"
+            //       ? feature.properties[naming.code] === hover
+            //         ? 1.2
+            //         : 0.8
+            //       : 0,
+            fillOpacity: feature.properties.level === level ? 0.9 : 0.1,
+            filter: blur("16px"),
+          })}
+          onEachFeature={onEachFeature}
+          whenReady={() => console.log("first")}
+        />
+
+        {level !== "gouvernorat" && (
+          <Button sx={{ zIndex: 1000 }} onClick={handleResetClick}>
+            Retour
+          </Button>
+        )}
+      </MapContainer>
+    </Box>
   );
 };
 

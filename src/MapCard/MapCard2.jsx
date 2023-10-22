@@ -16,8 +16,9 @@ import {
 // import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import styled from "@emotion/styled";
-// import MapComponent2 from "./MapComponents/MapComponent2";
-import MapComponent2 from "./MapComponents/MapComponent";
+import * as L from "leaflet";
+import MapComponent2 from "./MapComponents/MapComponent2";
+// import MapComponent2 from "./MapComponents/MapComponent";
 import ExpandedResults from "./MapComponents/ExpandedResults";
 import CircularProgress from "@mui/material/CircularProgress";
 import Legend2 from "./MapComponents/Legend2";
@@ -81,23 +82,34 @@ function MapCard({ id, map, toggleLayer, classNumber }) {
 
   const [expanded, setExpanded] = useState(false);
   const [geojson, setGeojson] = useState({});
+  const [boundaries, setBoundaries] = useState({});
   const [request, setRequest] = useState(null);
   const [target, setTarget] = useState(null);
 
   const [level, setLevel] = useState("gouvernorat");
 
-  const normalizeData = (data) => {
-    const result = {};
+  const normalizeData = (obj) => {
+    const normalizedData = {};
 
-    data.forEach((item) => {
-      const { code_variable, resultat } = item;
-      result[code_variable] = {};
-      for (const key in resultat) {
-        result[code_variable][key] = resultat[key];
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        normalizedData[key] = {};
+
+        const variables = obj[key].data.variables;
+        variables.forEach((item) => {
+          const { code_variable, resultat } = item;
+          normalizedData[key][code_variable] = {};
+
+          for (const zipCode in resultat) {
+            if (resultat.hasOwnProperty(zipCode)) {
+              normalizedData[key][code_variable][zipCode] = resultat[zipCode];
+            }
+          }
+        });
       }
-    });
+    }
 
-    return result;
+    return normalizedData;
   };
 
   useEffect(() => {
@@ -127,6 +139,45 @@ function MapCard({ id, map, toggleLayer, classNumber }) {
       });
   }, []);
 
+  useEffect(() => {
+    const boundsObject = {};
+
+    for (const mapName in geojson) {
+      if (geojson.hasOwnProperty(mapName)) {
+        boundsObject[mapName] = {};
+
+        const geoJSON = geojson[mapName];
+
+        geoJSON.features.forEach((feature) => {
+          const code = feature.properties[nomenclature[mapName].code];
+
+          const geometryType = feature.geometry.type;
+          let bounds;
+
+          const polygons =
+            geometryType === "Polygon"
+              ? [feature.geometry.coordinates]
+              : feature.geometry.coordinates;
+
+          const latLngs = [];
+          for (const polygon of polygons) {
+            for (const ring of polygon) {
+              latLngs.push(
+                ...ring.map((coord) => L.latLng(coord[1], coord[0]))
+              );
+            }
+          }
+
+          // Calculate the bounds using latLngs array.
+          bounds = L.latLngBounds(latLngs);
+
+          // Store the bounds in the object.
+          boundsObject[mapName][code] = bounds;
+        });
+      }
+    }
+  }, [geojson]);
+
   if (!geojson) {
     console.log("loading");
     return (
@@ -141,7 +192,7 @@ function MapCard({ id, map, toggleLayer, classNumber }) {
     );
   }
 
-  const data = normalizeData(map[level].data.variables);
+  const data = normalizeData(map.resultats);
 
   const getDivisionNames = (geojson) => {
     const divisionsMap = {};
@@ -202,16 +253,14 @@ function MapCard({ id, map, toggleLayer, classNumber }) {
               >
                 {displayMode === 1 && (
                   <Legend2
-                    data={data["prc"]}
+                    data={data}
+                    level={level}
                     colors={colors}
                     hover={hoveredGeo}
                   />
                 )}
                 {displayMode === 2 && (
-                  <Legend
-                    data={map.data.variables[0].resultat}
-                    colors={colors2}
-                  />
+                  <Legend data={data} level={level} colors={colors2} />
                 )}
                 <Box>
                   <Box
@@ -222,7 +271,7 @@ function MapCard({ id, map, toggleLayer, classNumber }) {
                     }}
                   >
                     <Typography>Moyenne Nationale: </Typography>{" "}
-                    <Chip>{data["prc"]["Total"]}%</Chip>
+                    <Chip>{data["gouvernorat"]["prc"]["Total"]}%</Chip>
                   </Box>
                   <Divider />
                   <Box
@@ -233,7 +282,7 @@ function MapCard({ id, map, toggleLayer, classNumber }) {
                     }}
                   >
                     <Typography>Total des voix: </Typography>{" "}
-                    <Chip>{data["voix"]["Total"]}</Chip>
+                    <Chip>{data["gouvernorat"]["voix"]["Total"]}</Chip>
                   </Box>
                 </Box>
               </Box>

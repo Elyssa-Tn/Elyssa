@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/joy";
 
-const Legend2 = ({ colors, data, hover }) => {
-  const values = Object.values(data);
+const Legend2 = ({ colors, level, data, hover }) => {
+  const values = Object.values(data[level].prc);
   const minValue = Math.min(...values);
   const maxValue = Math.max(...values);
   const singleColorRange = (maxValue - minValue) / 5;
