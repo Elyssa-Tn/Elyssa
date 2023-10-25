@@ -7,6 +7,7 @@ const initialState = {
   tooltip: null,
   target: null,
   minMax: null,
+  classNumber: 5,
   compareToggle: false,
 };
 
@@ -32,6 +33,9 @@ const interfaceSlice = createSlice({
     setMinMax: (state, action) => {
       state.minMax = action.payload;
     },
+    setClassNumber: (state, action) => {
+      state.classNumber = action.payload;
+    },
   },
 });
 
@@ -42,6 +46,7 @@ export const {
   setClickedTarget,
   toggleCompare,
   setMinMax,
+  setClassNumber,
 } = interfaceSlice.actions;
 
 export default interfaceSlice.reducer;

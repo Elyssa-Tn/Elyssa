@@ -5,6 +5,12 @@ import { useSelector } from "react-redux";
 const Legend2 = ({ ID, colors, hover }) => {
   const level = useSelector((state) => state.interface.level);
   const compare = useSelector((state) => state.interface.compareToggle);
+  const classNumber = useSelector((state) =>
+    compare
+      ? state.interface.classNumber[3][level]
+      : state.interface.classNumber[ID][level]
+  );
+
   const values = useSelector((state) =>
     compare
       ? state.interface.minMax[3][level]
@@ -12,7 +18,16 @@ const Legend2 = ({ ID, colors, hover }) => {
   );
 
   const { min, max } = values;
-  const singleColorRange = (max - min) / 5;
+  const singleColorRange = (max - min) / classNumber;
+
+  const stepSize = Math.floor(colors.length / classNumber);
+
+  const selectedColors = [];
+
+  for (var i = 0; i < classNumber; i++) {
+    var index = i * stepSize;
+    selectedColors.push(colors[index]);
+  }
 
   const calculateIndicatorPosition = (value) => {
     const indicatorPosition = ((value - min) / (max - min)) * 100;
@@ -72,19 +87,19 @@ const Legend2 = ({ ID, colors, hover }) => {
             }}
           ></Typography>
         </Box>
-        {colors.map((color, index) => (
+        {selectedColors.map((color, index) => (
           <Box key={index} style={rangeStyle}>
             <Typography
               style={{ fontSize: "0.75rem", transform: "translateX(-25%)" }}
             >
-              {(singleColorRange * index + min).toFixed(1)}
-              {/* {(singleColorRange * (index + 1) + minValue).toFixed(1)} */}
+              {/* {(singleColorRange * index + min).toFixed(1)} */}
+              {Math.round(singleColorRange * index + min)}
             </Typography>
             <Typography
               style={{
                 background: color,
                 display: "inline-block",
-                width: "40px",
+                width: "30px",
                 height: "20px",
                 border: `1px solid #fff`,
               }}
@@ -94,7 +109,8 @@ const Legend2 = ({ ID, colors, hover }) => {
         <Typography
           style={{ fontSize: "0.75rem", transform: "translateX(-50%)" }}
         >
-          {max.toFixed(1)}
+          {/* {max.toFixed(1)} */}
+          {Math.round(max)}
         </Typography>
       </Box>
     </Box>

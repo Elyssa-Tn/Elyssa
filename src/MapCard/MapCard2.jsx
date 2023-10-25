@@ -45,7 +45,7 @@ const ExpandMore = styled((props) => {
   marginLeft: "auto",
 }));
 
-function MapCard({ ID, toggleLayer, classNumber, geojson }) {
+function MapCard({ ID, toggleLayer, geojson }) {
   const compare = useSelector((state) => state.interface.compareToggle);
   const map = useSelector((state) => state.maps[ID]);
 
@@ -206,7 +206,8 @@ function MapCard({ ID, toggleLayer, classNumber, geojson }) {
                   justifyContent: "space-between",
                 }}
               >
-                {displayMode === 1 && <Legend2 ID={ID} colors={colors} />}
+                {/* {displayMode === 1 && <Legend2 ID={ID} colors={colors} />} */}
+                {displayMode === 1 && <Legend2 ID={ID} colors={Heatmap4} />}
                 {displayMode === 2 && <Legend ID={ID} colors={colors2} />}
                 <Box>
                   <Box
@@ -242,11 +243,10 @@ function MapCard({ ID, toggleLayer, classNumber, geojson }) {
                 data={map.normalizedData}
                 geojson={geojson}
                 // colors={colors}
-                colors={colors}
+                colors={Heatmap4}
                 colors2={colors2}
                 displayMode={displayMode}
                 toggleLayer={toggleLayer}
-                classNumber={classNumber}
               />
             </Box>
             <Divider orientation="vertical" />
