@@ -100,7 +100,7 @@ function Main(props) {
           gridTemplateColumns: {
             xs: "1fr",
             sm: "minmax(64px, 200px) minmax(450px, 1fr)",
-            md: "minmax(40rem, 60rem)",
+            md: "minmax(40rem, 62rem)",
           },
           margin: "auto",
         },
