@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import * as L from "leaflet";
+import { CssBaseline, CssVarsProvider, Divider, Sheet } from "@mui/joy";
 import { useDispatch, useSelector } from "react-redux";
 import { initializeElections } from "./reducers/electionReducer";
 
@@ -7,13 +9,17 @@ import ModalContents from "./ModalContents/ModalContents";
 import MapCard from "./MapCard/MapCard2";
 import Navbar from "./Navbar";
 import MapTitle from "./MapTitle";
-import { CssBaseline, CssVarsProvider, Divider } from "@mui/joy";
 import theme from "./theme";
+import { getGeoJSON } from "./services/geojson";
+import { setMaps } from "./reducers/mapReducer";
+import { setMinMax } from "./reducers/interfaceReducer";
 
 function App() {
   const dispatch = useDispatch();
 
   const init = useSelector((state) => state.elections.init);
+
+  const compare = useSelector((state) => state.interface.compareToggle);
 
   // const maps = useSelector((state) => state.maps.maps);
   const map = {
@@ -687,10 +693,835 @@ function App() {
         },
       },
     },
+    2: {
+      election: {
+        pays: "Tunisie",
+        type_election: "TNMUN",
+        mode_scrutin: "Proportionnel",
+        nombre_tours: 1,
+        uninominal_liste: "Scrutin de listes",
+        age_minimum_electeur: 18,
+        age_maximum_electeur: null,
+        territorial_national: false,
+        partiel_general: "Générale",
+        age_minimum_candidat: 23,
+        age_maximum_candidat: null,
+        militaires: null,
+        juges: null,
+        autres_exclus: null,
+        parite: null,
+        jeunesse: null,
+        debut: "2018-05-06",
+        fin: "2018-05-06",
+        date_campagne: "2018-04-14",
+        date_decret_officiel: "2018-05-04",
+        date_loi_electorale: "2014-05-26",
+        date_constitution: "2014-02-10",
+        date_planifiee: "2017-12-17",
+        description: "",
+        silence: "2018-05-05",
+        code_election: "tnmun2018",
+        nom: "Elections municipales 2018",
+        nombre_sieges: null,
+        rcno: 8,
+        decoupage_minimum: "commune",
+        decoupage_maximum: "delegation",
+        decoupages_consultables: null,
+        version_administratif: null,
+      },
+      parti: {
+        code_parti: "NAH",
+        denomination: null,
+        type: null,
+        groupement: null,
+        an_creation: null,
+        pays: "Tunisie",
+        rcno: 19,
+        description: null,
+        sigle: null,
+        logo: null,
+        classement_politique: null,
+        denomination_ar:
+          "\u062d\u0631\u0643\u0629 \u0627\u0644\u0646\u0647\u0636\u0629",
+        denomination_fr: "Ennahdha",
+      },
+      resultats: {
+        gouvernorat: {
+          data: {
+            type: "data",
+            code_election: "tnmun2018",
+            decoupage: "gouvernorat",
+            variables: [
+              {
+                code_variable: "prc",
+                code_parti: "NAH",
+                resultat: {
+                  11: 28.11,
+                  12: 28.26,
+                  13: 31.99,
+                  14: 36.9,
+                  15: 22.83,
+                  16: 17.18,
+                  17: 34.23,
+                  21: 26.26,
+                  22: 31.23,
+                  23: 24.76,
+                  24: 22.13,
+                  31: 24.58,
+                  32: 18.91,
+                  33: 25.83,
+                  34: 33.73,
+                  41: 32.34,
+                  42: 20.41,
+                  43: 24.37,
+                  51: 42.43,
+                  52: 46.39,
+                  53: 46.0,
+                  61: 23.18,
+                  62: 26.61,
+                  63: 35.37,
+                  Total: 28.64,
+                },
+              },
+              {
+                code_variable: "voix",
+                code_parti: "NAH",
+                resultat: {
+                  11: 40234,
+                  12: 22118,
+                  13: 30950,
+                  14: 18479,
+                  15: 35196,
+                  16: 6161,
+                  17: 25768,
+                  21: 11551,
+                  22: 15446,
+                  23: 10191,
+                  24: 8407,
+                  31: 28086,
+                  32: 22931,
+                  33: 18737,
+                  34: 55759,
+                  41: 26704,
+                  42: 17136,
+                  43: 19175,
+                  51: 26520,
+                  52: 35609,
+                  53: 8296,
+                  61: 14626,
+                  62: 6284,
+                  63: 11997,
+                  Total: 516361,
+                },
+              },
+            ],
+          },
+        },
+        delegation: {
+          data: {
+            type: "data",
+            code_election: "tnmun2018",
+            decoupage: "delegation",
+            variables: [
+              {
+                code_variable: "prc",
+                code_parti: "NAH",
+                resultat: {
+                  1151: 14.23,
+                  1152: 34.64,
+                  1153: 23.55,
+                  1154: 42.42,
+                  1155: 33.3,
+                  1156: 36.48,
+                  1157: 36.64,
+                  1158: 7.27,
+                  1159: 30.32,
+                  1160: 26.42,
+                  1161: 58.7,
+                  1162: 38.19,
+                  1163: 42.17,
+                  1164: 43.88,
+                  1165: 39.03,
+                  1166: 41.08,
+                  1167: 35.03,
+                  1168: 40.12,
+                  1169: 22.83,
+                  1170: 30.81,
+                  1171: 11.75,
+                  1251: 13.98,
+                  1252: 28.15,
+                  1253: 35.25,
+                  1254: 28.48,
+                  1255: 33.37,
+                  1256: 54.98,
+                  1257: 47.95,
+                  1351: 34.35,
+                  1352: 36.02,
+                  1353: 31.94,
+                  1354: 28.63,
+                  1355: 22.16,
+                  1356: 30.57,
+                  1357: 18.43,
+                  1358: 27.24,
+                  1359: 21.08,
+                  1360: 60.0,
+                  1361: 35.59,
+                  1362: 35.6,
+                  1451: 31.72,
+                  1452: 40.05,
+                  1453: 38.34,
+                  1454: 45.33,
+                  1455: 33.04,
+                  1456: 31.45,
+                  1457: 38.62,
+                  1458: 40.11,
+                  1551: 19.94,
+                  1552: 30.38,
+                  1553: 31.36,
+                  1554: 22.9,
+                  1555: 19.61,
+                  1556: 26.15,
+                  1557: 16.42,
+                  1558: 24.6,
+                  1559: 25.37,
+                  1560: 28.3,
+                  1561: 19.02,
+                  1562: 26.08,
+                  1563: 15.06,
+                  1564: 26.39,
+                  1565: 19.69,
+                  1566: 20.61,
+                  1651: 14.78,
+                  1652: 23.79,
+                  1653: 14.38,
+                  1654: 17.33,
+                  1655: 16.9,
+                  1656: 16.42,
+                  1751: 32.72,
+                  1752: 44.5,
+                  1753: 43.35,
+                  1754: 27.51,
+                  1755: 12.91,
+                  1756: 28.34,
+                  1757: 27.46,
+                  1758: 36.34,
+                  1759: 32.98,
+                  1760: 18.57,
+                  1761: 46.31,
+                  1762: 31.7,
+                  1763: 63.5,
+                  1764: 38.09,
+                  2151: 28.63,
+                  2152: 25.37,
+                  2153: 21.15,
+                  2154: 27.77,
+                  2155: 20.86,
+                  2156: 39.2,
+                  2157: 24.42,
+                  2158: 21.58,
+                  2159: 26.61,
+                  2251: 35.21,
+                  2252: 33.05,
+                  2253: 24.26,
+                  2254: 24.76,
+                  2255: 32.47,
+                  2256: 43.2,
+                  2257: 28.07,
+                  2258: 29.39,
+                  2259: 33.46,
+                  2351: 17.08,
+                  2352: 15.56,
+                  2353: 25.1,
+                  2354: 40.79,
+                  2355: 30.54,
+                  2356: 27.88,
+                  2357: 18.01,
+                  2358: 20.78,
+                  2359: 23.62,
+                  2360: 32.72,
+                  2361: 27.08,
+                  2451: 16.83,
+                  2452: 36.87,
+                  2453: 29.97,
+                  2454: 17.73,
+                  2455: 16.9,
+                  2456: 21.11,
+                  2457: 31.09,
+                  2458: 11.43,
+                  2459: 34.05,
+                  2460: 13.9,
+                  2461: 27.63,
+                  3151: 16.76,
+                  3152: 24.4,
+                  3153: 18.17,
+                  3154: 30.49,
+                  3155: 11.35,
+                  3156: 16.53,
+                  3157: 22.48,
+                  3158: 16.26,
+                  3159: 19.03,
+                  3160: 19.32,
+                  3161: 32.18,
+                  3162: 41.43,
+                  3163: 43.11,
+                  3164: 42.76,
+                  3165: 25.64,
+                  3166: 26.28,
+                  3251: 16.37,
+                  3252: 24.99,
+                  3253: 27.19,
+                  3254: 16.66,
+                  3255: 15.42,
+                  3256: 20.48,
+                  3257: 33.32,
+                  3258: 14.74,
+                  3259: 11.38,
+                  3260: 31.59,
+                  3261: 11.4,
+                  3262: 16.06,
+                  3263: 15.45,
+                  3351: 18.68,
+                  3352: 25.64,
+                  3353: 26.56,
+                  3354: 38.41,
+                  3355: 51.66,
+                  3356: 33.14,
+                  3357: 35.04,
+                  3358: 8.74,
+                  3359: 29.35,
+                  3360: 51.77,
+                  3361: 14.39,
+                  3451: 28.12,
+                  3452: 31.54,
+                  3453: 36.73,
+                  3454: 42.97,
+                  3455: 39.01,
+                  3456: 33.22,
+                  3457: 29.02,
+                  3458: 46.15,
+                  3459: 58.14,
+                  3460: 33.67,
+                  3461: 26.75,
+                  3462: 34.68,
+                  3463: 43.82,
+                  3464: 10.95,
+                  3465: 12.17,
+                  3466: 16.95,
+                  4151: 41.3,
+                  4152: 36.46,
+                  4153: 30.22,
+                  4154: 29.09,
+                  4155: 24.84,
+                  4156: 33.96,
+                  4157: 35.88,
+                  4158: 19.42,
+                  4159: 32.79,
+                  4160: 48.38,
+                  4161: 26.78,
+                  4251: 21.22,
+                  4252: 22.81,
+                  4253: 22.13,
+                  4254: 34.84,
+                  4255: 22.69,
+                  4256: 15.24,
+                  4257: 9.0,
+                  4258: 3.86,
+                  4259: 27.29,
+                  4260: 21.28,
+                  4261: 19.2,
+                  4262: 21.11,
+                  4263: 21.53,
+                  4351: 27.24,
+                  4352: 26.46,
+                  4353: 28.59,
+                  4354: 30.04,
+                  4355: 15.41,
+                  4356: 35.68,
+                  4357: 12.82,
+                  4358: 21.94,
+                  4359: 15.16,
+                  4360: 24.38,
+                  4361: 32.31,
+                  4362: 15.66,
+                  5151: 35.62,
+                  5152: 41.2,
+                  5153: 37.35,
+                  5154: 68.83,
+                  5155: 32.56,
+                  5156: 47.09,
+                  5157: 49.82,
+                  5158: 39.77,
+                  5159: 34.18,
+                  5160: 45.04,
+                  5251: 49.57,
+                  5252: 47.84,
+                  5253: 63.43,
+                  5254: 48.97,
+                  5255: 39.38,
+                  5256: 42.66,
+                  5257: 41.33,
+                  5258: 62.83,
+                  5259: 42.64,
+                  5351: 47.24,
+                  5352: 42.06,
+                  5353: 53.93,
+                  5354: 29.65,
+                  5355: 58.45,
+                  5356: 34.79,
+                  5357: 46.25,
+                  6151: 28.59,
+                  6152: 14.26,
+                  6153: 30.92,
+                  6154: 25.85,
+                  6155: 18.98,
+                  6156: 21.09,
+                  6157: 18.79,
+                  6159: 21.06,
+                  6160: 40.04,
+                  6161: 21.98,
+                  6251: 23.27,
+                  6252: 23.17,
+                  6253: 53.68,
+                  6254: 23.81,
+                  6255: 27.55,
+                  6351: 40.46,
+                  6352: 38.74,
+                  6353: 26.39,
+                  6354: 42.37,
+                  6355: 27.54,
+                  6356: 31.9,
+                  Total: 28.64,
+                },
+              },
+              {
+                code_variable: "voix",
+                code_parti: "NAH",
+                resultat: {
+                  1151: 1153,
+                  1152: 1249,
+                  1153: 1289,
+                  1154: 1687,
+                  1155: 1544,
+                  1156: 2336,
+                  1157: 1145,
+                  1158: 870,
+                  1159: 2364,
+                  1160: 3457,
+                  1161: 388,
+                  1162: 2186,
+                  1163: 3931,
+                  1164: 3723,
+                  1165: 1604,
+                  1166: 3423,
+                  1167: 900,
+                  1168: 749,
+                  1169: 1675,
+                  1170: 2329,
+                  1171: 2232,
+                  1251: 4109,
+                  1252: 3967,
+                  1253: 4377,
+                  1254: 1436,
+                  1255: 1241,
+                  1256: 3651,
+                  1257: 3337,
+                  1351: 1808,
+                  1352: 2383,
+                  1353: 4669,
+                  1354: 2365,
+                  1355: 1377,
+                  1356: 1801,
+                  1357: 1446,
+                  1358: 2622,
+                  1359: 1266,
+                  1360: 4455,
+                  1361: 3518,
+                  1362: 3240,
+                  1451: 3641,
+                  1452: 2736,
+                  1453: 3222,
+                  1454: 3021,
+                  1455: 871,
+                  1456: 2065,
+                  1457: 2132,
+                  1458: 791,
+                  1551: 3283,
+                  1552: 2822,
+                  1553: 3721,
+                  1554: 2799,
+                  1555: 1841,
+                  1556: 1221,
+                  1557: 1820,
+                  1558: 1151,
+                  1559: 1950,
+                  1560: 1574,
+                  1561: 2510,
+                  1562: 1653,
+                  1563: 1109,
+                  1564: 3260,
+                  1565: 1088,
+                  1566: 3394,
+                  1651: 1068,
+                  1652: 1274,
+                  1653: 764,
+                  1654: 1313,
+                  1655: 1285,
+                  1656: 457,
+                  1751: 4250,
+                  1752: 1249,
+                  1753: 1373,
+                  1754: 1691,
+                  1755: 592,
+                  1756: 1373,
+                  1757: 538,
+                  1758: 2778,
+                  1759: 1083,
+                  1760: 544,
+                  1761: 1885,
+                  1762: 2497,
+                  1763: 2423,
+                  1764: 3492,
+                  2151: 2387,
+                  2152: 1370,
+                  2153: 623,
+                  2154: 2667,
+                  2155: 628,
+                  2156: 517,
+                  2157: 1477,
+                  2158: 279,
+                  2159: 1603,
+                  2251: 2932,
+                  2252: 1109,
+                  2253: 1380,
+                  2254: 1911,
+                  2255: 1665,
+                  2256: 2379,
+                  2257: 2066,
+                  2258: 940,
+                  2259: 1064,
+                  2351: 776,
+                  2352: 1050,
+                  2353: 1253,
+                  2354: 968,
+                  2355: 1654,
+                  2356: 766,
+                  2357: 369,
+                  2358: 392,
+                  2359: 605,
+                  2360: 1354,
+                  2361: 1004,
+                  2451: 1019,
+                  2452: 953,
+                  2453: 942,
+                  2454: 519,
+                  2455: 798,
+                  2456: 596,
+                  2457: 1328,
+                  2458: 467,
+                  2459: 825,
+                  2460: 413,
+                  2461: 547,
+                  3151: 1226,
+                  3152: 2181,
+                  3153: 2264,
+                  3154: 1400,
+                  3155: 1138,
+                  3156: 1149,
+                  3157: 1856,
+                  3158: 748,
+                  3159: 438,
+                  3160: 2063,
+                  3161: 2009,
+                  3162: 1549,
+                  3163: 929,
+                  3164: 6062,
+                  3165: 1410,
+                  3166: 1664,
+                  3251: 3257,
+                  3252: 1225,
+                  3253: 1853,
+                  3254: 1188,
+                  3255: 738,
+                  3256: 2525,
+                  3257: 2804,
+                  3258: 2543,
+                  3259: 511,
+                  3260: 2412,
+                  3261: 1271,
+                  3262: 1469,
+                  3263: 1135,
+                  3351: 2849,
+                  3352: 1883,
+                  3353: 1251,
+                  3354: 1641,
+                  3355: 994,
+                  3356: 3384,
+                  3357: 2214,
+                  3358: 591,
+                  3359: 723,
+                  3360: 1796,
+                  3361: 1411,
+                  3451: 5988,
+                  3452: 5245,
+                  3453: 7773,
+                  3454: 7160,
+                  3455: 9064,
+                  3456: 2539,
+                  3457: 2160,
+                  3458: 3260,
+                  3459: 2418,
+                  3460: 2387,
+                  3461: 1556,
+                  3462: 644,
+                  3463: 3367,
+                  3464: 962,
+                  3465: 641,
+                  3466: 595,
+                  4151: 4380,
+                  4152: 4025,
+                  4153: 2164,
+                  4154: 2770,
+                  4155: 1588,
+                  4156: 2751,
+                  4157: 1493,
+                  4158: 1499,
+                  4159: 2005,
+                  4160: 1974,
+                  4161: 2055,
+                  4251: 2283,
+                  4252: 1120,
+                  4253: 1018,
+                  4254: 1548,
+                  4255: 3150,
+                  4256: 1354,
+                  4257: 295,
+                  4258: 168,
+                  4259: 1173,
+                  4260: 486,
+                  4261: 1775,
+                  4262: 1725,
+                  4263: 1041,
+                  4351: 2667,
+                  4352: 1371,
+                  4353: 2164,
+                  4354: 1309,
+                  4355: 1020,
+                  4356: 1275,
+                  4357: 882,
+                  4358: 1097,
+                  4359: 782,
+                  4360: 1757,
+                  4361: 4143,
+                  4362: 708,
+                  5151: 2691,
+                  5152: 2082,
+                  5153: 4240,
+                  5154: 2387,
+                  5155: 2471,
+                  5156: 1260,
+                  5157: 5310,
+                  5158: 375,
+                  5159: 770,
+                  5160: 4934,
+                  5251: 3380,
+                  5252: 5010,
+                  5253: 2820,
+                  5254: 6019,
+                  5255: 5711,
+                  5256: 5436,
+                  5257: 3531,
+                  5258: 2314,
+                  5259: 1388,
+                  5351: 2439,
+                  5352: 2062,
+                  5353: 1248,
+                  5354: 438,
+                  5355: 1266,
+                  5356: 263,
+                  5357: 580,
+                  6151: 448,
+                  6152: 472,
+                  6153: 2133,
+                  6154: 3422,
+                  6155: 1602,
+                  6156: 1155,
+                  6157: 1827,
+                  6159: 881,
+                  6160: 959,
+                  6161: 1727,
+                  6251: 1967,
+                  6252: 1329,
+                  6253: 1202,
+                  6254: 1238,
+                  6255: 548,
+                  6351: 2986,
+                  6352: 1704,
+                  6353: 1506,
+                  6354: 2847,
+                  6355: 926,
+                  6356: 2028,
+                  Total: 516361,
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
   };
+
+  function findMinMaxValues(normalizedMap) {
+    const result = {};
+
+    for (const key in normalizedMap) {
+      result[key] = {
+        delegation: {
+          min: Infinity,
+          max: -Infinity,
+        },
+        gouvernorat: {
+          min: Infinity,
+          max: -Infinity,
+        },
+      };
+
+      const data = normalizedMap[key].normalizedData;
+
+      for (const level in data) {
+        for (const prcKey in data[level].prc) {
+          const value = data[level].prc[prcKey];
+          if (value < result[key][level].min) {
+            result[key][level].min = value;
+          }
+          if (value > result[key][level].max) {
+            result[key][level].max = value;
+          }
+        }
+      }
+    }
+    result[3] = {
+      delegation: {
+        min: Math.min(result[1].delegation.min, result[2].delegation.min),
+        max: Math.max(result[1].delegation.max, result[2].delegation.max),
+      },
+      gouvernorat: {
+        min: Math.min(result[1].gouvernorat.min, result[2].gouvernorat.min),
+        max: Math.max(result[1].gouvernorat.max, result[2].gouvernorat.max),
+      },
+    };
+
+    return result;
+  }
+
+  const normalizeData = (obj) => {
+    const normalizedData = {};
+
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        normalizedData[key] = {};
+
+        const variables = obj[key].data.variables;
+        variables.forEach((item) => {
+          const { code_variable, resultat } = item;
+          normalizedData[key][code_variable] = {};
+
+          for (const code in resultat) {
+            if (resultat.hasOwnProperty(code)) {
+              normalizedData[key][code_variable][code] = resultat[code];
+            }
+          }
+        });
+      }
+    }
+
+    return normalizedData;
+  };
+
+  useEffect(() => {
+    let normalizedMap = {};
+    for (const key in map) {
+      const data = normalizeData(map[key].resultats);
+
+      normalizedMap[key] = { ...map[key], normalizedData: data };
+    }
+    const minMax = findMinMaxValues(normalizedMap);
+
+    dispatch(setMinMax(minMax));
+    dispatch(setMaps(normalizedMap));
+  }, [dispatch]);
 
   const [toggleLayer, setToggleLayer] = useState(false);
   const [classNumber, setclassNumber] = useState(5);
+
+  const [geojson, setGeojson] = useState({});
+
+  //Map files preparation
+
+  useEffect(() => {
+    const fetchAndUseGeoJSON = async (level) => {
+      try {
+        const map = await getGeoJSON(level);
+        return { [level]: map };
+      } catch (error) {
+        console.error("Error:", error);
+        throw error;
+      }
+    };
+
+    const levelsToFetch = ["gouvernorat", "delegation"];
+
+    Promise.all(levelsToFetch.map(fetchAndUseGeoJSON))
+      .then((results) => {
+        const formattedResults = {};
+        results.forEach((entry) => {
+          const key = Object.keys(entry)[0];
+          formattedResults[key] = entry[key];
+        });
+        setGeojson(formattedResults);
+      })
+      .catch((error) => {
+        console.error("An error occurred:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    const boundsObject = {};
+
+    for (const mapName in geojson) {
+      if (geojson.hasOwnProperty(mapName)) {
+        boundsObject[mapName] = {};
+
+        const geoJSON = geojson[mapName];
+
+        geoJSON.features.forEach((feature) => {
+          const code = feature.properties[`code_${mapName}`];
+
+          const geometryType = feature.geometry.type;
+          let bounds;
+
+          const polygons =
+            geometryType === "Polygon"
+              ? [feature.geometry.coordinates]
+              : feature.geometry.coordinates;
+
+          const latLngs = [];
+          for (const polygon of polygons) {
+            for (const ring of polygon) {
+              latLngs.push(
+                ...ring.map((coord) => L.latLng(coord[1], coord[0]))
+              );
+            }
+          }
+
+          // Calculate the bounds using latLngs array.
+          bounds = L.latLngBounds(latLngs);
+
+          // Store the bounds in the object.
+          boundsObject[mapName][code] = bounds;
+        });
+      }
+    }
+  }, [geojson]);
 
   useEffect(() => {
     dispatch(initializeElections());
@@ -701,15 +1532,7 @@ function App() {
       <CssVarsProvider theme={theme}>
         {/* <CssVarsProvider disableTransitionOnChange> */}
         <CssBaseline />
-        <Layout.Root
-        // sx={{
-        //   gridTemplateColumns: {
-        //     xs: "1fr",
-        //     sm: "minmax(64px, 200px) minmax(450px, 1fr)",
-        //     md: "minmax(160px, 300px) minmax(600px, 1fr) minmax(300px, 420px)",
-        //   },
-        // }}
-        >
+        <Layout.Root>
           <Layout.Header>
             <Navbar />
           </Layout.Header>
@@ -719,9 +1542,6 @@ function App() {
               parti={map[1]["parti"]}
             />
           </Layout.TopPanel>
-          {/* <Layout.SidePanel>
-            <ModalContents />
-          </Layout.SidePanel> */}
           <Layout.Main>
             {/* {maps &&
               maps.map((mapObject) => {
@@ -735,73 +1555,35 @@ function App() {
                   />
                 );
               })} */}
-            <MapCard
-              map={map[1]}
-              electionInfo={map[1]["election"]}
-              toggleLayer={toggleLayer}
-              classNumber={classNumber}
-            />
+            <Sheet
+              className="map container"
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "center",
+              }}
+            >
+              <MapCard
+                // map={map[1]}
+                // electionInfo={map[1]["election"]}
+                toggleLayer={toggleLayer}
+                classNumber={classNumber}
+                geojson={geojson}
+                ID={1}
+              />
+              {compare && (
+                <MapCard
+                  // map={map[2]}
+                  // electionInfo={map[2]["election"]}
+                  toggleLayer={toggleLayer}
+                  classNumber={classNumber}
+                  compare={compare}
+                  geojson={geojson}
+                  ID={2}
+                />
+              )}
+            </Sheet>
           </Layout.Main>
-          {/* <Sheet
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 1.5,
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                padding: 4,
-                justifyContent: "space-between",
-              }}
-            >
-              <Typography>Carte Satellite:</Typography>{" "}
-              <Switch
-                checked={toggleLayer}
-                onChange={(event) => setToggleLayer(event.target.checked)}
-              />
-            </Box>
-
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                padding: 4,
-                justifyContent: "space-between",
-              }}
-            >
-              <Typography>Transparence:</Typography>{" "}
-              <Slider
-                marks
-                valueLabelDisplay="on"
-                value={fillValue}
-                onChange={(event) => setFillValue(event.target.value)}
-                max={10}
-                sx={{ width: 260 }}
-              />
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                padding: 4,
-                justifyContent: "space-between",
-              }}
-            >
-              <Typography>Nombre de classes:</Typography>{" "}
-              <Slider
-                marks
-                valueLabelDisplay="on"
-                value={classNumber}
-                onChange={(event) => setclassNumber(event.target.value)}
-                min={4}
-                max={12}
-                sx={{ width: 260 }}
-              />
-            </Box>
-          </Sheet> */}
         </Layout.Root>
       </CssVarsProvider>
     );

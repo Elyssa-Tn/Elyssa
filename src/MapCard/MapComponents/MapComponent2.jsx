@@ -3,25 +3,41 @@ import "leaflet/dist/leaflet.css";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import custom from "../../assets/custom(3).json";
 import { Box, Button, Divider, Sheet, Typography } from "@mui/joy";
-// import mapDeletaion from "../../assets/delegation.json";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setClickedTarget,
+  setHover,
+  setLevel,
+  setTooltip,
+} from "../../reducers/interfaceReducer";
 
 const MapComponent2 = ({
-  naming,
+  ID,
   data,
   geojson,
-  level,
-  setLevel,
   colors,
   colors2,
   displayMode,
-  target,
-  setTarget,
   classNumber,
-  hover,
-  setHover,
 }) => {
-  const [tooltipContent, setTooltipContent] = useState(null);
-  const [tooltipPosition, setTooltipPosition] = useState(null);
+  const target = useSelector((state) => state.interface.target);
+  const level = useSelector((state) => state.interface.level);
+  const hover = useSelector((state) => state.interface.hover);
+  const tooltip = useSelector((state) => state.interface.tooltip);
+  const compare = useSelector((state) => state.interface.compare);
+
+  //CHANGE COLOR GENERATION ITS BAD
+
+  const { min, max } = useSelector((state) =>
+    compare
+      ? state.interface.minMax[3][level]
+      : state.interface.minMax[ID][level]
+  );
+
+  // const { min, max } = values;
+
+  const dispatch = useDispatch();
+
   const [interactive, setInteractive] = useState(true);
   const [ready, setReady] = useState(false);
   const centerCoords = [33.9989, 10.1658];
@@ -43,10 +59,7 @@ const MapComponent2 = ({
     .reverse()
     .map(() => useRef());
 
-  const values = Object.values(data[level]["prc"]);
-  const minValue = Math.min(...values);
-  const maxValue = Math.max(...values);
-  const singleColorRange = (maxValue - minValue) / classNumber;
+  const singleColorRange = (max - min) / classNumber;
   const stepSize = Math.floor(colors.length / classNumber);
   const selectedColors = [];
 
@@ -58,12 +71,10 @@ const MapComponent2 = ({
   useLayoutEffect(() => {
     const allRefsReady = geoJSONRefs.every((ref) => ref.current !== null);
     if (allRefsReady && mapRef.current && target) {
-      setTimeout(() => {
-        mapRef.current.flyToBounds(target, { animate: true });
-        setTarget(null);
-      }, 0);
+      mapRef.current.flyToBounds(target, { animate: false });
+      dispatch(setClickedTarget(null));
     }
-  }, [geoJSONRefs, mapRef, setTarget, target]);
+  }, [geoJSONRefs, target]);
 
   function getColorForPercentileValue(value) {
     const color1 = colors2[0];
@@ -85,7 +96,7 @@ const MapComponent2 = ({
   }
 
   const getColorForValue = (value) => {
-    const interval = Math.floor((value - minValue) / singleColorRange);
+    const interval = Math.floor((value - min) / singleColorRange);
     return selectedColors[Math.min(interval, classNumber - 1)];
   };
 
@@ -103,54 +114,79 @@ const MapComponent2 = ({
   const handleClick = (feature, layer) => {
     const code = Number(feature.properties[`code_${level}`]);
     setTargetCode(code);
-    const bounds = layer.getBounds();
-    setLevel("delegation");
-    setTarget(bounds);
+    const { _southWest, _northEast } = layer.getBounds();
+
+    const bounds = [
+      [_southWest.lat, _southWest.lng],
+      [_northEast.lat, _northEast.lng],
+    ];
+
+    dispatch(setLevel("delegation"));
+    dispatch(setClickedTarget(bounds));
     setInteractive(false);
   };
 
   const handleResetClick = () => {
-    setLevel("gouvernorat");
+    dispatch(setLevel("gouvernorat"));
     setTargetCode(null);
+    dispatch(setClickedTarget(null));
     mapRef.current.setView(centerCoords, 6);
     setInteractive(true);
   };
 
   const handleMousover = (e) => {
-    const { target, layerPoint } = e;
+    const { target, containerPoint } = e;
+    const { x, y } = containerPoint;
+
     const code = target.feature.properties[`code_${level}`];
     const name = target.feature.properties[`nom_${level}`];
-    setHover(code);
-    setTooltipContent({
-      name,
-      prc: data[level]["prc"][code],
-      voix: data[level]["voix"][code],
-    });
-    setTooltipPosition(layerPoint);
+    // const valueGov =
+    //   data["gouvernorat"]["prc"][target.feature.properties["code_gouvernorat"]];
+    const nomGov = target.feature.properties["nom_gouvernorat"];
+    dispatch(setHover(code));
+    dispatch(
+      setTooltip({
+        position: { x, y },
+        name,
+        gouvernorat: {
+          name: nomGov,
+          // value: valueGov,
+        },
+        code,
+        prc: data[level]["prc"][code],
+        voix: data[level]["voix"][code],
+      })
+    );
   };
 
   const handleMouseout = () => {
-    setHover(null);
-    setTooltipContent(null);
+    dispatch(setHover(null));
+    dispatch(setTooltip(null));
   };
 
   const onEachFeature = (feature, layer) => {
-    layer.on("click", () => {
-      handleClick(feature, layer);
+    layer.on({
+      click: () => {
+        handleClick(feature, layer);
+      },
+      mouseover: (e) => {
+        handleMousover(e);
+      },
+      mouseout: () => {
+        handleMouseout();
+      },
     });
-
-    layer.on("mouseover", handleMousover);
-    layer.on("mouseout", handleMouseout);
   };
 
   return (
     <Box>
-      {tooltipContent && (
+      {tooltip && (
         <Sheet
           style={{
             position: "absolute",
-            left: tooltipPosition.x,
-            top: tooltipPosition.y - 50,
+            transform: "translateX(-50%)",
+            left: tooltip.position.x,
+            top: tooltip.position.y - 50,
             borderRadius: "0.25rem",
             padding: "0.25rem",
             zIndex: 999,
@@ -160,23 +196,64 @@ const MapComponent2 = ({
             sx={{
               display: "flex",
               flexDirection: "column",
-              padding: "0.25rem",
+              padding: "0.5rem",
             }}
           >
-            <Typography>{tooltipContent.name}</Typography>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "flex-end",
+              }}
+            >
+              <Typography level="body-lg">{tooltip.name}</Typography>
+              {level !== "gouvernorat" && (
+                <Typography level="body-sm">
+                  &nbsp;{tooltip.gouvernorat.name}
+                </Typography>
+              )}
+            </Box>
             <Divider />
-            <Box sx={{ display: "flex", flexDirection: "row" }}>
-              <Typography>{tooltipContent.voix} voix</Typography>
-              <Divider sx={{ margin: "0 0.25rem" }} orientation="vertical" />
-              <Typography
-                style={{
-                  background: getColorForValue(tooltipContent.prc),
-                  width: "1.5rem",
-                  height: "1.5rem",
-                  border: "1px solid #fff",
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                paddingTop: "0.25rem",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
                 }}
-              ></Typography>
-              <Typography>{tooltipContent.prc}%</Typography>
+              >
+                <Typography level="body-md">
+                  {data[level]["voix"][tooltip.code]}
+                </Typography>
+                <Typography level="body-sm">&nbsp;voix</Typography>
+              </Box>
+              <Divider sx={{ margin: "0 0.25rem" }} orientation="vertical" />
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                }}
+              >
+                {" "}
+                <Typography
+                  style={{
+                    background: getColorForValue(
+                      data[level]["prc"][tooltip.code]
+                    ),
+                    width: "1.5rem",
+                    height: "1.5rem",
+                    border: "1px solid #fff",
+                  }}
+                ></Typography>
+                <Typography>{data[level]["prc"][tooltip.code]}%</Typography>
+              </Box>
             </Box>
           </Box>
         </Sheet>
@@ -197,7 +274,7 @@ const MapComponent2 = ({
         ]}
         noWrap={true}
         style={{
-          width: 480,
+          width: "26rem",
           height: 500,
           backgroundColor: "#add8e6",
           borderRadius: "1rem",
@@ -219,8 +296,13 @@ const MapComponent2 = ({
               data={geojson[key]}
               style={(feature) => ({
                 fillColor: getColor(feature),
-                fillOpacity: feature.properties.level === level ? 0.8 : 0,
-                weight: 0.4 + index,
+                fillOpacity:
+                  (feature.properties.level === level ? 0.8 : 0) +
+                  (feature.properties[`code_${level}`] === hover ? 0.4 : 0),
+                weight:
+                  0.4 +
+                  index +
+                  (feature.properties[`code_${level}`] === hover ? 2 : 0),
                 color: "#000",
               })}
               onEachFeature={onEachFeature}

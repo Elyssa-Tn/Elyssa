@@ -28,14 +28,13 @@ Content-Type: application/json
 # "req":{
 #   "type": "data",
 #   "code_election": "tnmun2018",
-#   "decoupage": "secteur",
+#   "decoupage": "delegation",
 #   "variables": [
-#     {"code_variable":"prc","code_parti":"NIDA"},
-#      {"code_variable":"voix","code_parti":"NIDA"}
+#     {"code_variable":"prc","code_parti":"NAH"},
+#      {"code_variable":"voix","code_parti":"NAH"}
 #   ]
 # }
 # } 
-
 
 # {
 # "req":{
@@ -49,24 +48,24 @@ Content-Type: application/json
 # }
 # } 
 
-{
-"req":{
-  "type": "data",
-  "code_election": "tnmun2018",
-  "decoupage": "gouvernorat",
-  "variables": [
-    {"code_variable":"voix"},
-    {"code_variable":"tp"}
-  ]
-}
-}
-
 # {
-#   "req":{
-#     "type":"election",
-#     "code_election":"tnac2011"
-#   }
+# "req":{
+#   "type": "data",
+#   "code_election": "tnmun2018",
+#   "decoupage": "gouvernorat",
+#   "variables": [
+#     {"code_variable":"voix"},
+#     {"code_variable":"tp"}
+#   ]
 # }
+# }
+
+{
+  "req":{
+    "type":"election",
+    "code_election":"tnmun2018"
+  }
+}
 
 # {
 #   "req":{

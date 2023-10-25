@@ -3,7 +3,7 @@ import electionServices from "../services/electionServices";
 
 const mapSlice = createSlice({
   name: "maps",
-  initialState: { counter: 0, maps: [] },
+  initialState: null,
   reducers: {
     createMap(state, action) {
       const ID = state.counter;
@@ -20,10 +20,13 @@ const mapSlice = createSlice({
         }, {});
       return { ...state, maps: [...filteredMaps] };
     },
+    setMaps(state, action) {
+      return action.payload;
+    },
   },
 });
 
-export const { createMap, deleteMap } = mapSlice.actions;
+export const { createMap, deleteMap, setMaps } = mapSlice.actions;
 
 export const fetchMapData = (map) => {
   return async (dispatch) => {
