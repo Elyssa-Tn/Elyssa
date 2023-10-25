@@ -12,7 +12,7 @@ import MapTitle from "./MapTitle";
 import theme from "./theme";
 import { getGeoJSON } from "./services/geojson";
 import { setMaps } from "./reducers/mapReducer";
-import { setMinMax } from "./reducers/interfaceReducer";
+import { setClassNumber, setMinMax } from "./reducers/interfaceReducer";
 
 function App() {
   const dispatch = useDispatch();
@@ -1437,6 +1437,26 @@ function App() {
     return normalizedData;
   };
 
+  const calculateClasses = (data) => {
+    const classNumber = {};
+
+    for (const key in data) {
+      classNumber[key] = {};
+
+      for (const level in data[key]) {
+        const min = data[key][level].min;
+        const max = data[key][level].max;
+
+        const dataRange = max - min;
+        const minClasses = Math.max(5, Math.ceil(dataRange / 12));
+
+        classNumber[key][level] = minClasses;
+      }
+    }
+
+    return classNumber;
+  };
+
   useEffect(() => {
     let normalizedMap = {};
     for (const key in map) {
@@ -1445,13 +1465,14 @@ function App() {
       normalizedMap[key] = { ...map[key], normalizedData: data };
     }
     const minMax = findMinMaxValues(normalizedMap);
+    const classNumber = calculateClasses(minMax);
 
     dispatch(setMinMax(minMax));
+    dispatch(setClassNumber(classNumber));
     dispatch(setMaps(normalizedMap));
   }, [dispatch]);
 
   const [toggleLayer, setToggleLayer] = useState(false);
-  const [classNumber, setclassNumber] = useState(5);
 
   const [geojson, setGeojson] = useState({});
 
@@ -1541,20 +1562,14 @@ function App() {
               electionInfo={map[1]["election"]}
               parti={map[1]["parti"]}
             />
+            {compare && (
+              <MapTitle
+                electionInfo={map[2]["election"]}
+                parti={map[2]["parti"]}
+              />
+            )}
           </Layout.TopPanel>
           <Layout.Main>
-            {/* {maps &&
-              maps.map((mapObject) => {
-                const [ID, map] = Object.entries(mapObject)[0];
-                return (
-                  <MapCard
-                    key={ID}
-                    id={ID}
-                    map={map[1]}
-                    electionInfo={map[0]}
-                  />
-                );
-              })} */}
             <Sheet
               className="map container"
               sx={{
@@ -1567,7 +1582,6 @@ function App() {
                 // map={map[1]}
                 // electionInfo={map[1]["election"]}
                 toggleLayer={toggleLayer}
-                classNumber={classNumber}
                 geojson={geojson}
                 ID={1}
               />
@@ -1576,8 +1590,6 @@ function App() {
                   // map={map[2]}
                   // electionInfo={map[2]["election"]}
                   toggleLayer={toggleLayer}
-                  classNumber={classNumber}
-                  compare={compare}
                   geojson={geojson}
                   ID={2}
                 />

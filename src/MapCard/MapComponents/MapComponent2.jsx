@@ -11,22 +11,21 @@ import {
   setTooltip,
 } from "../../reducers/interfaceReducer";
 
-const MapComponent2 = ({
-  ID,
-  data,
-  geojson,
-  colors,
-  colors2,
-  displayMode,
-  classNumber,
-}) => {
+const MapComponent2 = ({ ID, data, geojson, colors, colors2, displayMode }) => {
   const target = useSelector((state) => state.interface.target);
   const level = useSelector((state) => state.interface.level);
   const hover = useSelector((state) => state.interface.hover);
   const tooltip = useSelector((state) => state.interface.tooltip);
-  const compare = useSelector((state) => state.interface.compare);
+
+  const compare = useSelector((state) => state.interface.compareToggle);
 
   //CHANGE COLOR GENERATION ITS BAD
+
+  const classNumber = useSelector((state) =>
+    compare
+      ? state.interface.classNumber[3][level]
+      : state.interface.classNumber[ID][level]
+  );
 
   const { min, max } = useSelector((state) =>
     compare
@@ -61,6 +60,7 @@ const MapComponent2 = ({
 
   const singleColorRange = (max - min) / classNumber;
   const stepSize = Math.floor(colors.length / classNumber);
+
   const selectedColors = [];
 
   for (var i = 0; i < classNumber; i++) {
@@ -71,7 +71,7 @@ const MapComponent2 = ({
   useLayoutEffect(() => {
     const allRefsReady = geoJSONRefs.every((ref) => ref.current !== null);
     if (allRefsReady && mapRef.current && target) {
-      mapRef.current.flyToBounds(target, { animate: false });
+      mapRef.current.flyToBounds(target, { animate: true });
       dispatch(setClickedTarget(null));
     }
   }, [geoJSONRefs, target]);
@@ -97,6 +97,7 @@ const MapComponent2 = ({
 
   const getColorForValue = (value) => {
     const interval = Math.floor((value - min) / singleColorRange);
+
     return selectedColors[Math.min(interval, classNumber - 1)];
   };
 
@@ -249,10 +250,12 @@ const MapComponent2 = ({
                     ),
                     width: "1.5rem",
                     height: "1.5rem",
-                    border: "1px solid #fff",
+                    border: "1px solid #333",
                   }}
                 ></Typography>
-                <Typography>{data[level]["prc"][tooltip.code]}%</Typography>
+                <Typography>
+                  &nbsp;{data[level]["prc"][tooltip.code]}%
+                </Typography>
               </Box>
             </Box>
           </Box>
@@ -261,13 +264,15 @@ const MapComponent2 = ({
       <MapContainer
         key={level}
         zoomControl={false}
-        boxZoom={false}
+        // boxZoom={false}
         doubleClickZoom={false}
-        dragging={false}
-        scrollWheelZoom={false}
+        // dragging={false}
+        // scrollWheelZoom={false}
         ref={mapRef}
         center={centerCoords}
         zoom={6}
+        minZoom={6}
+        bounceAtZoomLimits={true}
         maxBounds={[
           [37.624276, 7.177274],
           [30.192062, 12.880537],
