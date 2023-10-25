@@ -101,7 +101,7 @@ const Legend2 = ({ ID, colors, hover }) => {
                 display: "inline-block",
                 width: "30px",
                 height: "20px",
-                border: `1px solid #fff`,
+                border: `1px solid #333`,
               }}
             ></Typography>
           </Box>

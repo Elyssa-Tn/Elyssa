@@ -266,7 +266,7 @@ const MapComponent2 = ({ ID, data, geojson, colors, colors2, displayMode }) => {
         zoomControl={false}
         // boxZoom={false}
         doubleClickZoom={false}
-        dragging={false}
+        // dragging={false}
         // scrollWheelZoom={false}
         ref={mapRef}
         center={centerCoords}

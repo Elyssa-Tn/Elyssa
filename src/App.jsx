@@ -1562,20 +1562,14 @@ function App() {
               electionInfo={map[1]["election"]}
               parti={map[1]["parti"]}
             />
+            {compare && (
+              <MapTitle
+                electionInfo={map[2]["election"]}
+                parti={map[2]["parti"]}
+              />
+            )}
           </Layout.TopPanel>
           <Layout.Main>
-            {/* {maps &&
-              maps.map((mapObject) => {
-                const [ID, map] = Object.entries(mapObject)[0];
-                return (
-                  <MapCard
-                    key={ID}
-                    id={ID}
-                    map={map[1]}
-                    electionInfo={map[0]}
-                  />
-                );
-              })} */}
             <Sheet
               className="map container"
               sx={{
@@ -1596,7 +1590,6 @@ function App() {
                   // map={map[2]}
                   // electionInfo={map[2]["election"]}
                   toggleLayer={toggleLayer}
-                  compare={compare}
                   geojson={geojson}
                   ID={2}
                 />
