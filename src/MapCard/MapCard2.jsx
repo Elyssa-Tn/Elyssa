@@ -180,7 +180,8 @@ function MapCard({ ID, toggleLayer, classNumber, geojson }) {
         {geojson && map && (
           <Card
             variant="soft"
-            key={map}
+            // key={map}
+            key={ID}
             style={{
               display: "flex",
               flexDirection: compare ? "column" : "row",

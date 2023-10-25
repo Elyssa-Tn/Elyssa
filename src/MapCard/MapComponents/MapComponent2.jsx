@@ -24,7 +24,7 @@ const MapComponent2 = ({
   const level = useSelector((state) => state.interface.level);
   const hover = useSelector((state) => state.interface.hover);
   const tooltip = useSelector((state) => state.interface.tooltip);
-  const compare = useSelector((state) => state.interface.compare);
+  const compare = useSelector((state) => state.interface.compareToggle);
 
   //CHANGE COLOR GENERATION ITS BAD
 
@@ -71,7 +71,7 @@ const MapComponent2 = ({
   useLayoutEffect(() => {
     const allRefsReady = geoJSONRefs.every((ref) => ref.current !== null);
     if (allRefsReady && mapRef.current && target) {
-      mapRef.current.flyToBounds(target, { animate: false });
+      mapRef.current.flyToBounds(target, { animate: true });
       dispatch(setClickedTarget(null));
     }
   }, [geoJSONRefs, target]);
@@ -252,7 +252,9 @@ const MapComponent2 = ({
                     border: "1px solid #fff",
                   }}
                 ></Typography>
-                <Typography>{data[level]["prc"][tooltip.code]}%</Typography>
+                <Typography>
+                  &nbsp;{data[level]["prc"][tooltip.code]}%
+                </Typography>
               </Box>
             </Box>
           </Box>
@@ -261,13 +263,15 @@ const MapComponent2 = ({
       <MapContainer
         key={level}
         zoomControl={false}
-        boxZoom={false}
+        // boxZoom={false}
         doubleClickZoom={false}
         dragging={false}
-        scrollWheelZoom={false}
+        // scrollWheelZoom={false}
         ref={mapRef}
         center={centerCoords}
         zoom={6}
+        minZoom={6}
+        bounceAtZoomLimits={true}
         maxBounds={[
           [37.624276, 7.177274],
           [30.192062, 12.880537],
