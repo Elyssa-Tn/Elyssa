@@ -60,12 +60,12 @@ Content-Type: application/json
 # }
 # }
 
-{
-  "req":{
-    "type":"election",
-    "code_election":"tnmun2018"
-  }
-}
+# {
+#   "req":{
+#     "type":"election",
+#     "code_election":"tnmun2018"
+#   }
+# }
 
 # {
 #   "req":{
@@ -74,8 +74,8 @@ Content-Type: application/json
 #   }
 # }
 
-# {
-#   "req":{
-#     "type":"init"
-#   }
-# }
+{
+  "req":{
+    "type":"init"
+  }
+}
