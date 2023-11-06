@@ -1,5 +1,6 @@
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import UndoIcon from "@mui/icons-material/Undo";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import custom from "../../assets/custom(3).json";
 import { Box, Button, Divider, Sheet, Typography } from "@mui/joy";
@@ -9,13 +10,24 @@ import {
   setHover,
   setLevel,
   setTooltip,
+  setZoomLevel,
 } from "../../reducers/interfaceReducer";
 
-const MapComponent2 = ({ ID, data, geojson, colors, colors2, displayMode }) => {
+const MapComponent2 = ({
+  ID,
+  data,
+  geojson,
+  colors,
+  colors2,
+  displayMode,
+  bounds,
+}) => {
   const target = useSelector((state) => state.interface.target);
   const level = useSelector((state) => state.interface.level);
+  const levels = useSelector((state) => state.interface.levels);
   const hover = useSelector((state) => state.interface.hover);
   const tooltip = useSelector((state) => state.interface.tooltip);
+  const zoomLevel = useSelector((state) => state.interface.zoomLevel);
 
   const compare = useSelector((state) => state.interface.compareToggle);
 
@@ -37,7 +49,6 @@ const MapComponent2 = ({ ID, data, geojson, colors, colors2, displayMode }) => {
 
   const dispatch = useDispatch();
 
-  const [interactive, setInteractive] = useState(true);
   const [ready, setReady] = useState(false);
   const centerCoords = [33.9989, 10.1658];
 
@@ -112,27 +123,87 @@ const MapComponent2 = ({ ID, data, geojson, colors, colors2, displayMode }) => {
     if (value && displayMode === 2) return getColorForPercentileValue(value);
   };
 
-  const handleClick = (feature, layer) => {
-    const code = Number(feature.properties[`code_${level}`]);
-    setTargetCode(code);
-    const { _southWest, _northEast } = layer.getBounds();
+  const getDifferentLevel = (levels, currentLevel, direction) => {
+    const currentIndex = levels.indexOf(currentLevel);
 
-    const bounds = [
-      [_southWest.lat, _southWest.lng],
-      [_northEast.lat, _northEast.lng],
-    ];
+    if (currentIndex === -1) {
+      return null;
+    }
 
-    dispatch(setLevel("delegation"));
-    dispatch(setClickedTarget(bounds));
-    setInteractive(false);
+    if (direction === "up" && currentIndex > 0) {
+      return levels[currentIndex - 1];
+    } else if (direction === "down" && currentIndex < levels.length - 1) {
+      return levels[currentIndex + 1];
+    } else {
+      return null;
+    }
   };
 
+  const handleClick = (feature) => {
+    const code = Number(feature.properties[`code_${level}`]);
+
+    if (level === levels[0]) {
+      const { _southWest, _northEast } = bounds[level][code];
+
+      const boundaries = [
+        [_southWest.lat, _southWest.lng],
+        [_northEast.lat, _northEast.lng],
+      ];
+
+      setTargetCode(code);
+      dispatch(setLevel(levels[1]));
+      dispatch(setClickedTarget(boundaries));
+    }
+    if (level === levels[1]) {
+      const targetGovCode = Number(
+        feature.properties[`code_${getDifferentLevel(levels, level, "up")}`]
+      );
+      console.log(
+        "target code:",
+        targetCode,
+        "target gov code:",
+        targetGovCode
+      );
+
+      console.log(targetCode === targetGovCode);
+
+      if (targetCode === targetGovCode) {
+        const { _southWest, _northEast } = bounds[level][code];
+
+        const boundaries = [
+          [_southWest.lat, _southWest.lng],
+          [_northEast.lat, _northEast.lng],
+        ];
+        dispatch(setClickedTarget(boundaries));
+      } else {
+        const { _southWest, _northEast } =
+          bounds[getDifferentLevel(levels, level, "up")][targetGovCode];
+
+        const boundaries = [
+          [_southWest.lat, _southWest.lng],
+          [_northEast.lat, _northEast.lng],
+        ];
+
+        console.log(`Old code: ${targetCode}. New code: ${targetGovCode}`);
+
+        setTargetCode(null);
+        setTimeout(() => {
+          setTargetCode(targetGovCode);
+        }, 1);
+        dispatch(setClickedTarget(boundaries));
+      }
+    }
+  };
+
+  useEffect(() => {
+    console.log(targetCode);
+  }, [targetCode]);
+
   const handleResetClick = () => {
-    dispatch(setLevel("gouvernorat"));
+    dispatch(setLevel(levels[0]));
     setTargetCode(null);
     dispatch(setClickedTarget(null));
     mapRef.current.setView(centerCoords, 6);
-    setInteractive(true);
   };
 
   const handleMousover = (e) => {
@@ -180,7 +251,14 @@ const MapComponent2 = ({ ID, data, geojson, colors, colors2, displayMode }) => {
   };
 
   return (
-    <Box>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+      }}
+    >
       {tooltip && (
         <Sheet
           style={{
@@ -209,7 +287,7 @@ const MapComponent2 = ({ ID, data, geojson, colors, colors2, displayMode }) => {
               }}
             >
               <Typography level="body-lg">{tooltip.name}</Typography>
-              {level !== "gouvernorat" && (
+              {level !== levels[0] && (
                 <Typography level="body-sm">
                   &nbsp;{tooltip.gouvernorat.name}
                 </Typography>
@@ -262,7 +340,7 @@ const MapComponent2 = ({ ID, data, geojson, colors, colors2, displayMode }) => {
         </Sheet>
       )}
       <MapContainer
-        key={level}
+        key={`${level}${ID}`}
         zoomControl={false}
         // boxZoom={false}
         doubleClickZoom={false}
@@ -270,8 +348,9 @@ const MapComponent2 = ({ ID, data, geojson, colors, colors2, displayMode }) => {
         // scrollWheelZoom={false}
         ref={mapRef}
         center={centerCoords}
-        zoom={6}
+        zoom={zoomLevel}
         minZoom={6}
+        zoomSnap={1}
         bounceAtZoomLimits={true}
         maxBounds={[
           [37.624276, 7.177274],
@@ -315,13 +394,14 @@ const MapComponent2 = ({ ID, data, geojson, colors, colors2, displayMode }) => {
               ref={geoJSONRefs[index]}
             />
           ))}
-
-        {level !== "gouvernorat" && (
+      </MapContainer>
+      <Box sx={{ order: ID }}>
+        {level !== levels[0] && (
           <Button sx={{ zIndex: 1000 }} onClick={handleResetClick}>
-            Retour
+            <UndoIcon />
           </Button>
         )}
-      </MapContainer>
+      </Box>
     </Box>
   );
 };

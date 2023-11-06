@@ -70,7 +70,7 @@ const SidePanel = (props) => {
 const TopPanel = (props) => {
   return (
     <Box
-      component="top"
+      component="main"
       className="TopPanel"
       {...props}
       sx={[
