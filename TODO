@@ -1,7 +1,3 @@
-Moyenne nationale
-
-Hovering over one feature highlights the same feature in the map or in the table
-
 Zoom lock button
 
 When a map is displayed, offer a way to compare on a temporal scale on the same map, or on a different one.
@@ -13,3 +9,5 @@ Graph view.
 Dual map zoom
 
 Map linking lock/unlock feature
+
+Button panel to contain all map controls

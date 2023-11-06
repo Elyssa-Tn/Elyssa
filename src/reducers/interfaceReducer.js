@@ -2,6 +2,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
+  levels: ["gouvernorat", "delegation"],
   level: "gouvernorat",
   hover: null,
   tooltip: null,
@@ -9,6 +10,8 @@ const initialState = {
   minMax: null,
   classNumber: 5,
   compareToggle: false,
+  zoomLevel: 6,
+  bounds: null,
 };
 
 const interfaceSlice = createSlice({
@@ -36,6 +39,12 @@ const interfaceSlice = createSlice({
     setClassNumber: (state, action) => {
       state.classNumber = action.payload;
     },
+    setZoomLevel: (state, action) => {
+      state.zoomLevel = action.payload;
+    },
+    setBounds: (state, action) => {
+      state.bounds = action.payload;
+    },
   },
 });
 
@@ -47,6 +56,8 @@ export const {
   toggleCompare,
   setMinMax,
   setClassNumber,
+  setZoomLevel,
+  setBounds,
 } = interfaceSlice.actions;
 
 export default interfaceSlice.reducer;

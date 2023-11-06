@@ -14,12 +14,18 @@ import { getGeoJSON } from "./services/geojson";
 import { setMaps } from "./reducers/mapReducer";
 import { setClassNumber, setMinMax } from "./reducers/interfaceReducer";
 
+import delegation from "./assets/delegation.json";
+import gouvernorat from "./assets/gouvernorat.json";
+
 function App() {
   const dispatch = useDispatch();
 
   const init = useSelector((state) => state.elections.init);
 
+  const levels = useSelector((state) => state.interface.levels);
+
   const compare = useSelector((state) => state.interface.compareToggle);
+  const [bounds, setBounds] = useState(null);
 
   // const maps = useSelector((state) => state.maps.maps);
   const map = {
@@ -1476,129 +1482,139 @@ function App() {
 
   const [geojson, setGeojson] = useState({});
 
-  //Map files preparation
+  //MAP FILES FETCHING, RESTORE THIS WHEN SERVER WORKS AGAIN
+
+  // useEffect(() => {
+  //   const fetchAndUseGeoJSON = async (level) => {
+  //     try {
+  //       const map = await getGeoJSON(level);
+  //       return { [level]: map };
+  //     } catch (error) {
+  //       console.error("Error:", error);
+  //       throw error;
+  //     }
+  //   };
+
+  //   Promise.all(levels.map(fetchAndUseGeoJSON))
+  //     .then((results) => {
+  //       const formattedResults = {};
+  //       results.forEach((entry) => {
+  //         const key = Object.keys(entry)[0];
+  //         formattedResults[key] = entry[key];
+  //       });
+  //       setGeojson(formattedResults);
+  //     })
+  //     .catch((error) => {
+  //       console.error("An error occurred:", error);
+  //     });
+  // }, []);
 
   useEffect(() => {
-    const fetchAndUseGeoJSON = async (level) => {
-      try {
-        const map = await getGeoJSON(level);
-        return { [level]: map };
-      } catch (error) {
-        console.error("Error:", error);
-        throw error;
-      }
+    const formattedResults = {
+      gouvernorat: gouvernorat,
+      delegation: delegation,
     };
-
-    const levelsToFetch = ["gouvernorat", "delegation"];
-
-    Promise.all(levelsToFetch.map(fetchAndUseGeoJSON))
-      .then((results) => {
-        const formattedResults = {};
-        results.forEach((entry) => {
-          const key = Object.keys(entry)[0];
-          formattedResults[key] = entry[key];
-        });
-        setGeojson(formattedResults);
-      })
-      .catch((error) => {
-        console.error("An error occurred:", error);
-      });
+    setGeojson(formattedResults);
   }, []);
 
   useEffect(() => {
-    const boundsObject = {};
+    const calculateBounds = async () => {
+      const boundsObject = {};
 
-    for (const mapName in geojson) {
-      if (geojson.hasOwnProperty(mapName)) {
-        boundsObject[mapName] = {};
+      for (const mapName in geojson) {
+        if (geojson.hasOwnProperty(mapName)) {
+          boundsObject[mapName] = {};
 
-        const geoJSON = geojson[mapName];
+          const geoJSON = geojson[mapName];
 
-        geoJSON.features.forEach((feature) => {
-          const code = feature.properties[`code_${mapName}`];
+          geoJSON.features.forEach((feature) => {
+            const code = feature.properties[`code_${mapName}`];
 
-          const geometryType = feature.geometry.type;
-          let bounds;
+            const geometryType = feature.geometry.type;
+            let bounds;
 
-          const polygons =
-            geometryType === "Polygon"
-              ? [feature.geometry.coordinates]
-              : feature.geometry.coordinates;
+            const polygons =
+              geometryType === "Polygon"
+                ? [feature.geometry.coordinates]
+                : feature.geometry.coordinates;
 
-          const latLngs = [];
-          for (const polygon of polygons) {
-            for (const ring of polygon) {
-              latLngs.push(
-                ...ring.map((coord) => L.latLng(coord[1], coord[0]))
-              );
+            const latLngs = [];
+            for (const polygon of polygons) {
+              for (const ring of polygon) {
+                latLngs.push(
+                  ...ring.map((coord) => L.latLng(coord[1], coord[0]))
+                );
+              }
             }
-          }
 
-          // Calculate the bounds using latLngs array.
-          bounds = L.latLngBounds(latLngs);
+            bounds = L.latLngBounds(latLngs);
 
-          // Store the bounds in the object.
-          boundsObject[mapName][code] = bounds;
-        });
+            boundsObject[mapName][code] = bounds;
+          });
+        }
+
+        if (Object.keys(boundsObject).length === levels.length) {
+          setBounds(boundsObject);
+        }
       }
-    }
+    };
+    if (geojson) calculateBounds();
   }, [geojson]);
 
-  useEffect(() => {
-    dispatch(initializeElections());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(initializeElections());
+  // }, [dispatch]);
 
-  if (init)
-    return (
-      <CssVarsProvider theme={theme}>
-        {/* <CssVarsProvider disableTransitionOnChange> */}
-        <CssBaseline />
-        <Layout.Root>
-          <Layout.Header>
-            <Navbar />
-          </Layout.Header>
-          <Layout.TopPanel>
+  // if (init)
+  return (
+    <CssVarsProvider theme={theme}>
+      {/* <CssVarsProvider disableTransitionOnChange> */}
+      <CssBaseline />
+      <Layout.Root>
+        <Layout.Header>
+          <Navbar />
+        </Layout.Header>
+        <Layout.TopPanel>
+          <MapTitle electionInfo={map[1]["election"]} parti={map[1]["parti"]} />
+          {compare && (
             <MapTitle
-              electionInfo={map[1]["election"]}
-              parti={map[1]["parti"]}
+              electionInfo={map[2]["election"]}
+              parti={map[2]["parti"]}
+            />
+          )}
+        </Layout.TopPanel>
+        <Layout.Main>
+          <Sheet
+            className="map container"
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "center",
+            }}
+          >
+            <MapCard
+              // map={map[1]}
+              // electionInfo={map[1]["election"]}
+              toggleLayer={toggleLayer}
+              geojson={geojson}
+              bounds={bounds}
+              ID={1}
             />
             {compare && (
-              <MapTitle
-                electionInfo={map[2]["election"]}
-                parti={map[2]["parti"]}
-              />
-            )}
-          </Layout.TopPanel>
-          <Layout.Main>
-            <Sheet
-              className="map container"
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "center",
-              }}
-            >
               <MapCard
-                // map={map[1]}
-                // electionInfo={map[1]["election"]}
+                // map={map[2]}
+                // electionInfo={map[2]["election"]}
                 toggleLayer={toggleLayer}
                 geojson={geojson}
-                ID={1}
+                bounds={bounds}
+                ID={2}
               />
-              {compare && (
-                <MapCard
-                  // map={map[2]}
-                  // electionInfo={map[2]["election"]}
-                  toggleLayer={toggleLayer}
-                  geojson={geojson}
-                  ID={2}
-                />
-              )}
-            </Sheet>
-          </Layout.Main>
-        </Layout.Root>
-      </CssVarsProvider>
-    );
+            )}
+          </Sheet>
+        </Layout.Main>
+      </Layout.Root>
+    </CssVarsProvider>
+  );
 }
 
 export default App;

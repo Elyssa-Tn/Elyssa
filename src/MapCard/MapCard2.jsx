@@ -20,12 +20,13 @@ import * as L from "leaflet";
 import MapComponent2 from "./MapComponents/MapComponent2";
 // import MapComponent2 from "./MapComponents/MapComponent";
 import ExpandedResults from "./MapComponents/ExpandedResults";
-import CircularProgress from "@mui/material/CircularProgress";
 import Legend2 from "./MapComponents/Legend2";
 import Legend from "./MapComponents/Legend";
 
 // import * as htmlToImage from "html-to-image";
 import DownloadIcon from "@mui/icons-material/Download";
+import CircularProgress from "@mui/joy/CircularProgress";
+
 import InfoIcon from "@mui/icons-material/Info";
 import PanoramaIcon from "@mui/icons-material/Panorama";
 import TableChartIcon from "@mui/icons-material/TableChart";
@@ -45,9 +46,9 @@ const ExpandMore = styled((props) => {
   marginLeft: "auto",
 }));
 
-function MapCard({ ID, toggleLayer, geojson }) {
+function MapCard({ ID, toggleLayer, bounds, geojson }) {
   const compare = useSelector((state) => state.interface.compareToggle);
-  const map = useSelector((state) => state.maps[ID]);
+  const maps = useSelector((state) => state.maps);
 
   const dispatch = useDispatch();
 
@@ -150,7 +151,7 @@ function MapCard({ ID, toggleLayer, geojson }) {
   //   }
   // }, [geojson]);
 
-  if (!geojson) {
+  if (!geojson || !maps || !bounds) {
     console.log("loading");
     return (
       <CircularProgress
@@ -163,6 +164,8 @@ function MapCard({ ID, toggleLayer, geojson }) {
       />
     );
   }
+
+  const map = maps[ID];
 
   const handleDownload = async () => {
     if (mapRef.current) {
@@ -186,8 +189,8 @@ function MapCard({ ID, toggleLayer, geojson }) {
               display: "flex",
               flexDirection: compare ? "column" : "row",
               position: "relative",
-              justifyContent: "center",
-              alignItems: "center",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
               borderRadius: 0,
               borderTop: "none",
               borderBottom: "none",
@@ -247,6 +250,7 @@ function MapCard({ ID, toggleLayer, geojson }) {
                 colors2={colors2}
                 displayMode={displayMode}
                 toggleLayer={toggleLayer}
+                bounds={bounds}
               />
             </Box>
             <Divider orientation="vertical" />
