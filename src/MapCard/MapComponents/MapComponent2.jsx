@@ -3,7 +3,7 @@ import "leaflet/dist/leaflet.css";
 import UndoIcon from "@mui/icons-material/Undo";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import custom from "../../assets/custom(3).json";
-import { Box, Button, Divider, Sheet, Typography } from "@mui/joy";
+import { Box, Button, ButtonGroup, Divider, Sheet, Typography } from "@mui/joy";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setClickedTarget,
@@ -82,7 +82,7 @@ const MapComponent2 = ({
   useLayoutEffect(() => {
     const allRefsReady = geoJSONRefs.every((ref) => ref.current !== null);
     if (allRefsReady && mapRef.current && target) {
-      mapRef.current.flyToBounds(target, { animate: true });
+      mapRef.current.flyToBounds(target, { animate: ID === 1 ? true : false });
       dispatch(setClickedTarget(null));
     }
   }, [geoJSONRefs, target]);
@@ -250,11 +250,15 @@ const MapComponent2 = ({
     });
   };
 
+  const getMapZoom = () => {
+    return mapRef && console.log("object", mapRef.current.getZoom());
+  };
+
   return (
     <Box
       sx={{
         display: "flex",
-        flexDirection: "column",
+        flexDirection: ID === 2 ? "row-reverse" : "row",
         justifyContent: "space-between",
         alignItems: "flex-start",
       }}
@@ -395,13 +399,18 @@ const MapComponent2 = ({
             />
           ))}
       </MapContainer>
-      <Box sx={{ order: ID }}>
-        {level !== levels[0] && (
-          <Button sx={{ zIndex: 1000 }} onClick={handleResetClick}>
-            <UndoIcon />
-          </Button>
-        )}
-      </Box>
+      <ButtonGroup
+        orientation="vertical"
+        size="sm"
+        sx={{ paddingTop: "0.25rem" }}
+      >
+        <Button
+          disabled={level === levels[0] ? true : false}
+          onClick={handleResetClick}
+        >
+          <UndoIcon />
+        </Button>
+      </ButtonGroup>
     </Box>
   );
 };
