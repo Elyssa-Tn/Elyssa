@@ -4,6 +4,12 @@ import { CssBaseline, CssVarsProvider, Divider, Sheet } from "@mui/joy";
 import { useDispatch, useSelector } from "react-redux";
 import { initializeElections } from "./reducers/electionReducer";
 
+import {
+  experimental_extendTheme as materialExtendTheme,
+  Experimental_CssVarsProvider as MaterialCssVarsProvider,
+  THEME_ID as MATERIAL_THEME_ID,
+} from "@mui/material/styles";
+
 import Layout from "./Layout";
 import ModalContents from "./ModalContents/ModalContents";
 import MapCard from "./MapCard/MapCard2";
@@ -18,6 +24,8 @@ import delegation from "./assets/delegation.json";
 import gouvernorat from "./assets/gouvernorat.json";
 
 function App() {
+  const materialTheme = materialExtendTheme();
+
   const dispatch = useDispatch();
 
   const init = useSelector((state) => state.elections.init);
@@ -1549,7 +1557,10 @@ function App() {
 
             bounds = L.latLngBounds(latLngs);
 
-            boundsObject[mapName][code] = bounds;
+            boundsObject[mapName][code] = {
+              name: feature.properties[`nom_${mapName}`],
+              bounds,
+            };
           });
         }
 
@@ -1567,56 +1578,60 @@ function App() {
 
   // if (init)
   return (
-    <CssVarsProvider theme={theme}>
-      {/* <CssVarsProvider disableTransitionOnChange> */}
-      <CssBaseline />
-      <Layout.Root>
-        <Layout.Header>
-          <Navbar />
-        </Layout.Header>
-        <Layout.TopPanel>
-          <MapTitle electionInfo={map[1]["election"]} parti={map[1]["parti"]} />
-          {compare && (
+    <MaterialCssVarsProvider theme={{ [MATERIAL_THEME_ID]: materialTheme }}>
+      <CssVarsProvider theme={theme}>
+        <CssBaseline />
+        <Layout.Root>
+          <Layout.Header>
+            <Navbar />
+          </Layout.Header>
+          <Layout.TopPanel>
             <MapTitle
-              electionInfo={map[2]["election"]}
-              parti={map[2]["parti"]}
-            />
-          )}
-        </Layout.TopPanel>
-        <Layout.Main>
-          <Sheet
-            className="map container"
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "center",
-            }}
-          >
-            <MapCard
-              // map={map[1]}
-              // electionInfo={map[1]["election"]}
-              toggleLayer={toggleLayer}
-              geojson={geojson}
-              bounds={bounds}
-              ID={1}
+              electionInfo={map[1]["election"]}
+              parti={map[1]["parti"]}
             />
             {compare && (
-              <>
-                <Divider orientation="vertical" />
-                <MapCard
-                  // map={map[2]}
-                  // electionInfo={map[2]["election"]}
-                  toggleLayer={toggleLayer}
-                  geojson={geojson}
-                  bounds={bounds}
-                  ID={2}
-                />
-              </>
+              <MapTitle
+                electionInfo={map[2]["election"]}
+                parti={map[2]["parti"]}
+              />
             )}
-          </Sheet>
-        </Layout.Main>
-      </Layout.Root>
-    </CssVarsProvider>
+          </Layout.TopPanel>
+          <Layout.Main>
+            <Sheet
+              className="map container"
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "center",
+              }}
+            >
+              <MapCard
+                // map={map[1]}
+                // electionInfo={map[1]["election"]}
+                toggleLayer={toggleLayer}
+                geojson={geojson}
+                bounds={bounds}
+                ID={1}
+              />
+              {compare && (
+                <>
+                  <Divider orientation="vertical" />
+                  <MapCard
+                    // map={map[2]}
+                    // electionInfo={map[2]["election"]}
+                    toggleLayer={toggleLayer}
+                    geojson={geojson}
+                    bounds={bounds}
+                    ID={2}
+                  />
+                </>
+              )}
+            </Sheet>
+          </Layout.Main>
+        </Layout.Root>
+      </CssVarsProvider>
+    </MaterialCssVarsProvider>
   );
 }
 

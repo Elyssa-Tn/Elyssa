@@ -13,6 +13,7 @@ const initialState = {
   zoomLevel: 6,
   bounds: null,
   levelLock: { 1: false, 2: false },
+  chartMode: { 1: false, 2: false },
 };
 
 const interfaceSlice = createSlice({
@@ -54,6 +55,14 @@ const interfaceSlice = createSlice({
       };
       state.levelLock = updatedLevelLock;
     },
+    setChartMode: (state, action) => {
+      const id = action.payload;
+      const updatedChartMode = {
+        ...state.chartMode,
+        [id]: !state.chartMode[id],
+      };
+      state.chartMode = updatedChartMode;
+    },
   },
 });
 
@@ -68,6 +77,7 @@ export const {
   setZoomLevel,
   setBounds,
   setLevelLock,
+  setChartMode,
 } = interfaceSlice.actions;
 
 export default interfaceSlice.reducer;

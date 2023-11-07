@@ -38,6 +38,7 @@ import InfoPanel from "./MapComponents/InfoPanel";
 import { deleteMap } from "../reducers/mapReducer";
 import { getGeoJSON } from "../services/geojson";
 import { toggleCompare } from "../reducers/interfaceReducer";
+import ChartComponent from "./MapComponents/ChartComponent";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -48,6 +49,7 @@ const ExpandMore = styled((props) => {
 
 function MapCard({ ID, toggleLayer, bounds, geojson }) {
   const compare = useSelector((state) => state.interface.compareToggle);
+  const chartMode = useSelector((state) => state.interface.chartMode[ID]);
   const maps = useSelector((state) => state.maps);
 
   const dispatch = useDispatch();
@@ -152,13 +154,12 @@ function MapCard({ ID, toggleLayer, bounds, geojson }) {
   // }, [geojson]);
 
   if (!geojson || !maps || !bounds) {
-    console.log("loading");
     return (
       <CircularProgress
         style={{
           position: "relative",
-          bottom: "20%",
-          left: "50%",
+          // bottom: "20%",
+          // left: "50%",
           transform: "translate(-50%, -50%)",
         }}
       />
@@ -202,55 +203,61 @@ function MapCard({ ID, toggleLayer, bounds, geojson }) {
                 paddingBottom: "0.5rem",
               }}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
-              >
-                {displayMode === 1 && <Legend2 ID={ID} colors={Heatmap4} />}
-                {displayMode === 2 && <Legend ID={ID} colors={colors2} />}
-                <Box>
+              {chartMode ? (
+                <ChartComponent data={map.normalizedData} bounds={bounds} />
+              ) : (
+                <>
                   <Box
                     sx={{
                       display: "flex",
-                      alignContent: "center",
+                      flexDirection: "row",
                       justifyContent: "space-between",
                     }}
                   >
-                    <Typography>Moyenne Nationale: </Typography>{" "}
-                    <Chip>
-                      {map.normalizedData["gouvernorat"]["prc"]["Total"]}%
-                    </Chip>
+                    {displayMode === 1 && <Legend2 ID={ID} colors={Heatmap4} />}
+                    {displayMode === 2 && <Legend ID={ID} colors={colors2} />}
+                    <Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignContent: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Typography>Moyenne Nationale: </Typography>{" "}
+                        <Chip>
+                          {map.normalizedData["gouvernorat"]["prc"]["Total"]}%
+                        </Chip>
+                      </Box>
+                      <Divider />
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignContent: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Typography>Total des voix: </Typography>{" "}
+                        <Chip>
+                          {map.normalizedData["gouvernorat"]["voix"]["Total"]}
+                        </Chip>
+                      </Box>
+                    </Box>
                   </Box>
                   <Divider />
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignContent: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Typography>Total des voix: </Typography>{" "}
-                    <Chip>
-                      {map.normalizedData["gouvernorat"]["voix"]["Total"]}
-                    </Chip>
-                  </Box>
-                </Box>
-              </Box>
-              <Divider />
-              <MapComponent2
-                ID={ID}
-                data={map.normalizedData}
-                geojson={geojson}
-                // colors={colors}
-                colors={Heatmap4}
-                colors2={colors2}
-                displayMode={displayMode}
-                toggleLayer={toggleLayer}
-                bounds={bounds}
-              />
+                  <MapComponent2
+                    ID={ID}
+                    data={map.normalizedData}
+                    geojson={geojson}
+                    // colors={colors}
+                    colors={Heatmap4}
+                    colors2={colors2}
+                    displayMode={displayMode}
+                    toggleLayer={toggleLayer}
+                    bounds={bounds}
+                  />
+                </>
+              )}
             </Box>
             <Divider orientation="vertical" />
             <Sheet

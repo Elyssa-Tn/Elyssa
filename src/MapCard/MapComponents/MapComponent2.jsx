@@ -4,6 +4,7 @@ import UndoIcon from "@mui/icons-material/Undo";
 import SaveAltOutlinedIcon from "@mui/icons-material/SaveAltOutlined";
 import FileDownloadOffOutlinedIcon from "@mui/icons-material/FileDownloadOffOutlined";
 import LayersOutlinedIcon from "@mui/icons-material/LayersOutlined";
+import EqualizerOutlinedIcon from "@mui/icons-material/EqualizerOutlined";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import custom from "../../assets/custom(3).json";
 import {
@@ -17,6 +18,7 @@ import {
 } from "@mui/joy";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  setChartMode,
   setClickedTarget,
   setHover,
   setLevel,
@@ -211,7 +213,7 @@ const MapComponent2 = ({
   const handleClick = (feature) => {
     const code = Number(feature.properties[`code_${level}`]);
 
-    const { _southWest, _northEast } = bounds[level][code];
+    const { _southWest, _northEast } = bounds[level][code].bounds;
     const boundaries = [
       [_southWest.lat, _southWest.lng],
       [_northEast.lat, _northEast.lng],
@@ -282,12 +284,12 @@ const MapComponent2 = ({
   };
 
   const handleLockChange = () => {
-    console.log(`before: `, levelLock);
     dispatch(setLevelLock(ID));
-    console.log(`after: `, levelLock);
   };
 
-  console.log(levelLock);
+  const handleGraphButton = () => {
+    dispatch(setChartMode(ID));
+  };
 
   return (
     <Box
@@ -462,6 +464,11 @@ const MapComponent2 = ({
         >
           <Button>
             <LayersOutlinedIcon />
+          </Button>
+        </Tooltip>
+        <Tooltip placement="top" arrow title="Afficher en graphique">
+          <Button onClick={handleGraphButton}>
+            <EqualizerOutlinedIcon />
           </Button>
         </Tooltip>
       </ButtonGroup>
