@@ -1,14 +1,28 @@
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import UndoIcon from "@mui/icons-material/Undo";
+import SaveAltOutlinedIcon from "@mui/icons-material/SaveAltOutlined";
+import FileDownloadOffOutlinedIcon from "@mui/icons-material/FileDownloadOffOutlined";
+import LayersOutlinedIcon from "@mui/icons-material/LayersOutlined";
+import EqualizerOutlinedIcon from "@mui/icons-material/EqualizerOutlined";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import custom from "../../assets/custom(3).json";
-import { Box, Button, ButtonGroup, Divider, Sheet, Typography } from "@mui/joy";
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Divider,
+  Sheet,
+  Tooltip,
+  Typography,
+} from "@mui/joy";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  setChartMode,
   setClickedTarget,
   setHover,
   setLevel,
+  setLevelLock,
   setTooltip,
   setZoomLevel,
 } from "../../reducers/interfaceReducer";
@@ -28,6 +42,7 @@ const MapComponent2 = ({
   const hover = useSelector((state) => state.interface.hover);
   const tooltip = useSelector((state) => state.interface.tooltip);
   const zoomLevel = useSelector((state) => state.interface.zoomLevel);
+  const levelLock = useSelector((state) => state.interface.levelLock[ID]);
 
   const compare = useSelector((state) => state.interface.compareToggle);
 
@@ -139,65 +154,79 @@ const MapComponent2 = ({
     }
   };
 
+  // const handleClick = (feature) => {
+  //   const code = Number(feature.properties[`code_${level}`]);
+
+  //   if (level === levels[0]) {
+  //     const { _southWest, _northEast } = bounds[level][code];
+
+  //     const boundaries = [
+  //       [_southWest.lat, _southWest.lng],
+  //       [_northEast.lat, _northEast.lng],
+  //     ];
+
+  //     setTargetCode(code);
+  //     dispatch(setLevel(levels[1]));
+  //     dispatch(setClickedTarget(boundaries));
+  //   }
+  //   if (level === levels[1]) {
+  //     const targetGovCode = Number(
+  //       feature.properties[`code_${getDifferentLevel(levels, level, "up")}`]
+  //     );
+  //     console.log(
+  //       "target code:",
+  //       targetCode,
+  //       "target gov code:",
+  //       targetGovCode
+  //     );
+
+  //     console.log(targetCode === targetGovCode);
+
+  //     if (targetCode === targetGovCode) {
+  //       const { _southWest, _northEast } = bounds[level][code];
+
+  //       const boundaries = [
+  //         [_southWest.lat, _southWest.lng],
+  //         [_northEast.lat, _northEast.lng],
+  //       ];
+  //       dispatch(setClickedTarget(boundaries));
+  //     } else {
+  //       const { _southWest, _northEast } =
+  //         bounds[getDifferentLevel(levels, level, "up")][targetGovCode];
+
+  //       const boundaries = [
+  //         [_southWest.lat, _southWest.lng],
+  //         [_northEast.lat, _northEast.lng],
+  //       ];
+
+  //       console.log(`Old code: ${targetCode}. New code: ${targetGovCode}`);
+
+  //       setTargetCode(null);
+  //       setTimeout(() => {
+  //         setTargetCode(targetGovCode);
+  //       }, 1);
+  //       dispatch(setClickedTarget(boundaries));
+  //     }
+  //   }
+  // };
+
   const handleClick = (feature) => {
     const code = Number(feature.properties[`code_${level}`]);
 
-    if (level === levels[0]) {
-      const { _southWest, _northEast } = bounds[level][code];
+    const { _southWest, _northEast } = bounds[level][code].bounds;
+    const boundaries = [
+      [_southWest.lat, _southWest.lng],
+      [_northEast.lat, _northEast.lng],
+    ];
 
-      const boundaries = [
-        [_southWest.lat, _southWest.lng],
-        [_northEast.lat, _northEast.lng],
-      ];
-
-      setTargetCode(code);
+    setTargetCode(code);
+    console.log(ID, levelLock);
+    if (!levelLock) {
       dispatch(setLevel(levels[1]));
-      dispatch(setClickedTarget(boundaries));
     }
-    if (level === levels[1]) {
-      const targetGovCode = Number(
-        feature.properties[`code_${getDifferentLevel(levels, level, "up")}`]
-      );
-      console.log(
-        "target code:",
-        targetCode,
-        "target gov code:",
-        targetGovCode
-      );
 
-      console.log(targetCode === targetGovCode);
-
-      if (targetCode === targetGovCode) {
-        const { _southWest, _northEast } = bounds[level][code];
-
-        const boundaries = [
-          [_southWest.lat, _southWest.lng],
-          [_northEast.lat, _northEast.lng],
-        ];
-        dispatch(setClickedTarget(boundaries));
-      } else {
-        const { _southWest, _northEast } =
-          bounds[getDifferentLevel(levels, level, "up")][targetGovCode];
-
-        const boundaries = [
-          [_southWest.lat, _southWest.lng],
-          [_northEast.lat, _northEast.lng],
-        ];
-
-        console.log(`Old code: ${targetCode}. New code: ${targetGovCode}`);
-
-        setTargetCode(null);
-        setTimeout(() => {
-          setTargetCode(targetGovCode);
-        }, 1);
-        dispatch(setClickedTarget(boundaries));
-      }
-    }
+    dispatch(setClickedTarget(boundaries));
   };
-
-  useEffect(() => {
-    console.log(targetCode);
-  }, [targetCode]);
 
   const handleResetClick = () => {
     dispatch(setLevel(levels[0]));
@@ -252,6 +281,14 @@ const MapComponent2 = ({
 
   const getMapZoom = () => {
     return mapRef && console.log("object", mapRef.current.getZoom());
+  };
+
+  const handleLockChange = () => {
+    dispatch(setLevelLock(ID));
+  };
+
+  const handleGraphButton = () => {
+    dispatch(setChartMode(ID));
   };
 
   return (
@@ -367,6 +404,7 @@ const MapComponent2 = ({
           backgroundColor: "#add8e6",
           borderRadius: "1rem",
           marginTop: "0.25rem",
+          padding: "0.25rem",
         }}
         attributionControl={false}
       >
@@ -399,17 +437,40 @@ const MapComponent2 = ({
             />
           ))}
       </MapContainer>
-      <ButtonGroup
-        orientation="vertical"
-        size="sm"
-        sx={{ paddingTop: "0.25rem" }}
-      >
-        <Button
-          disabled={level === levels[0] ? true : false}
-          onClick={handleResetClick}
+      <ButtonGroup orientation="vertical" size="sm" sx={{ padding: "0.25rem" }}>
+        <Tooltip placement="top" arrow title="Retour">
+          <Button
+            disabled={level === levels[0] ? true : false}
+            onClick={handleResetClick}
+          >
+            <UndoIcon />
+          </Button>
+        </Tooltip>
+        <Tooltip placement="top" arrow title="Rester sur ce niveau">
+          <Button onClick={handleLockChange}>
+            {levelLock ? (
+              <FileDownloadOffOutlinedIcon />
+            ) : (
+              <SaveAltOutlinedIcon />
+            )}
+          </Button>
+        </Tooltip>
+        <Tooltip
+          placement="top"
+          arrow
+          title={`Changer de niveau: ${
+            level.charAt(0).toUpperCase() + level.slice(1)
+          }`}
         >
-          <UndoIcon />
-        </Button>
+          <Button>
+            <LayersOutlinedIcon />
+          </Button>
+        </Tooltip>
+        <Tooltip placement="top" arrow title="Afficher en graphique">
+          <Button onClick={handleGraphButton}>
+            <EqualizerOutlinedIcon />
+          </Button>
+        </Tooltip>
       </ButtonGroup>
     </Box>
   );
