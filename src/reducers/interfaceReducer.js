@@ -12,6 +12,7 @@ const initialState = {
   compareToggle: false,
   zoomLevel: 6,
   bounds: null,
+  levelLock: { 1: false, 2: false },
 };
 
 const interfaceSlice = createSlice({
@@ -45,6 +46,14 @@ const interfaceSlice = createSlice({
     setBounds: (state, action) => {
       state.bounds = action.payload;
     },
+    setLevelLock: (state, action) => {
+      const id = action.payload;
+      const updatedLevelLock = {
+        ...state.levelLock,
+        [id]: !state.levelLock[id],
+      };
+      state.levelLock = updatedLevelLock;
+    },
   },
 });
 
@@ -58,6 +67,7 @@ export const {
   setClassNumber,
   setZoomLevel,
   setBounds,
+  setLevelLock,
 } = interfaceSlice.actions;
 
 export default interfaceSlice.reducer;

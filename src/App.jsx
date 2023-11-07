@@ -1601,14 +1601,17 @@ function App() {
               ID={1}
             />
             {compare && (
-              <MapCard
-                // map={map[2]}
-                // electionInfo={map[2]["election"]}
-                toggleLayer={toggleLayer}
-                geojson={geojson}
-                bounds={bounds}
-                ID={2}
-              />
+              <>
+                <Divider orientation="vertical" />
+                <MapCard
+                  // map={map[2]}
+                  // electionInfo={map[2]["election"]}
+                  toggleLayer={toggleLayer}
+                  geojson={geojson}
+                  bounds={bounds}
+                  ID={2}
+                />
+              </>
             )}
           </Sheet>
         </Layout.Main>

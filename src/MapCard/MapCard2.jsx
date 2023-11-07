@@ -209,7 +209,6 @@ function MapCard({ ID, toggleLayer, bounds, geojson }) {
                   justifyContent: "space-between",
                 }}
               >
-                {/* {displayMode === 1 && <Legend2 ID={ID} colors={colors} />} */}
                 {displayMode === 1 && <Legend2 ID={ID} colors={Heatmap4} />}
                 {displayMode === 2 && <Legend ID={ID} colors={colors2} />}
                 <Box>
