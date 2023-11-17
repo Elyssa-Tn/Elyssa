@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setChartMode,
   setClickedTarget,
+  setCurrentTarget,
   setHover,
   setLevel,
   setLevelLock,
@@ -220,15 +221,17 @@ const MapComponent2 = ({
     ];
 
     setTargetCode(code);
-    console.log(ID, levelLock);
+    // console.log(ID, levelLock);
     if (!levelLock) {
       dispatch(setLevel(levels[1]));
     }
 
+    dispatch(setCurrentTarget(code));
     dispatch(setClickedTarget(boundaries));
   };
 
   const handleResetClick = () => {
+    dispatch(setCurrentTarget(null));
     dispatch(setLevel(levels[0]));
     setTargetCode(null);
     dispatch(setClickedTarget(null));
@@ -244,7 +247,7 @@ const MapComponent2 = ({
     // const valueGov =
     //   data["gouvernorat"]["prc"][target.feature.properties["code_gouvernorat"]];
     const nomGov = target.feature.properties["nom_gouvernorat"];
-    dispatch(setHover(code));
+    dispatch(setHover({ code: code, name: name }));
     dispatch(
       setTooltip({
         position: { x, y },
@@ -424,11 +427,15 @@ const MapComponent2 = ({
                 fillColor: getColor(feature),
                 fillOpacity:
                   (feature.properties.level === level ? 0.8 : 0) +
-                  (feature.properties[`code_${level}`] === hover ? 0.4 : 0),
+                  (hover && feature.properties[`code_${level}`] === hover.code
+                    ? 0.4
+                    : 0),
                 weight:
                   0.4 +
                   index +
-                  (feature.properties[`code_${level}`] === hover ? 2 : 0),
+                  (hover && feature.properties[`code_${level}`] === hover.code
+                    ? 2
+                    : 0),
                 color: "#000",
               })}
               onEachFeature={onEachFeature}

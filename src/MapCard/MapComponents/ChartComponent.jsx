@@ -1,11 +1,11 @@
-import { Box } from "@mui/joy";
 import {
   BarChart,
   BarPlot,
-  ChartContainer,
+  ChartsReferenceLine,
+  ChartsTooltip,
   ChartsXAxis,
   ChartsYAxis,
-  ChartReferenceLine,
+  ResponsiveChartContainer,
 } from "@mui/x-charts";
 import { useSelector } from "react-redux";
 
@@ -29,30 +29,25 @@ function ChartComponent({ data, bounds }) {
   ];
 
   return (
-    <ChartContainer
+    <ResponsiveChartContainer
       width={450}
       height={600}
       margin={{ right: 0, bottom: 110 }}
       series={series}
       xAxis={[{ id: "names", data: names, scaleType: "band" }]}
       yAxis={[{ id: "values", scaleType: "linear" }]}
-      bottomAxis={{
-        axisId: "names",
-        labelStyle: {
-          fontSize: 14,
-        },
-        tickLabelStyle: {
-          angle: -45,
-          textAnchor: "end",
-          fontSize: 12,
-        },
-        tickLabelInterval: () => true,
-      }}
     >
-      <BarPlot />
-      <ChartReferenceLine
+      <BarPlot
+        slotProps={{
+          bar: { onClick: (e) => console.log(e.target) },
+        }}
+      />
+
+      <ChartsTooltip trigger="axis" />
+      <ChartsReferenceLine
+        labelAlign="end"
         y={average}
-        label="Moyenne Nationale"
+        // label="Moyenne Nationale"
         lineStyle={{ stroke: "red" }}
       />
       <ChartsXAxis
@@ -66,21 +61,22 @@ function ChartComponent({ data, bounds }) {
         tickLabelInterval={() => true}
       />
       <ChartsYAxis label={key} position="left" axisId="values" />
-    </ChartContainer>
+    </ResponsiveChartContainer>
+
     // <BarChart
     //   xAxis={[{ id: "names", data: names, scaleType: "band" }]}
-    // bottomAxis={{
-    //   axisId: "names",
-    //   labelStyle: {
-    //     fontSize: 14,
-    //   },
-    //   tickLabelStyle: {
-    //     angle: -45,
-    //     textAnchor: "end",
-    //     fontSize: 12,
-    //   },
-    //   tickLabelInterval: () => true,
-    // }}
+    //   bottomAxis={{
+    //     axisId: "names",
+    //     labelStyle: {
+    //       fontSize: 14,
+    //     },
+    //     tickLabelStyle: {
+    //       angle: -45,
+    //       textAnchor: "end",
+    //       fontSize: 12,
+    //     },
+    //     tickLabelInterval: () => true,
+    //   }}
     //   series={[{ data: values }]}
     //   width={450}
     //   height={600}

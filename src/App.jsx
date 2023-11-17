@@ -1572,9 +1572,9 @@ function App() {
     if (geojson) calculateBounds();
   }, [geojson]);
 
-  // useEffect(() => {
-  //   dispatch(initializeElections());
-  // }, [dispatch]);
+  useEffect(() => {
+    dispatch(initializeElections());
+  }, [dispatch]);
 
   // if (init)
   return (
