@@ -7,6 +7,7 @@ const initialState = {
   hover: null,
   tooltip: null,
   target: null,
+  currentTarget: null,
   minMax: null,
   classNumber: 5,
   compareToggle: false,
@@ -31,6 +32,9 @@ const interfaceSlice = createSlice({
     },
     setClickedTarget: (state, action) => {
       state.target = action.payload;
+    },
+    setCurrentTarget: (state, action) => {
+      state.currentTarget = action.payload;
     },
     toggleCompare: (state) => {
       state.compareToggle = !state.compareToggle;
@@ -71,6 +75,7 @@ export const {
   setHover,
   setTooltip,
   setClickedTarget,
+  setCurrentTarget,
   toggleCompare,
   setMinMax,
   setClassNumber,

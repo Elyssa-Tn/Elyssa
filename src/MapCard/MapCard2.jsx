@@ -39,6 +39,7 @@ import { deleteMap } from "../reducers/mapReducer";
 import { getGeoJSON } from "../services/geojson";
 import { toggleCompare } from "../reducers/interfaceReducer";
 import ChartComponent from "./MapComponents/ChartComponent";
+import ChartComponent2 from "./MapComponents/ChartComponent2";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -204,7 +205,7 @@ function MapCard({ ID, toggleLayer, bounds, geojson }) {
               }}
             >
               {chartMode ? (
-                <ChartComponent data={map.normalizedData} bounds={bounds} />
+                <ChartComponent2 data={map.normalizedData} bounds={bounds} />
               ) : (
                 <>
                   <Box
