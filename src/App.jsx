@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import * as L from "leaflet";
-import { CssBaseline, CssVarsProvider, Divider, Sheet } from "@mui/joy";
+import {
+  Button,
+  CssBaseline,
+  CssVarsProvider,
+  Divider,
+  Modal,
+  Sheet,
+} from "@mui/joy";
 import { useDispatch, useSelector } from "react-redux";
 import { initializeElections } from "./reducers/electionReducer";
 
@@ -19,9 +26,10 @@ import theme from "./theme";
 import { getGeoJSON } from "./services/geojson";
 import { setMaps } from "./reducers/mapReducer";
 import { setClassNumber, setMinMax } from "./reducers/interfaceReducer";
+import ModalComponent from "./ModalComponent";
 
-import delegation from "./assets/delegation.json";
-import gouvernorat from "./assets/gouvernorat.json";
+// import delegation from "./assets/delegation.json";
+// import gouvernorat from "./assets/gouvernorat.json";
 
 function App() {
   const materialTheme = materialExtendTheme();
@@ -35,7 +43,10 @@ function App() {
   const compare = useSelector((state) => state.interface.compareToggle);
   const [bounds, setBounds] = useState(null);
 
-  // const maps = useSelector((state) => state.maps.maps);
+  const [open, setOpen] = useState(true);
+
+  const maps = useSelector((state) => state.maps);
+
   const map = {
     1: {
       election: {
@@ -1492,38 +1503,38 @@ function App() {
 
   //MAP FILES FETCHING, RESTORE THIS WHEN SERVER WORKS AGAIN
 
-  // useEffect(() => {
-  //   const fetchAndUseGeoJSON = async (level) => {
-  //     try {
-  //       const map = await getGeoJSON(level);
-  //       return { [level]: map };
-  //     } catch (error) {
-  //       console.error("Error:", error);
-  //       throw error;
-  //     }
-  //   };
-
-  //   Promise.all(levels.map(fetchAndUseGeoJSON))
-  //     .then((results) => {
-  //       const formattedResults = {};
-  //       results.forEach((entry) => {
-  //         const key = Object.keys(entry)[0];
-  //         formattedResults[key] = entry[key];
-  //       });
-  //       setGeojson(formattedResults);
-  //     })
-  //     .catch((error) => {
-  //       console.error("An error occurred:", error);
-  //     });
-  // }, []);
-
   useEffect(() => {
-    const formattedResults = {
-      gouvernorat: gouvernorat,
-      delegation: delegation,
+    const fetchAndUseGeoJSON = async (level) => {
+      try {
+        const map = await getGeoJSON(level);
+        return { [level]: map };
+      } catch (error) {
+        console.error("Error:", error);
+        throw error;
+      }
     };
-    setGeojson(formattedResults);
+
+    Promise.all(levels.map(fetchAndUseGeoJSON))
+      .then((results) => {
+        const formattedResults = {};
+        results.forEach((entry) => {
+          const key = Object.keys(entry)[0];
+          formattedResults[key] = entry[key];
+        });
+        setGeojson(formattedResults);
+      })
+      .catch((error) => {
+        console.error("An error occurred:", error);
+      });
   }, []);
+
+  // useEffect(() => {
+  //   const formattedResults = {
+  //     gouvernorat: gouvernorat,
+  //     delegation: delegation,
+  //   };
+  //   setGeojson(formattedResults);
+  // }, []);
 
   useEffect(() => {
     const calculateBounds = async () => {
@@ -1576,67 +1587,76 @@ function App() {
     dispatch(initializeElections());
   }, [dispatch]);
 
-  useEffect(() => {
-    console.log(init);
-  }, [init]);
-
-  // if (init)
-  return (
-    <MaterialCssVarsProvider theme={{ [MATERIAL_THEME_ID]: materialTheme }}>
-      <CssVarsProvider theme={theme}>
-        <CssBaseline />
-        <Layout.Root>
-          <Layout.Header>
-            <Navbar />
-          </Layout.Header>
-          <Layout.TopPanel>
-            <MapTitle
-              electionInfo={map[1]["election"]}
-              parti={map[1]["parti"]}
-            />
-            {compare && (
-              <MapTitle
-                electionInfo={map[2]["election"]}
-                parti={map[2]["parti"]}
-              />
-            )}
-          </Layout.TopPanel>
-          <Layout.Main>
-            <Sheet
-              className="map container"
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "center",
-              }}
-            >
-              <MapCard
-                // map={map[1]}
-                // electionInfo={map[1]["election"]}
-                toggleLayer={toggleLayer}
-                geojson={geojson}
-                bounds={bounds}
-                ID={1}
+  if (init)
+    return (
+      <MaterialCssVarsProvider theme={{ [MATERIAL_THEME_ID]: materialTheme }}>
+        <CssVarsProvider theme={theme}>
+          <CssBaseline />
+          <Layout.Root>
+            <Layout.Header>
+              <Navbar />
+            </Layout.Header>
+            <Layout.TopPanel>
+              <Button
+                variant="outlined"
+                color="neutral"
+                onClick={() => setOpen(true)}
+              >
+                Open
+              </Button>
+              <Modal open={open} onClose={() => setOpen(false)}>
+                <ModalComponent />
+              </Modal>
+              {/* <MapTitle
+                electionInfo={map[1]["election"]}
+                parti={map[1]["parti"]}
               />
               {compare && (
-                <>
-                  <Divider orientation="vertical" />
+                <MapTitle
+                  electionInfo={map[2]["election"]}
+                  parti={map[2]["parti"]}
+                />
+              )} */}
+            </Layout.TopPanel>
+            <Layout.Main>
+              <Sheet
+                className="map container"
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                }}
+              >
+                {maps[1] && (
                   <MapCard
-                    // map={map[2]}
-                    // electionInfo={map[2]["election"]}
+                    // map={map[1]}
+                    // electionInfo={map[1]["election"]}
                     toggleLayer={toggleLayer}
                     geojson={geojson}
                     bounds={bounds}
-                    ID={2}
+                    ID={1}
                   />
-                </>
-              )}
-            </Sheet>
-          </Layout.Main>
-        </Layout.Root>
-      </CssVarsProvider>
-    </MaterialCssVarsProvider>
-  );
+                )}
+
+                {compare && (
+                  <>
+                    <Divider orientation="vertical" />
+                    <MapCard
+                      // map={map[2]}
+                      // electionInfo={map[2]["election"]}
+                      toggleLayer={toggleLayer}
+                      geojson={geojson}
+                      bounds={bounds}
+                      ID={2}
+                    />
+                  </>
+                )}
+              </Sheet>
+            </Layout.Main>
+          </Layout.Root>
+        </CssVarsProvider>
+      </MaterialCssVarsProvider>
+    );
 }
 
 export default App;

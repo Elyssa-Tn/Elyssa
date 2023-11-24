@@ -3,19 +3,22 @@ import electionServices from "../services/electionServices";
 
 const electionSlice = createSlice({
   name: "elections",
-  initialState: {},
+  initialState: { loading: false, data: {}, init: null },
   reducers: {
+    toggleLoading(state) {
+      state.loading = !state.loading;
+    },
     electionInit(state, action) {
-      const object = action.payload.data;
-      return { ...state, init: object };
+      state.init = action.payload.data;
     },
     addElectionDataToState(state, action) {
-      return { ...state, ...action.payload };
+      state.data = { ...state.data, ...action.payload };
     },
   },
 });
 
-export const { electionInit, addElectionDataToState } = electionSlice.actions;
+export const { toggleLoading, electionInit, addElectionDataToState } =
+  electionSlice.actions;
 
 export const initializeElections = () => {
   return async (dispatch) => {
@@ -26,9 +29,15 @@ export const initializeElections = () => {
 
 export const fetchElectionData = (election) => {
   return async (dispatch) => {
+    dispatch(toggleLoading());
     const electionData = await electionServices.getElectionInfo(election);
-    const object = { [election]: electionData };
-    dispatch(addElectionDataToState(object));
+    if (electionData.data)
+      dispatch(addElectionDataToState({ [election]: electionData.data }));
+
+    //Extra time for reasons
+    // setTimeout(() => {
+    dispatch(toggleLoading());
+    // }, 50);
   };
 };
 

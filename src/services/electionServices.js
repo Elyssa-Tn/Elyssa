@@ -87,17 +87,52 @@ const requestFormatter = (map) => {
   return req;
 };
 
+//TODO: RESTORE THIS AND IMPROVE IT
+// const getRequestResults = async (map) => {
+//   const req = requestFormatter(map);
+//   try {
+//     const response = await axios.post(url, req, {
+//       cache: { interpretHeader: false, methods: ["get", "post"] },
+//     });
+//     return response.data;
+//   } catch (error) {
+//     return error;
+//   }
+// };
+
 const getRequestResults = async (map) => {
-  const req = requestFormatter(map);
-  try {
-    const response = await axios.post(url, req, {
-      cache: { interpretHeader: false, methods: ["get", "post"] },
+  const quickFetch = async (level) => {
+    const req = {
+      type: "data",
+      code_election: map.election.code_election,
+      decoupage: level,
+      variables: [
+        { code_variable: "prc", code_parti: map.parti.code_parti },
+        { code_variable: "voix", code_parti: map.parti.code_parti },
+      ],
+    };
+    try {
+      const response = await axios.post(url, req, {
+        cache: { interpretHeader: false, methods: ["get", "post"] },
+      });
+      return response.data;
+    } catch (error) {
+      return error;
+    }
+  };
+
+  const levels = ["gouvernorat", "delegation"];
+
+  Promise.all(levels.map(quickFetch))
+    .then((results) => {
+      return results;
+    })
+    .catch((error) => {
+      console.error("An error occurred:", error);
     });
-    return response.data;
-  } catch (error) {
-    return error;
-  }
 };
+
+//TODO: End of temporary map fetching code
 
 const electionServices = { init, getElectionInfo, getRequestResults };
 
