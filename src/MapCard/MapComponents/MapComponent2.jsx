@@ -68,8 +68,6 @@ const MapComponent2 = ({
   const [ready, setReady] = useState(false);
   const centerCoords = [33.9989, 10.1658];
 
-  const [targetCode, setTargetCode] = useState(null);
-
   const minValueColor = colors[0];
   const maxValueColor = colors[1];
 
@@ -212,7 +210,8 @@ const MapComponent2 = ({
   // };
 
   const handleClick = (feature) => {
-    const code = Number(feature.properties[`code_${level}`]);
+    const code = feature.properties[`code_${level}`];
+    dispatch(setCurrentTarget(code));
 
     const { _southWest, _northEast } = bounds[level][code].bounds;
     const boundaries = [
@@ -220,20 +219,17 @@ const MapComponent2 = ({
       [_northEast.lat, _northEast.lng],
     ];
 
-    setTargetCode(code);
     // console.log(ID, levelLock);
     if (!levelLock) {
       dispatch(setLevel(levels[1]));
     }
 
-    dispatch(setCurrentTarget(code));
     dispatch(setClickedTarget(boundaries));
   };
 
   const handleResetClick = () => {
     dispatch(setCurrentTarget(null));
     dispatch(setLevel(levels[0]));
-    setTargetCode(null);
     dispatch(setClickedTarget(null));
     mapRef.current.setView(centerCoords, 6);
   };
