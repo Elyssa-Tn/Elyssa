@@ -1576,6 +1576,10 @@ function App() {
     dispatch(initializeElections());
   }, [dispatch]);
 
+  useEffect(() => {
+    console.log(init);
+  }, [init]);
+
   // if (init)
   return (
     <MaterialCssVarsProvider theme={{ [MATERIAL_THEME_ID]: materialTheme }}>

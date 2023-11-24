@@ -5,21 +5,8 @@ const mapSlice = createSlice({
   name: "maps",
   initialState: null,
   reducers: {
-    createMap(state, action) {
-      const ID = state.counter;
-      const newMap = { [ID]: action.payload };
-
-      return { counter: ID + 1, maps: [...state.maps, newMap] };
-    },
-    deleteMap(state, action) {
-      const filteredMaps = Object.keys(state.maps)
-        .filter((id) => id !== action.payload)
-        .reduce((result, id) => {
-          result[id] = { ...state.maps[id] };
-          return result;
-        }, {});
-      return { ...state, maps: [...filteredMaps] };
-    },
+    createMap(state, action) {},
+    deleteMap(state, action) {},
     setMaps(state, action) {
       return action.payload;
     },
