@@ -1607,7 +1607,7 @@ function App() {
               <Modal open={open} onClose={() => setOpen(false)}>
                 <ModalComponent />
               </Modal>
-              {/* <MapTitle
+              <MapTitle
                 electionInfo={map[1]["election"]}
                 parti={map[1]["parti"]}
               />
@@ -1616,7 +1616,7 @@ function App() {
                   electionInfo={map[2]["election"]}
                   parti={map[2]["parti"]}
                 />
-              )} */}
+              )}
             </Layout.TopPanel>
             <Layout.Main>
               <Sheet

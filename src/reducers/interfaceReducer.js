@@ -4,6 +4,13 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   levels: ["gouvernorat", "delegation"],
   level: "gouvernorat",
+  viewport: {
+    latitude: 33.9989,
+    longitude: 10.1658,
+    zoom: 5,
+    bearing: 0,
+    pitch: 0,
+  },
   hover: null,
   tooltip: null,
   target: null,
@@ -23,6 +30,13 @@ const interfaceSlice = createSlice({
   reducers: {
     setLevel: (state, action) => {
       state.level = action.payload;
+    },
+    setViewport: (state, action) => {
+      const newViewport = action.payload;
+      state.viewport = { ...state.viewport, ...newViewport };
+    },
+    resetViewport: (state) => {
+      state.viewport = initialState.viewport;
     },
     setHover: (state, action) => {
       state.hover = action.payload;
@@ -72,6 +86,8 @@ const interfaceSlice = createSlice({
 
 export const {
   setLevel,
+  setViewport,
+  resetViewport,
   setHover,
   setTooltip,
   setClickedTarget,

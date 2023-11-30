@@ -12,12 +12,14 @@ import {
   Sheet,
   Input,
   Button,
+  ButtonGroup,
 } from "@mui/joy";
 // import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import styled from "@emotion/styled";
 import * as L from "leaflet";
 import MapComponent2 from "./MapComponents/MapComponent2";
+import MapComponent from "./MapComponents/MapComponent";
 // import MapComponent2 from "./MapComponents/MapComponent";
 import ExpandedResults from "./MapComponents/ExpandedResults";
 import Legend2 from "./MapComponents/Legend2";
@@ -76,6 +78,22 @@ function MapCard({ ID, toggleLayer, bounds, geojson }) {
     "#551785",
     "#2b1ca7",
     "#0022c8",
+  ];
+
+  const Heatmap4Converted = [
+    [255, 255, 255, 255],
+    [255, 227, 170, 255],
+    [255, 198, 85, 255],
+    [255, 170, 0, 255],
+    [255, 113, 0, 255],
+    [255, 57, 0, 255],
+    [255, 0, 0, 255],
+    [213, 6, 33, 255],
+    [170, 11, 67, 255],
+    [128, 17, 100, 255],
+    [85, 23, 133, 255],
+    [43, 28, 167, 255],
+    [0, 34, 200, 255],
   ];
 
   const [expanded, setExpanded] = useState(false);
@@ -245,12 +263,12 @@ function MapCard({ ID, toggleLayer, bounds, geojson }) {
                     </Box>
                   </Box>
                   <Divider />
-                  <MapComponent2
+                  <MapComponent
                     ID={ID}
                     data={map.normalizedData}
                     geojson={geojson}
                     // colors={colors}
-                    colors={Heatmap4}
+                    colors={Heatmap4Converted}
                     colors2={colors2}
                     displayMode={displayMode}
                     toggleLayer={toggleLayer}
@@ -282,7 +300,7 @@ function MapCard({ ID, toggleLayer, bounds, geojson }) {
                 </Button>
               </Box>
               <Divider />
-              <Box>
+              <ButtonGroup orientation="vertical">
                 <Button>
                   {compare ? (
                     <InfoIcon />
@@ -310,7 +328,7 @@ function MapCard({ ID, toggleLayer, bounds, geojson }) {
                     </>
                   )}
                 </Button>
-              </Box>
+              </ButtonGroup>
             </Sheet>
           </Card>
         )}

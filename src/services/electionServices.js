@@ -103,14 +103,17 @@ const requestFormatter = (map) => {
 const getRequestResults = async (map) => {
   const quickFetch = async (level) => {
     const req = {
-      type: "data",
-      code_election: map.election.code_election,
-      decoupage: level,
-      variables: [
-        { code_variable: "prc", code_parti: map.parti.code_parti },
-        { code_variable: "voix", code_parti: map.parti.code_parti },
-      ],
+      req: {
+        type: "data",
+        code_election: map.election.code_election,
+        decoupage: level,
+        variables: [
+          { code_variable: "prc", code_parti: map.parti.code_parti },
+          { code_variable: "voix", code_parti: map.parti.code_parti },
+        ],
+      },
     };
+    console.log(req);
     try {
       const response = await axios.post(url, req, {
         cache: { interpretHeader: false, methods: ["get", "post"] },
@@ -125,6 +128,7 @@ const getRequestResults = async (map) => {
 
   Promise.all(levels.map(quickFetch))
     .then((results) => {
+      console.log(results);
       return results;
     })
     .catch((error) => {
