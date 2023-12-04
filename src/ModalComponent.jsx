@@ -17,12 +17,13 @@ import {
   Tabs,
   Typography,
 } from "@mui/joy";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchElectionData } from "./reducers/electionReducer";
 import { fetchMapData } from "./reducers/mapReducer";
+import { setModalOpen, setReady } from "./reducers/interfaceReducer";
 
-function ModalComponent() {
+const ModalComponent = React.forwardRef(function ModalComponent() {
   const [selectedElection, setSelectedElection] = useState(null);
   const [hoveredElection, setHoveredElection] = useState(null);
   const [selectedParti, setSelectedParti] = useState(null);
@@ -41,6 +42,8 @@ function ModalComponent() {
 
   const partiSelection = (parti) => {
     const request = { election: selectedElection, parti: parti };
+    dispatch(setReady(false));
+    dispatch(setModalOpen(false));
     dispatch(fetchMapData(request));
   };
 
@@ -207,6 +210,6 @@ function ModalComponent() {
       </Tabs>
     </ModalDialog>
   );
-}
+});
 
 export default ModalComponent;

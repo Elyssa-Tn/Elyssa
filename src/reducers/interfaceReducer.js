@@ -4,6 +4,13 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   levels: ["gouvernorat", "delegation"],
   level: "gouvernorat",
+  viewport: {
+    latitude: 33.9989,
+    longitude: 10.1658,
+    zoom: 5,
+    bearing: 0,
+    pitch: 0,
+  },
   hover: null,
   tooltip: null,
   target: null,
@@ -15,6 +22,8 @@ const initialState = {
   bounds: null,
   levelLock: { 1: false, 2: false },
   chartMode: { 1: false, 2: false },
+  ready: false,
+  modalOpen: true,
 };
 
 const interfaceSlice = createSlice({
@@ -23,6 +32,13 @@ const interfaceSlice = createSlice({
   reducers: {
     setLevel: (state, action) => {
       state.level = action.payload;
+    },
+    setViewport: (state, action) => {
+      const newViewport = action.payload;
+      state.viewport = { ...state.viewport, ...newViewport };
+    },
+    resetViewport: (state) => {
+      state.viewport = initialState.viewport;
     },
     setHover: (state, action) => {
       state.hover = action.payload;
@@ -36,8 +52,8 @@ const interfaceSlice = createSlice({
     setCurrentTarget: (state, action) => {
       state.currentTarget = action.payload;
     },
-    toggleCompare: (state) => {
-      state.compareToggle = !state.compareToggle;
+    toggleCompare: (state, action) => {
+      state.compareToggle = action.payload;
     },
     setMinMax: (state, action) => {
       state.minMax = action.payload;
@@ -67,11 +83,19 @@ const interfaceSlice = createSlice({
       };
       state.chartMode = updatedChartMode;
     },
+    setReady: (state, action) => {
+      state.ready = action.payload;
+    },
+    setModalOpen: (state, action) => {
+      state.modalOpen = action.payload;
+    },
   },
 });
 
 export const {
   setLevel,
+  setViewport,
+  resetViewport,
   setHover,
   setTooltip,
   setClickedTarget,
@@ -83,6 +107,8 @@ export const {
   setBounds,
   setLevelLock,
   setChartMode,
+  setReady,
+  setModalOpen,
 } = interfaceSlice.actions;
 
 export default interfaceSlice.reducer;

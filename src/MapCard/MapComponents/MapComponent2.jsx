@@ -65,7 +65,6 @@ const MapComponent2 = ({
 
   const dispatch = useDispatch();
 
-  const [ready, setReady] = useState(false);
   const centerCoords = [33.9989, 10.1658];
 
   const minValueColor = colors[0];

@@ -11,11 +11,11 @@ import annotationPlugin from "chartjs-plugin-annotation";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, Button, ButtonGroup, Radio, Switch } from "@mui/joy";
 import { useEffect, useState } from "react";
-import { setHover } from "../../reducers/interfaceReducer";
+import { setChartMode, setHover } from "../../reducers/interfaceReducer";
 import EqualizerOutlinedIcon from "@mui/icons-material/EqualizerOutlined";
 import ExploreIcon from "@mui/icons-material/Explore";
 
-const ChartComponent = ({ data, bounds }) => {
+const ChartComponent = ({ ID, data, bounds }) => {
   Chart.register(
     BarController,
     BarElement,
@@ -57,6 +57,10 @@ const ChartComponent = ({ data, bounds }) => {
 
   const average = data["gouvernorat"]["prc"]["Total"];
 
+  const handleGraphButton = () => {
+    dispatch(setChartMode(ID));
+  };
+
   return (
     <Box>
       <ButtonGroup>
@@ -86,7 +90,7 @@ const ChartComponent = ({ data, bounds }) => {
           <Button>
             <EqualizerOutlinedIcon />
           </Button>
-          <Button>
+          <Button onClick={handleGraphButton}>
             <ExploreIcon />
           </Button>
         </ButtonGroup>

@@ -103,13 +103,15 @@ const requestFormatter = (map) => {
 const getRequestResults = async (map) => {
   const quickFetch = async (level) => {
     const req = {
-      type: "data",
-      code_election: map.election.code_election,
-      decoupage: level,
-      variables: [
-        { code_variable: "prc", code_parti: map.parti.code_parti },
-        { code_variable: "voix", code_parti: map.parti.code_parti },
-      ],
+      req: {
+        type: "data",
+        code_election: map.election.code_election,
+        decoupage: level,
+        variables: [
+          { code_variable: "prc", code_parti: map.parti.code_parti },
+          { code_variable: "voix", code_parti: map.parti.code_parti },
+        ],
+      },
     };
     try {
       const response = await axios.post(url, req, {
@@ -123,13 +125,13 @@ const getRequestResults = async (map) => {
 
   const levels = ["gouvernorat", "delegation"];
 
-  Promise.all(levels.map(quickFetch))
-    .then((results) => {
-      return results;
-    })
-    .catch((error) => {
-      console.error("An error occurred:", error);
-    });
+  try {
+    const results = await Promise.all(levels.map(quickFetch));
+    return results;
+  } catch (error) {
+    console.error("An error occurred:", error);
+    throw error;
+  }
 };
 
 //TODO: End of temporary map fetching code

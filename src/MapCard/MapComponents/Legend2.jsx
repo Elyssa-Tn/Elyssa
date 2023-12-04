@@ -1,5 +1,4 @@
-import { Box, Typography } from "@mui/joy";
-import { useEffect } from "react";
+import { Box, CircularProgress, Typography } from "@mui/joy";
 import { useSelector } from "react-redux";
 
 const Legend2 = ({ ID, colors, hover }) => {
