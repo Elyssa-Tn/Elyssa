@@ -113,7 +113,6 @@ const getRequestResults = async (map) => {
         ],
       },
     };
-    console.log(req);
     try {
       const response = await axios.post(url, req, {
         cache: { interpretHeader: false, methods: ["get", "post"] },
@@ -126,14 +125,13 @@ const getRequestResults = async (map) => {
 
   const levels = ["gouvernorat", "delegation"];
 
-  Promise.all(levels.map(quickFetch))
-    .then((results) => {
-      console.log(results);
-      return results;
-    })
-    .catch((error) => {
-      console.error("An error occurred:", error);
-    });
+  try {
+    const results = await Promise.all(levels.map(quickFetch));
+    return results;
+  } catch (error) {
+    console.error("An error occurred:", error);
+    throw error;
+  }
 };
 
 //TODO: End of temporary map fetching code

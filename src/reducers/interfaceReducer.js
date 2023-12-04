@@ -22,6 +22,8 @@ const initialState = {
   bounds: null,
   levelLock: { 1: false, 2: false },
   chartMode: { 1: false, 2: false },
+  ready: false,
+  modalOpen: true,
 };
 
 const interfaceSlice = createSlice({
@@ -50,8 +52,8 @@ const interfaceSlice = createSlice({
     setCurrentTarget: (state, action) => {
       state.currentTarget = action.payload;
     },
-    toggleCompare: (state) => {
-      state.compareToggle = !state.compareToggle;
+    toggleCompare: (state, action) => {
+      state.compareToggle = action.payload;
     },
     setMinMax: (state, action) => {
       state.minMax = action.payload;
@@ -81,6 +83,12 @@ const interfaceSlice = createSlice({
       };
       state.chartMode = updatedChartMode;
     },
+    setReady: (state, action) => {
+      state.ready = action.payload;
+    },
+    setModalOpen: (state, action) => {
+      state.modalOpen = action.payload;
+    },
   },
 });
 
@@ -99,6 +107,8 @@ export const {
   setBounds,
   setLevelLock,
   setChartMode,
+  setReady,
+  setModalOpen,
 } = interfaceSlice.actions;
 
 export default interfaceSlice.reducer;

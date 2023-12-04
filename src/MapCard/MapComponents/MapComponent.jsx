@@ -1,11 +1,9 @@
-import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
 import UndoIcon from "@mui/icons-material/Undo";
 import SaveAltOutlinedIcon from "@mui/icons-material/SaveAltOutlined";
 import FileDownloadOffOutlinedIcon from "@mui/icons-material/FileDownloadOffOutlined";
 import LayersOutlinedIcon from "@mui/icons-material/LayersOutlined";
 import EqualizerOutlinedIcon from "@mui/icons-material/EqualizerOutlined";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useState } from "react";
 import custom from "../../assets/custom(3).json";
 import {
   Box,
@@ -30,7 +28,7 @@ import {
 } from "../../reducers/interfaceReducer";
 import { DeckGL, GeoJsonLayer, WebMercatorViewport } from "deck.gl";
 
-const MapComponent2 = ({
+const MapComponent = ({
   ID,
   data,
   geojson,
@@ -52,14 +50,6 @@ const MapComponent2 = ({
 
   //CHANGE COLOR GENERATION ITS BAD
 
-  const INITIAL_VIEW_STATE = {
-    latitude: 33.9989,
-    longitude: 10.1658,
-    zoom: 5,
-    bearing: 0,
-    pitch: 0,
-  };
-
   const classNumber = useSelector((state) =>
     compare
       ? state.interface.classNumber[3][level]
@@ -71,8 +61,6 @@ const MapComponent2 = ({
       ? state.interface.minMax[3][level]
       : state.interface.minMax[ID][level]
   );
-
-  // const { min, max } = values;
 
   const dispatch = useDispatch();
 
@@ -89,11 +77,6 @@ const MapComponent2 = ({
   // }, [data]);
   // console.log(singleValue);
 
-  const mapRef = useRef(null);
-  const geoJSONRefs = Object.keys(geojson)
-    .reverse()
-    .map(() => useRef());
-
   const singleColorRange = (max - min) / classNumber;
   const stepSize = Math.floor(colors.length / classNumber);
 
@@ -103,14 +86,6 @@ const MapComponent2 = ({
     var index = i * stepSize;
     selectedColors.push(colors[index]);
   }
-
-  useLayoutEffect(() => {
-    const allRefsReady = geoJSONRefs.every((ref) => ref.current !== null);
-    if (allRefsReady && mapRef.current && target) {
-      mapRef.current.flyToBounds(target, { animate: ID === 1 ? true : false });
-      dispatch(setClickedTarget(null));
-    }
-  }, [geoJSONRefs, target]);
 
   function getColorForPercentileValue(value) {
     const color1 = colors2[0];
@@ -172,7 +147,6 @@ const MapComponent2 = ({
     dispatch(setCurrentTarget(null));
     dispatch(setLevel(levels[0]));
     dispatch(setClickedTarget(null));
-    mapRef.current.setView(centerCoords, 6);
   };
 
   const handleMousover = (object, x, y) => {
@@ -227,7 +201,6 @@ const MapComponent2 = ({
       [_southWest.lng, _southWest.lat],
       [_northEast.lng, _northEast.lat],
     ];
-    console.log(boundaries);
 
     const viewportWebMercator = new WebMercatorViewport(viewport);
 
@@ -251,27 +224,29 @@ const MapComponent2 = ({
     // dispatch(setClickedTarget(boundaries));
   };
 
-  const layers = Object.keys(geojson).map((mapLevel, index) => {
-    const data = geojson[mapLevel];
+  const layers = Object.keys(geojson)
+    .reverse()
+    .map((mapLevel, index) => {
+      const data = geojson[mapLevel];
 
-    //TODO: A BETTER WAY TO DISPLAY TARGETED subsections on level change
+      //TODO: A BETTER WAY TO DISPLAY TARGETED subsections on level change
 
-    return new GeoJsonLayer({
-      key: mapLevel,
-      id: mapLevel,
-      data,
-      pickable: mapLevel === level,
-      // stroked: mapLevel === level,
-      stroked: true,
-      filled: mapLevel === level,
-      extruded: false,
-      lineWidthMinPixels: index === 0 ? 2 : 0.5,
-      getLineColor: [0, 0, 0],
-      getFillColor: (feature) => getColor(feature),
-      onHover: ({ object, x, y }) => handleMousover(object, x, y),
-      onClick: ({ object }) => handleClick(object),
+      return new GeoJsonLayer({
+        key: mapLevel,
+        id: mapLevel,
+        data,
+        pickable: mapLevel === level,
+        // stroked: mapLevel === level,
+        stroked: true,
+        filled: mapLevel === level,
+        extruded: false,
+        lineWidthMinPixels: index === 1 ? 2 : 0.5,
+        getLineColor: [3, 3, 3],
+        getFillColor: (feature) => getColor(feature),
+        onHover: ({ object, x, y }) => handleMousover(object, x, y),
+        onClick: ({ object }) => handleClick(object),
+      });
     });
-  });
 
   return (
     <Box
@@ -431,4 +406,4 @@ const MapComponent2 = ({
   );
 };
 
-export default MapComponent2;
+export default MapComponent;
