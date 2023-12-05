@@ -52,7 +52,7 @@ const ExpandMore = styled((props) => {
 function MapCard({ ID, bounds, geojson }) {
   const compare = useSelector((state) => state.interface.compareToggle);
   const chartMode = useSelector((state) => state.interface.chartMode[ID]);
-  const map = useSelector((state) => state.maps[ID].resultat);
+  const map = useSelector((state) => state.maps[ID]);
 
   const dispatch = useDispatch();
 
@@ -220,7 +220,7 @@ function MapCard({ ID, bounds, geojson }) {
               }}
             >
               {chartMode ? (
-                <ChartComponent ID={ID} data={map} bounds={bounds} />
+                <ChartComponent ID={ID} data={map.resultat} bounds={bounds} />
               ) : (
                 <>
                   <Box
@@ -230,8 +230,12 @@ function MapCard({ ID, bounds, geojson }) {
                       justifyContent: "space-between",
                     }}
                   >
-                    {displayMode === 1 && <Legend2 ID={ID} colors={Heatmap4} />}
-                    {displayMode === 2 && <Legend ID={ID} colors={colors2} />}
+                    {map.type === "simple" && (
+                      <Legend2 ID={ID} colors={Heatmap4} />
+                    )}
+                    {map.type === "evolution" && (
+                      <Legend ID={ID} colors={colors2} />
+                    )}
                     <Box>
                       <Box
                         sx={{
@@ -240,8 +244,23 @@ function MapCard({ ID, bounds, geojson }) {
                           justifyContent: "space-between",
                         }}
                       >
-                        <Typography>Moyenne Nationale: </Typography>{" "}
-                        <Chip>{map["gouvernorat"]["prc"]["Total"]}%</Chip>
+                        <Typography>
+                          {map.type === "simple"
+                            ? "Moyenne Nationale: "
+                            : "Evolution Nationale: "}
+                        </Typography>
+                        <Chip>
+                          {map.type === "simple"
+                            ? `${map.resultat["gouvernorat"]["prc"]["Total"]}%`
+                            : `${(
+                                map.resultat["gouvernorat"]["prc"]["Total"][
+                                  "newValue"
+                                ] -
+                                map.resultat["gouvernorat"]["prc"]["Total"][
+                                  "oldValue"
+                                ]
+                              ).toFixed(1)}%`}
+                        </Chip>
                       </Box>
                       <Divider />
                       <Box
@@ -251,15 +270,31 @@ function MapCard({ ID, bounds, geojson }) {
                           justifyContent: "space-between",
                         }}
                       >
-                        <Typography>Total des voix: </Typography>{" "}
-                        <Chip>{map["gouvernorat"]["voix"]["Total"]}</Chip>
+                        <Typography>
+                          {map.type === "simple"
+                            ? "Total des voix: "
+                            : "Nombre de voix: "}
+                        </Typography>
+                        <Chip>
+                          {map.type === "simple"
+                            ? `${map.resultat["gouvernorat"]["voix"]["Total"]}`
+                            : `${
+                                map.resultat["gouvernorat"]["voix"]["Total"][
+                                  "newValue"
+                                ] -
+                                map.resultat["gouvernorat"]["voix"]["Total"][
+                                  "oldValue"
+                                ]
+                              }`}
+                        </Chip>
                       </Box>
                     </Box>
                   </Box>
                   <Divider />
                   <MapComponent
                     ID={ID}
-                    data={map}
+                    data={map.resultat}
+                    type={map.type}
                     geojson={geojson}
                     // colors={colors}
                     colors={Heatmap4Converted}

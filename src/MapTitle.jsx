@@ -19,7 +19,8 @@ function MapTitle({ electionInfo, parti }) {
         }}
         level="title-lg"
       >
-        {electionInfo.nom}
+        {/* {electionInfo.nom} */}
+        Nom D'election
       </Typography>
     </Box>
   );

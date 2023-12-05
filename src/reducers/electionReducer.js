@@ -31,8 +31,22 @@ export const fetchElectionData = (election) => {
   return async (dispatch) => {
     dispatch(toggleLoading());
     const electionData = await electionServices.getElectionInfo(election);
-    if (electionData.data)
+
+    if (electionData.data) {
+      const { data } = await electionServices.getPartiScores(election);
+      const partiScores = data.variables[0].resultat.Total;
+      electionData.data.partis.forEach((parti) => {
+        if (partiScores[parti.code_parti] !== undefined) {
+          parti.score = partiScores[parti.code_parti];
+        }
+      });
+      const sortedPartis = [...electionData.data.partis].sort(
+        (a, b) => b.score - a.score
+      );
+
+      electionData.data = { ...electionData.data, partis: sortedPartis };
       dispatch(addElectionDataToState({ [election]: electionData.data }));
+    }
 
     //Extra time for reasons
     // setTimeout(() => {
