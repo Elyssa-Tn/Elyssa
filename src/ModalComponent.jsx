@@ -243,7 +243,7 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
             onClose={() => setSecondModalOpen(false)}
           >
             <ModalDialog layout="center">
-              <DialogTitle>Afficher l'évolution de cet indicateur?</DialogTitle>
+              <Typography>Afficher l'évolution de cet indicateur?</Typography>
               <DialogActions>
                 <Button variant="outlined" onClick={fetchPartiData}>
                   Non
