@@ -43,6 +43,28 @@ const getElectionInfo = async (election) => {
   }
 };
 
+const getPartiScores = async (election) => {
+  try {
+    const response = await axios.post(
+      url,
+      {
+        req: {
+          type: "data",
+          code_election: election,
+          decoupage: "gouvernorat",
+          variables: [{ code_variable: "prc", code_parti: "*" }],
+        },
+      },
+      {
+        cache: { interpretHeader: false, methods: ["get", "post"] },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    return error;
+  }
+};
+
 const requestFormatter = (map) => {
   let req = {
     req: {
@@ -136,7 +158,12 @@ const getRequestResults = async (map) => {
 
 //TODO: End of temporary map fetching code
 
-const electionServices = { init, getElectionInfo, getRequestResults };
+const electionServices = {
+  init,
+  getElectionInfo,
+  getPartiScores,
+  getRequestResults,
+};
 
 export default electionServices;
 

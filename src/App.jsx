@@ -99,6 +99,54 @@ function App() {
     return result;
   }
 
+  //TODO:REMOVE THIS
+  function findMinMaxValuesInEvolutionMap(maps) {
+    const result = {};
+    for (const key in maps) {
+      if (maps[key] && maps[key].resultat) {
+        result[key] = {
+          delegation: {
+            min: Infinity,
+            max: -Infinity,
+          },
+          gouvernorat: {
+            min: Infinity,
+            max: -Infinity,
+          },
+        };
+        const data = maps[key].resultat;
+        for (const level in data) {
+          for (const prcKey in data[level].prc) {
+            const value = data[level].prc[prcKey].percent;
+            if (!isNaN(value)) {
+              if (value < result[key][level].min) {
+                result[key][level].min = value;
+              }
+              if (value > result[key][level].max) {
+                result[key][level].max = value;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (result[1] && result[2]) {
+      result[3] = {
+        delegation: {
+          min: Math.min(result[1].delegation.min, result[2].delegation.min),
+          max: Math.max(result[1].delegation.max, result[2].delegation.max),
+        },
+        gouvernorat: {
+          min: Math.min(result[1].gouvernorat.min, result[2].gouvernorat.min),
+          max: Math.max(result[1].gouvernorat.max, result[2].gouvernorat.max),
+        },
+      };
+    }
+
+    return result;
+  }
+
   const calculateClasses = (data) => {
     const classNumber = {};
 
@@ -121,10 +169,19 @@ function App() {
 
   useEffect(() => {
     if (maps[1] || maps[2] !== null) {
-      const minMax = findMinMaxValues(maps);
-      const classNumber = calculateClasses(minMax);
-      dispatch(setClassNumber(classNumber));
-      dispatch(setMinMax(minMax));
+      if (maps[1].type === "simple") {
+        const minMax = findMinMaxValues(maps);
+        const classNumber = calculateClasses(minMax);
+        dispatch(setClassNumber(classNumber));
+        dispatch(setMinMax(minMax));
+      }
+      if (maps[1].type === "evolution") {
+        const minMax = findMinMaxValuesInEvolutionMap(maps);
+        const classNumber = calculateClasses(minMax);
+        dispatch(setClassNumber(classNumber));
+        dispatch(setMinMax(minMax));
+        console.log(minMax);
+      }
 
       if (maps[1] && maps[2]) {
         dispatch(toggleCompare(true));

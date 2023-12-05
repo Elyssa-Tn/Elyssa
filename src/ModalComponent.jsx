@@ -1,14 +1,18 @@
 import { Home, KeyboardArrowRight } from "@mui/icons-material";
 import {
   Box,
+  Button,
   Card,
   CircularProgress,
+  DialogActions,
+  DialogTitle,
   Divider,
   Link,
   List,
   ListDivider,
   ListItemButton,
   ListItemContent,
+  Modal,
   ModalDialog,
   Sheet,
   Tab,
@@ -20,7 +24,7 @@ import {
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchElectionData } from "./reducers/electionReducer";
-import { fetchMapData } from "./reducers/mapReducer";
+import { fetchEvolutionData, fetchMapData } from "./reducers/mapReducer";
 import { setModalOpen, setReady } from "./reducers/interfaceReducer";
 
 const ModalComponent = React.forwardRef(function ModalComponent() {
@@ -30,8 +34,11 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
   const [hoveredParti, setHoveredParti] = useState(null);
 
   const init = useSelector((state) => state.elections.init);
+  const maps = useSelector((state) => state.maps);
   const loading = useSelector((state) => state.elections.loading);
   const data = useSelector((state) => state.elections.data);
+
+  const [secondModalOpen, setSecondModalOpen] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -41,10 +48,35 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
   };
 
   const partiSelection = (parti) => {
+    setSelectedParti(parti);
+    if (maps[1] || maps[2]) {
+      const keys = [1, 2];
+      for (const key of keys) {
+        if (maps[key] && maps[key].parti.code_parti === parti.code_parti) {
+          setSecondModalOpen(true);
+          return;
+        }
+      }
+    }
+
     const request = { election: selectedElection, parti: parti };
     dispatch(setReady(false));
     dispatch(setModalOpen(false));
     dispatch(fetchMapData(request));
+  };
+
+  const fetchPartiData = () => {
+    const request = { election: selectedElection, parti: selectedParti };
+    dispatch(setReady(false));
+    dispatch(setModalOpen(false));
+    dispatch(fetchMapData(request));
+  };
+
+  const handleEvolutionDisplay = () => {
+    const request = { election: selectedElection, parti: selectedParti };
+    dispatch(fetchEvolutionData(request));
+    setSecondModalOpen(false);
+    dispatch(setModalOpen(false));
   };
 
   return (
@@ -56,8 +88,10 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
         }}
       >
         <TabList>
-          <Tab>Données électorales</Tab>
-          <Tab>Indicateurs socio-économiques</Tab>
+          <Tab key="Données électorales">Données électorales</Tab>
+          <Tab key="Indicateurs socio-économiques">
+            Indicateurs socio-économiques
+          </Tab>
         </TabList>
         <TabPanel value={0}>
           <Box sx={{ display: "flex", flexDirection: "row" }}>
@@ -180,6 +214,7 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
                             <ListItemContent>
                               {parti.denomination_fr}
                             </ListItemContent>
+                            {parti.score}%
                             <KeyboardArrowRight />
                           </ListItemButton>
                           <ListDivider />
@@ -203,6 +238,20 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
               )}
             </Sheet>
           )}
+          <Modal
+            open={secondModalOpen}
+            onClose={() => setSecondModalOpen(false)}
+          >
+            <ModalDialog layout="center">
+              <DialogTitle>Afficher l'évolution de cet indicateur?</DialogTitle>
+              <DialogActions>
+                <Button variant="outlined" onClick={fetchPartiData}>
+                  Non
+                </Button>
+                <Button onClick={handleEvolutionDisplay}>Oui</Button>
+              </DialogActions>
+            </ModalDialog>
+          </Modal>
         </TabPanel>
         <TabPanel value={1}>
           <Typography>Indicateurs socio-économiques</Typography>

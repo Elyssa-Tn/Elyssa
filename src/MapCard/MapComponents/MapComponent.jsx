@@ -31,6 +31,7 @@ import { DeckGL, GeoJsonLayer, WebMercatorViewport } from "deck.gl";
 const MapComponent = ({
   ID,
   data,
+  type,
   geojson,
   colors,
   colors2,
@@ -87,6 +88,12 @@ const MapComponent = ({
     selectedColors.push(colors[index]);
   }
 
+  const getColorOnScale = (value) => {
+    const factor = (value - min) / (max - min);
+    const color = [255 * (1 - factor), 255 * factor, 0, 255];
+    return color;
+  };
+
   function getColorForPercentileValue(value) {
     const color1 = colors2[0];
     const color2 = colors2[1];
@@ -116,14 +123,21 @@ const MapComponent = ({
   };
 
   const getColor = (feature) => {
-    const value = data[level]["prc"][feature.properties[`code_${level}`]];
+    if (type === "simple") {
+      const value = data[level]["prc"][feature.properties[`code_${level}`]];
+      if (!value) return [211, 211, 211, 255];
+      return getColorForValue(value);
+    }
 
-    if (!value) return [211, 211, 211, 255];
+    if (type === "evolution") {
+      const value =
+        data[level]["prc"][feature.properties[`code_${level}`]]["percent"];
+      if (!value) return [211, 211, 211, 255];
+      return getColorOnScale(value);
+    }
 
-    if (singleValue) return colors[4];
-
-    if (value && displayMode === 1) return getColorForValue(value);
-    if (value && displayMode === 2) return getColorForPercentileValue(value);
+    // if (singleValue) return colors[4];
+    // if (value && displayMode === 2) return getColorForPercentileValue(value);
   };
 
   const getDifferentLevel = (levels, currentLevel, direction) => {
@@ -167,8 +181,10 @@ const MapComponent = ({
               // value: valueGov,
             },
             code,
-            prc: data[level]["prc"][code],
-            voix: data[level]["voix"][code],
+            prc:
+              type === "simple"
+                ? data[level]["prc"][code]
+                : data[level]["prc"][code]["percent"],
           })
         );
       }
@@ -245,6 +261,9 @@ const MapComponent = ({
         getFillColor: (feature) => getColor(feature),
         onHover: ({ object, x, y }) => handleMousover(object, x, y),
         onClick: ({ object }) => handleClick(object),
+        updateTriggers: {
+          getFillColor: type,
+        },
       });
     });
 
@@ -308,7 +327,10 @@ const MapComponent = ({
                   }}
                 >
                   <Typography level="body-md">
-                    {data[level]["voix"][tooltip.code]}
+                    {type === "simple"
+                      ? data[level]["voix"][tooltip.code]
+                      : data[level]["voix"][tooltip.code]["newValue"] -
+                        data[level]["voix"][tooltip.code]["oldValue"]}
                   </Typography>
                   <Typography level="body-sm">&nbsp;voix</Typography>
                 </Box>
@@ -322,7 +344,11 @@ const MapComponent = ({
                   <Typography
                     style={{
                       background: rgbaToCssString(
-                        getColorForValue(data[level]["prc"][tooltip.code])
+                        type === "simple"
+                          ? getColorForValue(data[level]["prc"][tooltip.code])
+                          : getColorOnScale(
+                              data[level]["prc"][tooltip.code]["percent"]
+                            )
                       ),
                       width: "1.5rem",
                       height: "1.5rem",
@@ -330,7 +356,11 @@ const MapComponent = ({
                     }}
                   ></Typography>
                   <Typography>
-                    &nbsp;{data[level]["prc"][tooltip.code]}%
+                    &nbsp;
+                    {type === "simple"
+                      ? data[level]["prc"][tooltip.code]
+                      : data[level]["prc"][tooltip.code]["percent"]}
+                    %
                   </Typography>
                 </Box>
               </Box>

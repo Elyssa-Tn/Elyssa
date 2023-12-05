@@ -65,13 +65,8 @@ const ChartComponent = ({ ID, data, bounds }) => {
     <Box>
       <ButtonGroup>
         <Button
-          variant="soft"
-          endDecorator={
-            <Switch
-              checked={displayAverage}
-              onChange={() => setDisplayAverage(event.target.checked)}
-            />
-          }
+          variant={displayAverage ? "solid" : "outlined"}
+          onClick={() => setDisplayAverage(!displayAverage)}
         >
           Moyenne generale
         </Button>

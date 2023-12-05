@@ -1,125 +1,137 @@
-const Legend = ({ data, colors }) => {
-  const values = Object.values(data);
-  const minValue = Math.min(...values);
-  const maxValue = Math.max(...values);
-  const minValueColor = colors[0];
-  const maxValueColor = colors[1];
+// const Legend = ({ data, colors }) => {
+//   const values = Object.values(data);
+//   const minValue = Math.min(...values);
+//   const maxValue = Math.max(...values);
+//   const minValueColor = colors[0];
+//   const maxValueColor = colors[1];
 
+//   const getColorScale = (maxValue, minValue) => {
+//     const colorScale = [];
 
-  const getColorScale = (maxValue, minValue) => {
-    const colorScale = [];
+//     const step = (maxValue - minValue) / 4;
 
-    const step = (maxValue - minValue) / 4;
+//     for (let i = 4; i >= 0; i--) {
+//       const value = minValue + i * step;
+//       const color = getColorForValue(value);
 
-    for (let i = 4; i >= 0; i--) {
-      const value = minValue + i * step;
-      const color = getColorForValue(value);
+//       colorScale.push({ value, color });
+//     }
 
-      colorScale.push({ value, color });
-    }
+//     return colorScale;
+//   };
 
-    return colorScale;
-  };
+//   const getColorForValue = (value) => {
+//     const normalizedValue = (value - minValue) / (maxValue - minValue);
+//     const r = Math.floor(
+//       normalizedValue *
+//         (parseInt(maxValueColor.substr(1, 2), 16) -
+//           parseInt(minValueColor.substr(1, 2), 16)) +
+//         parseInt(minValueColor.substr(1, 2), 16)
+//     );
+//     const g = Math.floor(
+//       normalizedValue *
+//         (parseInt(maxValueColor.substr(3, 2), 16) -
+//           parseInt(minValueColor.substr(3, 2), 16)) +
+//         parseInt(minValueColor.substr(3, 2), 16)
+//     );
+//     const b = Math.floor(
+//       normalizedValue *
+//         (parseInt(maxValueColor.substr(5, 2), 16) -
+//           parseInt(minValueColor.substr(5, 2), 16)) +
+//         parseInt(minValueColor.substr(5, 2), 16)
+//     );
 
-  const getColorForValue = (value) => {
-    const normalizedValue = (value - minValue) / (maxValue - minValue);
-    const r = Math.floor(
-      normalizedValue *
-        (parseInt(maxValueColor.substr(1, 2), 16) -
-          parseInt(minValueColor.substr(1, 2), 16)) +
-        parseInt(minValueColor.substr(1, 2), 16)
-    );
-    const g = Math.floor(
-      normalizedValue *
-        (parseInt(maxValueColor.substr(3, 2), 16) -
-          parseInt(minValueColor.substr(3, 2), 16)) +
-        parseInt(minValueColor.substr(3, 2), 16)
-    );
-    const b = Math.floor(
-      normalizedValue *
-        (parseInt(maxValueColor.substr(5, 2), 16) -
-          parseInt(minValueColor.substr(5, 2), 16)) +
-        parseInt(minValueColor.substr(5, 2), 16)
-    );
+//     return `rgb(${r}, ${g}, ${b})`;
+//   };
 
-    return `rgb(${r}, ${g}, ${b})`;
-  };
+//   const colorScale = getColorScale(maxValue, minValue);
 
-  const colorScale = getColorScale(maxValue, minValue);
+//   const legendContainerStyle = {
+//     display: "flex",
+//     position: "absolute",
+//     bottom: "10px",
+//     left: "4px",
+//     flexDirection: "column",
+//     alignItems: "center",
+//     backgroundColor: "white",
+//     padding: "10px",
+//     borderRadius: "4px",
+//     boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+//   };
 
-  // const legendStyle = {
-  // position: "absolute",
-  // bottom: "10px",
-  // left: "4px",
-  //   backgroundColor: "white",
-  //   padding: "4px",
-  //   borderRadius: "4px",
-  //   boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
-  // };
+//   const legendScaleStyle = {
+//     width: "20px",
+//     height: "100px",
+//     marginBottom: "5px",
+//     background: `linear-gradient(to bottom, ${maxValueColor}, ${minValueColor})`,
+//   };
 
-  // const legendItemStyle = {
-  //   display: "flex",
-  //   alignItems: "center",
-  //   marginBottom: "5px",
-  // };
+//   const graduatedLineStyle = {
+//     position: "absolute",
+//     top: "0",
+//     left: "22px",
+//     width: "1px",
+//     height: "100%",
+//     backgroundColor: "black",
+//   };
 
-  // const legendSquareStyle = {
-  //   width: "20px",
-  //   height: "20px",
-  //   border: "1px solid black",
-  //   marginRight: "5px",
-  // };
+//   return (
+//     <div style={legendContainerStyle}>
+//       <div style={{ fontSize: "12px" }}>100</div>
+//       <div style={legendScaleStyle} />
+//       <div style={{ fontSize: "12px" }}>0.1</div>
+//     </div>
+//   );
+// };
 
-  // return (
-  //   <div style={legendStyle} className="leaflet-bottom leaflet-left">
-  //     {colorScale.map((scale, index) => (
-  //       <div key={index} style={legendItemStyle}>
-  //         <div
-  //           style={{
-  //             ...legendSquareStyle,
-  //             backgroundColor: scale.color,
-  //           }}
-  //         ></div>
-  //         <div style={{ fontSize: "12px" }}>{scale.value.toFixed(2)}</div>
-  //       </div>
-  //     ))}
-  //   </div>
-  // );
-  const legendContainerStyle = {
+// export default Legend;
+
+import { Box, Sheet, Typography } from "@mui/joy";
+import React from "react";
+import { useSelector } from "react-redux";
+
+const Legend = ({ ID }) => {
+  const level = useSelector((state) => state.interface.level);
+  const { min, max } = useSelector(
+    (state) => state.interface.minMax[ID][level]
+  );
+  const midValue = (parseFloat(max) + parseFloat(min)) / 2;
+
+  const legendStyle = {
     display: "flex",
-    position: "absolute",
-    bottom: "10px",
-    left: "4px",
-    flexDirection: "column",
     alignItems: "center",
-    backgroundColor: "white",
+    justifyContent: "space-between",
     padding: "10px",
-    borderRadius: "4px",
-    boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+    background: "lightgray",
+    margin: "10px",
   };
 
-  const legendScaleStyle = {
-    width: "20px",
-    height: "100px",
-    marginBottom: "5px",
-    background: `linear-gradient(to bottom, ${maxValueColor}, ${minValueColor})`,
-  };
-
-  const graduatedLineStyle = {
-    position: "absolute",
-    top: "0",
-    left: "22px",
-    width: "1px",
-    height: "100%",
-    backgroundColor: "black",
+  const barStyle = {
+    width: "14rem",
+    height: "20px",
+    background: `linear-gradient(to right, red, green)`,
   };
 
   return (
-    <div style={legendContainerStyle}>
-      <div style={{ fontSize: "12px" }}>100</div>
-      <div style={legendScaleStyle} />
-      <div style={{ fontSize: "12px" }}>0.1</div>
-    </div>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        <Typography>{min}</Typography>
+        <Typography>{midValue}</Typography>
+        <Typography>{max}</Typography>
+      </Box>
+      <Box style={barStyle}></Box>
+    </Box>
   );
 };
 

@@ -60,8 +60,7 @@ Content-Type: application/json
   "code_election": "tnmun2018",
   "decoupage": "gouvernorat",
   "variables": [
-    {"code_variable":"prc","code_parti":"*"},
-    {"code_variable":"voix","code_parti":"*"}
+    {"code_variable":"prc","code_parti":"*"}
   ]
 }
 } 
