@@ -28,24 +28,30 @@ const mapSlice = createSlice({
       for (const level in oldMap.resultat) {
         combinedData[level] = {};
 
-        for (const key in oldMap.resultat[level]) {
-          const oldValues = oldMap.resultat[level][key];
-          const newValues = newMap.resultat[level][key];
-          combinedData[level][key] = {};
+        for (const code in oldMap.resultat[level]) {
+          const oldValues = oldMap.resultat[level][code];
+          const newValues = newMap.resultat[level][code];
+          combinedData[level][code] = {};
 
-          for (const code in oldValues) {
-            const oldValue = oldValues[code];
-            const newValue = newValues[code];
-            const percent = (((newValue - oldValue) / oldValue) * 100).toFixed(
-              1
-            );
+          let percent;
 
-            combinedData[level][key][code] = {
-              oldValue,
-              newValue,
-              percent,
-            };
-          }
+          if (oldValues && newValues)
+            percent = (
+              ((newValues.prc - oldValues.prc) / oldValues.prc) *
+              100
+            ).toFixed(1);
+
+          combinedData[level][code] = {
+            code_parti: oldValues.code_parti,
+            nom_fr: oldValues.nom_fr,
+            oldprc: oldValues.prc,
+            oldvoix: oldValues.voix,
+            oldvotes: oldValues.votes,
+            newprc: newValues ? newValues.prc : null,
+            newvoix: newValues ? newValues.voix : null,
+            newvotes: newValues ? newValues.votes : null,
+            percent,
+          };
         }
       }
 
@@ -68,20 +74,21 @@ export const { createMap, deleteMap, createEvolutionMap, setMaps } =
 export const fetchMapData = (map) => {
   return async (dispatch) => {
     const result = await electionServices.getRequestResults(map);
+
     let mapObject = { ...map, resultat: {} };
 
     result.forEach((data) => {
       const { decoupage, variables } = data.data;
+      const object = {};
 
-      const normalizedVariables = {
-        ...variables.reduce((acc, { code_variable, resultat }) => {
-          acc[code_variable] = resultat;
-          return acc;
-        }, {}),
-      };
+      variables[0].resultat.forEach((resultat) => {
+        const { code_unite, ...data } = resultat;
+        object[code_unite] = data;
+      });
+
       mapObject = {
         ...mapObject,
-        resultat: { ...mapObject.resultat, [decoupage]: normalizedVariables },
+        resultat: { ...mapObject.resultat, [decoupage]: object },
         type: "simple",
       };
     });
@@ -97,17 +104,17 @@ export const fetchEvolutionData = (map) => {
 
     result.forEach((data) => {
       const { decoupage, variables } = data.data;
+      const object = {};
 
-      const normalizedVariables = {
-        ...variables.reduce((acc, { code_variable, resultat }) => {
-          acc[code_variable] = resultat;
-          return acc;
-        }, {}),
-      };
+      variables[0].resultat.forEach((resultat) => {
+        const { code_unite, ...data } = resultat;
+        object[code_unite] = data;
+      });
 
       mapObject = {
         ...mapObject,
-        resultat: { ...mapObject.resultat, [decoupage]: normalizedVariables },
+        resultat: { ...mapObject.resultat, [decoupage]: object },
+        type: "simple",
       };
     });
 

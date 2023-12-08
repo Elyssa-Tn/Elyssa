@@ -124,14 +124,17 @@ const MapComponent = ({
 
   const getColor = (feature) => {
     if (type === "simple") {
-      const value = data[level]["prc"][feature.properties[`code_${level}`]];
-      if (!value) return [211, 211, 211, 255];
+      if (!data[level][feature.properties[`code_${level}`]])
+        return [211, 211, 211, 200];
+      const value = data[level][feature.properties[`code_${level}`]]["prc"];
+      if (!value) return [211, 211, 211, 200];
       return getColorForValue(value);
     }
 
     if (type === "evolution") {
-      const value =
-        data[level]["prc"][feature.properties[`code_${level}`]]["percent"];
+      if (!data[level][feature.properties[`code_${level}`]])
+        return [211, 211, 211, 200];
+      const value = data[level][feature.properties[`code_${level}`]]["percent"];
       if (!value) return [211, 211, 211, 255];
       return getColorOnScale(value);
     }
@@ -167,10 +170,12 @@ const MapComponent = ({
     if (object) {
       if (object.properties) {
         const code = object.properties[`code_${level}`];
+        if (tooltip && tooltip.code === code) return;
         const name = object.properties[`nom_${level}`];
         // const valueGov =
         //   data["gouvernorat"]["prc"][target.feature.properties["code_gouvernorat"]];
         const nomGov = object.properties["nom_gouvernorat"];
+        //TODO: reduce the frequency of dispatches
         dispatch(setHover({ code: code, name: name }));
         dispatch(
           setTooltip({
@@ -181,10 +186,11 @@ const MapComponent = ({
               // value: valueGov,
             },
             code,
-            prc:
-              type === "simple"
-                ? data[level]["prc"][code]
-                : data[level]["prc"][code]["percent"],
+            prc: data[level][code]
+              ? type === "simple"
+                ? data[level][code]["prc"]
+                : data[level][code]["percent"]
+              : null,
           })
         );
       }
@@ -328,9 +334,9 @@ const MapComponent = ({
                 >
                   <Typography level="body-md">
                     {type === "simple"
-                      ? data[level]["voix"][tooltip.code]
-                      : data[level]["voix"][tooltip.code]["newValue"] -
-                        data[level]["voix"][tooltip.code]["oldValue"]}
+                      ? data[level][tooltip.code]["voix"]
+                      : data[level][tooltip.code]["newvoix"] -
+                        data[level][tooltip.code]["oldvoix"]}
                   </Typography>
                   <Typography level="body-sm">&nbsp;voix</Typography>
                 </Box>
@@ -345,9 +351,9 @@ const MapComponent = ({
                     style={{
                       background: rgbaToCssString(
                         type === "simple"
-                          ? getColorForValue(data[level]["prc"][tooltip.code])
+                          ? getColorForValue(data[level][tooltip.code]["prc"])
                           : getColorOnScale(
-                              data[level]["prc"][tooltip.code]["percent"]
+                              data[level][tooltip.code]["percent"]
                             )
                       ),
                       width: "1.5rem",
@@ -358,8 +364,8 @@ const MapComponent = ({
                   <Typography>
                     &nbsp;
                     {type === "simple"
-                      ? data[level]["prc"][tooltip.code]
-                      : data[level]["prc"][tooltip.code]["percent"]}
+                      ? data[level][tooltip.code]["prc"].toFixed(2)
+                      : data[level][tooltip.code]["percent"]}
                     %
                   </Typography>
                 </Box>

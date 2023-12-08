@@ -250,7 +250,7 @@ function MapCard({ ID, bounds, geojson }) {
                             : "Evolution Nationale: "}
                         </Typography>
                         <Chip>
-                          {map.type === "simple"
+                          {/* {map.type === "simple"
                             ? `${map.resultat["gouvernorat"]["prc"]["Total"]}%`
                             : `${(
                                 map.resultat["gouvernorat"]["prc"]["Total"][
@@ -259,7 +259,7 @@ function MapCard({ ID, bounds, geojson }) {
                                 map.resultat["gouvernorat"]["prc"]["Total"][
                                   "oldValue"
                                 ]
-                              ).toFixed(1)}%`}
+                              ).toFixed(1)}%`} */}
                         </Chip>
                       </Box>
                       <Divider />
@@ -276,7 +276,7 @@ function MapCard({ ID, bounds, geojson }) {
                             : "Nombre de voix: "}
                         </Typography>
                         <Chip>
-                          {map.type === "simple"
+                          {/* {map.type === "simple"
                             ? `${map.resultat["gouvernorat"]["voix"]["Total"]}`
                             : `${
                                 map.resultat["gouvernorat"]["voix"]["Total"][
@@ -285,7 +285,7 @@ function MapCard({ ID, bounds, geojson }) {
                                 map.resultat["gouvernorat"]["voix"]["Total"][
                                   "oldValue"
                                 ]
-                              }`}
+                              }`} */}
                         </Chip>
                       </Box>
                     </Box>

@@ -4,7 +4,8 @@ Content-Type: application/json
 
 {
   "req":{
-    "type":"init"
+    "type":"init",
+    "pays":"Tunisie"
   }
 }
 
@@ -15,6 +16,7 @@ Content-Type: application/json
 {
   "req":{
     "type":"election",
+    "pays":"tunisie",
     "code_election":"tnmun2018"
   }
 }
@@ -27,7 +29,8 @@ Content-Type: application/json
 "req":{
   "type":"data",
   "code_election": "tnac2011",
-  "decoupage":"commune",
+  "pays":"tunisie",
+  "decoupage":"delegation",
    "variables": [
      {"code_variable":"tp"}
    ]
@@ -41,11 +44,11 @@ Content-Type: application/json
 {
 "req":{
   "type": "data",
+  "pays":"tunisie",
   "code_election": "tnmun2018",
   "decoupage": "gouvernorat",
   "variables": [
-    {"code_variable":"prc","code_parti":"NIDA"},
-    {"code_variable":"voix","code_parti":"NIDA"}
+    {"code_variable":"prc","code_parti":"NIDA"}
   ]
 }
 } 
@@ -57,8 +60,9 @@ Content-Type: application/json
 {
 "req":{
   "type": "data",
+  "pays":"tunisie",
   "code_election": "tnmun2018",
-  "decoupage": "gouvernorat",
+  "decoupage": "pays",
   "variables": [
     {"code_variable":"prc","code_parti":"*"}
   ]
@@ -72,6 +76,7 @@ Content-Type: application/json
 {
 "req":{
   "type": "data",
+  "pays":"tunisie",
   "code_election": "tnac2011",
   "decoupage": "gouvernorat",
   "variables": [
@@ -88,10 +93,10 @@ Content-Type: application/json
 {
 "req":{
   "type": "data",
+  "pays":"tunisie",
   "code_election": "tnmun2018",
   "decoupage": "gouvernorat",
   "variables": [
-    {"code_variable":"voix"},
     {"code_variable":"tp"}
   ]
 }
