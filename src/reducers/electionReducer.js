@@ -23,7 +23,20 @@ export const { toggleLoading, electionInit, addElectionDataToState } =
 export const initializeElections = () => {
   return async (dispatch) => {
     const elections = await electionServices.init();
-    dispatch(electionInit(elections));
+
+    const sortedElections = [...elections.data.elections].sort((a, b) => {
+      const year1 = parseInt(a.nom.match(/\d{4}/)[0], 10);
+      const year2 = parseInt(b.nom.match(/\d{4}/)[0], 10);
+
+      return year1 - year2;
+    });
+
+    dispatch(
+      electionInit({
+        ...elections,
+        data: { ...elections.data, elections: sortedElections },
+      })
+    );
   };
 };
 
@@ -33,18 +46,22 @@ export const fetchElectionData = (election) => {
     const electionData = await electionServices.getElectionInfo(election);
 
     if (electionData.data) {
-      const { data } = await electionServices.getPartiScores(election);
-      const partiScores = data.variables[0].resultat.Total;
-      electionData.data.partis.forEach((parti) => {
-        if (partiScores[parti.code_parti] !== undefined) {
-          parti.score = partiScores[parti.code_parti];
-        }
-      });
-      const sortedPartis = [...electionData.data.partis].sort(
-        (a, b) => b.score - a.score
-      );
+      if (electionData.data.partis && electionData.data.partis.length !== 0) {
+        const { data } = await electionServices.getPartiScores(election);
+        const partiScores = data.variables[0].resultat;
 
-      electionData.data = { ...electionData.data, partis: sortedPartis };
+        electionData.data.partis.forEach((parti) => {
+          const partiScore = partiScores.find(
+            (partiScore) => partiScore.code_parti === parti.code_parti
+          );
+          if (partiScore) parti.score = Number(partiScore.prc.toFixed(1));
+        });
+        const sortedPartis = [...electionData.data.partis].sort(
+          (a, b) => b.score - a.score
+        );
+
+        electionData.data = { ...electionData.data, partis: sortedPartis };
+      }
       dispatch(addElectionDataToState({ [election]: electionData.data }));
     }
 

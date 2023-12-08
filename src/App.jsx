@@ -70,8 +70,8 @@ function App() {
         };
         const data = maps[key].resultat;
         for (const level in data) {
-          for (const prcKey in data[level].prc) {
-            const value = data[level].prc[prcKey];
+          for (const code in data[level]) {
+            const value = data[level][code].prc;
             if (value < result[key][level].min) {
               result[key][level].min = value;
             }
@@ -116,8 +116,8 @@ function App() {
         };
         const data = maps[key].resultat;
         for (const level in data) {
-          for (const prcKey in data[level].prc) {
-            const value = data[level].prc[prcKey].percent;
+          for (const code in data[level]) {
+            const value = data[level][code].percent;
             if (!isNaN(value)) {
               if (value < result[key][level].min) {
                 result[key][level].min = value;
@@ -180,7 +180,6 @@ function App() {
         const classNumber = calculateClasses(minMax);
         dispatch(setClassNumber(classNumber));
         dispatch(setMinMax(minMax));
-        console.log(minMax);
       }
 
       if (maps[1] && maps[2]) {

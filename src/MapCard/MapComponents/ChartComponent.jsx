@@ -31,36 +31,25 @@ const ChartComponent = ({ ID, data, bounds }) => {
   const dispatch = useDispatch();
 
   const [datasets, setDatasets] = useState(null);
+  const [codes, setCodes] = useState(null);
   const [displayAverage, setDisplayAverage] = useState(false);
 
   useEffect(() => {
-    const combinedObject = [];
+    const codes = Object.keys(data[level]);
+    setCodes(codes);
+  }, [data, level]);
 
-    Object.keys(bounds[level]).forEach((key) => {
-      const filterString =
-        currentTarget !== null ? currentTarget.toString() : null;
+  // const average = data["gouvernorat"]["prc"]["Total"];
+  const average = 20;
 
-      if (currentTarget !== null && !key.startsWith(filterString)) {
-        return;
-      }
-
-      const obj = {
-        code: Number(key),
-        name: bounds[level][key].name,
-        value: data[level]["prc"][key],
-      };
-      combinedObject.push(obj);
-    });
-
-    setDatasets(combinedObject);
-  }, [bounds, data, currentTarget, level]);
-
-  const average = data["gouvernorat"]["prc"]["Total"];
+  console.log(data[level]);
 
   const handleGraphButton = () => {
     dispatch(setChartMode(ID));
   };
 
+  const displayedVariable = "prc";
+  if (!codes) return <span>loading</span>;
   return (
     <Box>
       <ButtonGroup>
@@ -92,17 +81,23 @@ const ChartComponent = ({ ID, data, bounds }) => {
         <Box height={500} width={400}>
           <Bar
             data={{
-              datasets: [{ data: datasets }],
+              labels: codes.map((code) => data[level][code]["nom_fr"]),
+              datasets: [
+                {
+                  label: "Pourcentage",
+                  data: codes.map((code) => data[level][code]["prc"]),
+                },
+              ],
             }}
             options={{
               parsing: {
-                xAxisKey: "name",
-                yAxisKey: "value",
+                xAxisKey: "nom_fr",
+                yAxisKey: displayedVariable,
               },
               onHover: (event, elements) => {
-                if (elements.length) {
-                  dispatch(setHover(datasets[elements[0].index]));
-                }
+                // if (elements.length) {
+                //   dispatch(setHover(datasets[elements[0].index]));
+                // }
               },
               maintainAspectRatio: false,
               responsive: true,

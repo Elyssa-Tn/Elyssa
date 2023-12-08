@@ -11,6 +11,7 @@ const init = async () => {
       {
         req: {
           type: "init",
+          pays: "Tunisie",
         },
       },
       {
@@ -30,6 +31,7 @@ const getElectionInfo = async (election) => {
       {
         req: {
           type: "election",
+          pays: "Tunisie",
           code_election: election,
         },
       },
@@ -50,13 +52,15 @@ const getPartiScores = async (election) => {
       {
         req: {
           type: "data",
+          pays: "Tunisie",
           code_election: election,
-          decoupage: "gouvernorat",
+          decoupage: "pays",
           variables: [{ code_variable: "prc", code_parti: "*" }],
         },
       },
       {
-        cache: { interpretHeader: false, methods: ["get", "post"] },
+        cache: { methods: ["get", "post"] },
+        headers: { "Access-Control-Allow-Origin": "*" },
       }
     );
     return response.data;
@@ -127,17 +131,15 @@ const getRequestResults = async (map) => {
     const req = {
       req: {
         type: "data",
+        pays: "Tunisie",
         code_election: map.election.code_election,
         decoupage: level,
-        variables: [
-          { code_variable: "prc", code_parti: map.parti.code_parti },
-          { code_variable: "voix", code_parti: map.parti.code_parti },
-        ],
+        variables: [{ code_variable: "prc", code_parti: map.parti.code_parti }],
       },
     };
     try {
       const response = await axios.post(url, req, {
-        cache: { interpretHeader: false, methods: ["get", "post"] },
+        cache: { methods: ["get", "post"] },
       });
       return response.data;
     } catch (error) {

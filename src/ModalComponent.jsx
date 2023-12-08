@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Card,
+  Chip,
   CircularProgress,
   DialogActions,
   Divider,
@@ -42,7 +43,8 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
   const dispatch = useDispatch();
 
   const electionSelection = (election) => {
-    dispatch(fetchElectionData(election.code_election));
+    if (!data[election.code_election])
+      dispatch(fetchElectionData(election.code_election));
     setSelectedElection(election);
   };
 
@@ -213,7 +215,7 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
                             <ListItemContent>
                               {parti.denomination_fr}
                             </ListItemContent>
-                            {parti.score}%
+                            <Chip>{parti.score}%</Chip>
                             <KeyboardArrowRight />
                           </ListItemButton>
                           <ListDivider />
