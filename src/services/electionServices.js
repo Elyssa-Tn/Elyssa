@@ -173,6 +173,8 @@ export const fetchGeojson = async (level) => {
   const req = {
     req: {
       type: "map_decoupage",
+      pays: "Tunisie",
+      version: "10",
       decoupages: [level],
     },
   };

@@ -3,6 +3,7 @@ import SaveAltOutlinedIcon from "@mui/icons-material/SaveAltOutlined";
 import FileDownloadOffOutlinedIcon from "@mui/icons-material/FileDownloadOffOutlined";
 import LayersOutlinedIcon from "@mui/icons-material/LayersOutlined";
 import EqualizerOutlinedIcon from "@mui/icons-material/EqualizerOutlined";
+import CloseIcon from "@mui/icons-material/Close";
 import { useState } from "react";
 import custom from "../../assets/custom(3).json";
 import {
@@ -27,6 +28,7 @@ import {
   setViewport,
 } from "../../reducers/interfaceReducer";
 import { DeckGL, GeoJsonLayer, WebMercatorViewport } from "deck.gl";
+import { deleteMap } from "../../reducers/mapReducer";
 
 const MapComponent = ({
   ID,
@@ -90,7 +92,14 @@ const MapComponent = ({
 
   const getColorOnScale = (value) => {
     const factor = (value - min) / (max - min);
-    const color = [255 * (1 - factor), 255 * factor, 0, 255];
+
+    const color = [
+      Math.round(255 * (1 - factor)),
+      Math.round(255 * factor),
+      0,
+      255,
+    ];
+
     return color;
   };
 
@@ -131,7 +140,7 @@ const MapComponent = ({
       return getColorForValue(value);
     }
 
-    if (type === "evolution") {
+    if (type === "evolution" || type === "comparaison") {
       if (!data[level][feature.properties[`code_${level}`]])
         return [211, 211, 211, 200];
       const value = data[level][feature.properties[`code_${level}`]]["percent"];
@@ -404,6 +413,11 @@ const MapComponent = ({
       </Sheet>
 
       <ButtonGroup orientation="vertical" size="sm" sx={{ padding: "0.25rem" }}>
+        <Tooltip placement="top" arrow title="Fermer">
+          <Button onClick={() => dispatch(deleteMap(ID))}>
+            <CloseIcon />
+          </Button>
+        </Tooltip>
         <Tooltip placement="top" arrow title="Retour">
           <Button
             disabled={level === levels[0] ? true : false}
