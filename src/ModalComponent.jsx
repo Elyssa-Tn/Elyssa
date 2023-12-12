@@ -24,8 +24,16 @@ import {
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchElectionData } from "./reducers/electionReducer";
-import { fetchEvolutionData, fetchMapData } from "./reducers/mapReducer";
-import { setModalOpen, setReady } from "./reducers/interfaceReducer";
+import {
+  fetchCompareMap,
+  fetchEvolutionData,
+  fetchMapData,
+} from "./reducers/mapReducer";
+import {
+  setModalCompareFlag,
+  setModalOpen,
+  setReady,
+} from "./reducers/interfaceReducer";
 
 const ModalComponent = React.forwardRef(function ModalComponent() {
   const [selectedElection, setSelectedElection] = useState(null);
@@ -37,6 +45,9 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
   const maps = useSelector((state) => state.maps);
   const loading = useSelector((state) => state.elections.loading);
   const data = useSelector((state) => state.elections.data);
+  const modalCompareFlag = useSelector(
+    (state) => state.interface.modalCompareFlag
+  );
 
   const [secondModalOpen, setSecondModalOpen] = useState(false);
 
@@ -59,18 +70,37 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
         }
       }
     }
+    console.log(modalCompareFlag);
 
-    const request = { election: selectedElection, parti: parti };
-    dispatch(setReady(false));
-    dispatch(setModalOpen(false));
-    dispatch(fetchMapData(request));
+    if (modalCompareFlag) {
+      const request = { election: selectedElection, parti: parti };
+      dispatch(setReady(false));
+      dispatch(setModalOpen(false));
+      dispatch(setModalCompareFlag(false));
+      dispatch(fetchCompareMap(request));
+    }
+    if (!modalCompareFlag) {
+      const request = { election: selectedElection, parti: parti };
+      dispatch(setReady(false));
+      dispatch(setModalOpen(false));
+      dispatch(fetchMapData(request));
+    }
   };
 
   const fetchPartiData = () => {
-    const request = { election: selectedElection, parti: selectedParti };
-    dispatch(setReady(false));
-    dispatch(setModalOpen(false));
-    dispatch(fetchMapData(request));
+    if (!modalCompareFlag) {
+      const request = { election: selectedElection, parti: selectedParti };
+      dispatch(setReady(false));
+      dispatch(setModalOpen(false));
+      dispatch(fetchMapData(request));
+    }
+    if (modalCompareFlag) {
+      const request = { election: selectedElection, parti: selectedParti };
+      dispatch(setReady(false));
+      dispatch(setModalOpen(false));
+      dispatch(setModalCompareFlag(false));
+      dispatch(fetchCompareMap(request));
+    }
   };
 
   const handleEvolutionDisplay = () => {

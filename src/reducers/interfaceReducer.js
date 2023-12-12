@@ -24,6 +24,7 @@ const initialState = {
   chartMode: { 1: false, 2: false },
   ready: false,
   modalOpen: true,
+  modalCompareFlag: false,
 };
 
 const interfaceSlice = createSlice({
@@ -89,6 +90,9 @@ const interfaceSlice = createSlice({
     setModalOpen: (state, action) => {
       state.modalOpen = action.payload;
     },
+    setModalCompareFlag: (state, action) => {
+      state.modalCompareFlag = action.payload;
+    },
   },
 });
 
@@ -109,6 +113,7 @@ export const {
   setChartMode,
   setReady,
   setModalOpen,
+  setModalCompareFlag,
 } = interfaceSlice.actions;
 
 export default interfaceSlice.reducer;

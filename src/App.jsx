@@ -18,13 +18,11 @@ import {
 } from "@mui/material/styles";
 
 import Layout from "./Layout";
-import ModalContents from "./ModalContents/ModalContents";
 import MapCard from "./MapCard/MapCard2";
 import Navbar from "./Navbar";
 import MapTitle from "./MapTitle";
 import theme from "./theme";
 import { getGeoJSON } from "./services/geojson";
-import { setMaps } from "./reducers/mapReducer";
 import {
   setClassNumber,
   setMinMax,
@@ -168,14 +166,33 @@ function App() {
   };
 
   useEffect(() => {
+    //TODO: This is bad, needs massive improving
     if (maps[1] || maps[2] !== null) {
-      if (maps[1].type === "simple") {
+      if (maps[1] && maps[1].type === "simple") {
         const minMax = findMinMaxValues(maps);
         const classNumber = calculateClasses(minMax);
         dispatch(setClassNumber(classNumber));
         dispatch(setMinMax(minMax));
       }
-      if (maps[1].type === "evolution") {
+      if (
+        maps[1] &&
+        (maps[1].type === "evolution" || maps[1].type === "comparaison")
+      ) {
+        const minMax = findMinMaxValuesInEvolutionMap(maps);
+        const classNumber = calculateClasses(minMax);
+        dispatch(setClassNumber(classNumber));
+        dispatch(setMinMax(minMax));
+      }
+      if (maps[2] && maps[2].type === "simple") {
+        const minMax = findMinMaxValues(maps);
+        const classNumber = calculateClasses(minMax);
+        dispatch(setClassNumber(classNumber));
+        dispatch(setMinMax(minMax));
+      }
+      if (
+        maps[2] &&
+        (maps[2].type === "evolution" || maps[2].type === "comparaison")
+      ) {
         const minMax = findMinMaxValuesInEvolutionMap(maps);
         const classNumber = calculateClasses(minMax);
         dispatch(setClassNumber(classNumber));

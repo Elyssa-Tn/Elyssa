@@ -2,17 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import {
   Card,
   IconButton,
-  CardActions,
-  CardContent,
   Box,
   Typography,
-  Switch,
   Divider,
   Chip,
   Sheet,
   Input,
   Button,
   ButtonGroup,
+  Stack,
 } from "@mui/joy";
 // import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
@@ -32,14 +30,19 @@ import CircularProgress from "@mui/joy/CircularProgress";
 import InfoIcon from "@mui/icons-material/Info";
 import PanoramaIcon from "@mui/icons-material/Panorama";
 import TableChartIcon from "@mui/icons-material/TableChart";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ExploreIcon from "@mui/icons-material/Explore";
 import { toSvg } from "html-to-image";
 import { useDispatch, useSelector } from "react-redux";
 import { TabList, TabPanel, Tabs, Tab } from "@mui/joy";
 import InfoPanel from "./MapComponents/InfoPanel";
-import { deleteMap } from "../reducers/mapReducer";
+import { deleteMap, fetchEvolutionData } from "../reducers/mapReducer";
 import { getGeoJSON } from "../services/geojson";
-import { setModalOpen, toggleCompare } from "../reducers/interfaceReducer";
+import {
+  setModalCompareFlag,
+  setModalOpen,
+  toggleCompare,
+} from "../reducers/interfaceReducer";
 import ChartComponent from "./MapComponents/ChartComponent";
 
 const ExpandMore = styled((props) => {
@@ -53,6 +56,7 @@ function MapCard({ ID, bounds, geojson }) {
   const compare = useSelector((state) => state.interface.compareToggle);
   const chartMode = useSelector((state) => state.interface.chartMode[ID]);
   const map = useSelector((state) => state.maps[ID]);
+  const elections = useSelector((state) => state.elections.init.elections);
 
   const dispatch = useDispatch();
 
@@ -194,6 +198,37 @@ function MapCard({ ID, bounds, geojson }) {
     }
   };
 
+  //TODO: Remove this part eventually when the server will have more data for better handling
+
+  const findElectionByCode = (electionCode) => {
+    const foundElection = elections.find(
+      (election) => election.code_election === electionCode
+    );
+    return foundElection;
+  };
+
+  const Election_1 = findElectionByCode("TNAC2011");
+  const Election_2 = findElectionByCode("tnmun2018");
+
+  const selectElectionForEvolution = (election) => {
+    const currentElectionCode = election.code_election;
+
+    const otherElectionCode =
+      currentElectionCode === Election_1.code_election
+        ? Election_2.code_election
+        : Election_1.code_election;
+    return findElectionByCode(otherElectionCode);
+  };
+
+  //END OF TEMPORARY CODE
+
+  const handleEvolutionDisplay = () => {
+    const targetElection = selectElectionForEvolution(map.election);
+    const request = { election: targetElection, parti: map.parti };
+
+    dispatch(fetchEvolutionData(request));
+  };
+  console.log(map);
   if (Object.keys(geojson).length === 2 && map) {
     return (
       <>
@@ -236,6 +271,9 @@ function MapCard({ ID, bounds, geojson }) {
                     {map.type === "evolution" && (
                       <Legend ID={ID} colors={colors2} />
                     )}
+                    {map.type === "comparaison" && (
+                      <Legend ID={ID} colors={colors2} />
+                    )}
                     <Box>
                       <Box
                         sx={{
@@ -245,9 +283,9 @@ function MapCard({ ID, bounds, geojson }) {
                         }}
                       >
                         <Typography>
-                          {map.type === "simple"
-                            ? "Moyenne Nationale: "
-                            : "Evolution Nationale: "}
+                          {map.type === "evolution"
+                            ? "Evolution Nationale: "
+                            : "Moyenne Nationale: "}
                         </Typography>
                         <Chip>
                           {/* {map.type === "simple"
@@ -320,47 +358,97 @@ function MapCard({ ID, bounds, geojson }) {
                 <Typography>Rechercher un gouvernorat:</Typography>
                 <Input placeholder="ex: Ariana" color="primary" />
               </Box>
+              <Divider orientation={compare ? "vertical" : "horizontal"} />
+              {!compare && (
+                <Box>
+                  {map.type === "evolution" ? (
+                    <Box>
+                      <Typography>Afficher la carte de:</Typography>
+                      <ButtonGroup>
+                        <Button>{map.election[0].fin}</Button>
+                        <Button>{map.election[1].fin}</Button>
+                      </ButtonGroup>
+                    </Box>
+                  ) : (
+                    <Box>
+                      <Typography>
+                        Afficher l'evolution de cet indicateur?
+                      </Typography>
+                      <Button onClick={handleEvolutionDisplay}>Afficher</Button>
+                    </Box>
+                  )}
+                </Box>
+              )}
               <Divider />
-              <Box>
-                <Typography>Comparez avec un autre indicateur:</Typography>
-                <Button
-                  onClick={() =>
-                    compare
-                      ? dispatch(deleteMap(ID))
-                      : dispatch(setModalOpen(true))
-                  }
-                  endDecorator={"+"}
-                >
-                  {compare ? "Annulez La comparaison" : "Comparez"}
-                </Button>
-              </Box>
-              <Divider />
+              {!compare ? (
+                <Stack>
+                  <Typography>Comparez avec un autre indicateur:</Typography>
+                  <Button
+                    onClick={() => {
+                      dispatch(setModalCompareFlag(true));
+                      dispatch(setModalOpen(true));
+                    }}
+                    endDecorator={<AddCircleOutlineIcon />}
+                    disabled={map.type === "evolution"}
+                  >
+                    <Typography>Sur la même carte</Typography>
+                  </Button>
+                  <Typography>Ou</Typography>
+                  <Button
+                    onClick={() => dispatch(setModalOpen(true))}
+                    endDecorator={<AddCircleOutlineIcon />}
+                  >
+                    <Typography>Sur une deuxième carte</Typography>
+                  </Button>
+                </Stack>
+              ) : (
+                <Box>
+                  <Typography>Annuler la comparaison</Typography>
+                  <Button onClick={() => dispatch(deleteMap(ID))}>
+                    Annulez
+                  </Button>
+                </Box>
+              )}
+
+              <Divider orientation={compare ? "vertical" : "horizontal"} />
               <ButtonGroup orientation="vertical">
-                <Button>
+                <Button
+                  sx={{
+                    justifyContent: "space-between",
+                  }}
+                  size="sm"
+                  endDecorator={compare ? null : <InfoIcon />}
+                >
                   {compare ? (
                     <InfoIcon />
                   ) : (
-                    <>
-                      Méthodologie <InfoIcon />
-                    </>
+                    <Typography>Méthodologie</Typography>
                   )}
                 </Button>
-                <Button>
+                <Button
+                  sx={{
+                    justifyContent: "space-between",
+                  }}
+                  size="sm"
+                  endDecorator={compare ? null : <TableChartIcon />}
+                >
                   {compare ? (
                     <TableChartIcon />
                   ) : (
-                    <>
-                      Télécharger les données <TableChartIcon />
-                    </>
+                    <Typography>Télécharger les données</Typography>
                   )}
                 </Button>
-                <Button>
+                <Button
+                  sx={{
+                    justifyContent: "space-between",
+                  }}
+                  size="sm"
+                  endDecorator={compare ? null : <PanoramaIcon />}
+                >
                   {compare ? (
                     <PanoramaIcon />
                   ) : (
-                    <>
-                      Télécharger la carte <PanoramaIcon />
-                    </>
+                    <Typography>Télécharger la carte</Typography>
                   )}
                 </Button>
               </ButtonGroup>
