@@ -48,7 +48,7 @@ export const fetchElectionData = (election) => {
     if (electionData.data) {
       if (electionData.data.partis && electionData.data.partis.length !== 0) {
         const { data } = await electionServices.getPartiScores(election);
-        const partiScores = data.variables[0].resultat;
+        const partiScores = data.result[0].variables[0].resultat;
 
         electionData.data.partis.forEach((parti) => {
           const partiScore = partiScores.find(
@@ -65,10 +65,7 @@ export const fetchElectionData = (election) => {
       dispatch(addElectionDataToState({ [election]: electionData.data }));
     }
 
-    //Extra time for reasons
-    // setTimeout(() => {
     dispatch(toggleLoading());
-    // }, 50);
   };
 };
 

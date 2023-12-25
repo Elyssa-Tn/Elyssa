@@ -61,45 +61,38 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
 
   const partiSelection = (parti) => {
     setSelectedParti(parti);
-    if (maps[1] || maps[2]) {
-      const keys = [1, 2];
-      for (const key of keys) {
-        if (maps[key] && maps[key].parti.code_parti === parti.code_parti) {
-          setSecondModalOpen(true);
-          return;
-        }
-      }
+    const request = { election: selectedElection, parti };
+
+    if (
+      (maps[1] || maps[2]) &&
+      (maps[1]?.parti.code_parti === parti.code_parti ||
+        maps[2]?.parti.code_parti === parti.code_parti)
+    ) {
+      setSecondModalOpen(true);
+      return;
     }
-    console.log(modalCompareFlag);
+
+    dispatch(setReady(false));
+    dispatch(setModalOpen(false));
 
     if (modalCompareFlag) {
-      const request = { election: selectedElection, parti: parti };
-      dispatch(setReady(false));
-      dispatch(setModalOpen(false));
       dispatch(setModalCompareFlag(false));
       dispatch(fetchCompareMap(request));
-    }
-    if (!modalCompareFlag) {
-      const request = { election: selectedElection, parti: parti };
-      dispatch(setReady(false));
-      dispatch(setModalOpen(false));
+    } else {
       dispatch(fetchMapData(request));
     }
   };
 
   const fetchPartiData = () => {
-    if (!modalCompareFlag) {
-      const request = { election: selectedElection, parti: selectedParti };
-      dispatch(setReady(false));
-      dispatch(setModalOpen(false));
-      dispatch(fetchMapData(request));
-    }
+    const request = { election: selectedElection, parti: selectedParti };
+    dispatch(setReady(false));
+    dispatch(setModalOpen(false));
+
     if (modalCompareFlag) {
-      const request = { election: selectedElection, parti: selectedParti };
-      dispatch(setReady(false));
-      dispatch(setModalOpen(false));
       dispatch(setModalCompareFlag(false));
       dispatch(fetchCompareMap(request));
+    } else {
+      dispatch(fetchMapData(request));
     }
   };
 

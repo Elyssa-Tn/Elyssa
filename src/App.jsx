@@ -18,7 +18,7 @@ import {
 } from "@mui/material/styles";
 
 import Layout from "./Layout";
-import MapCard from "./MapCard/MapCard2";
+import MapCard from "./MapCard/MapCard";
 import Navbar from "./Navbar";
 import MapTitle from "./MapTitle";
 import theme from "./theme";

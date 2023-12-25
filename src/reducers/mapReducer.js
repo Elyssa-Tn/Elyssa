@@ -88,11 +88,12 @@ const mapSlice = createSlice({
             ).toFixed(1);
 
           combinedData[level][code] = {
-            code_parti: oldValues.code_parti,
+            old_parti: oldValues.code_parti,
             nom_fr: oldValues.nom_fr,
             oldprc: oldValues.prc,
             oldvoix: oldValues.voix,
             oldvotes: oldValues.votes,
+            new_parti: newValues ? newValues.code_parti : null,
             newprc: newValues ? newValues.prc : null,
             newvoix: newValues ? newValues.voix : null,
             newvotes: newValues ? newValues.votes : null,
@@ -129,7 +130,8 @@ export const fetchMapData = (map) => {
     let mapObject = { ...map, resultat: {} };
 
     result.forEach((data) => {
-      const { decoupage, variables } = data.data;
+      const { decoupage } = data.data.req;
+      const { variables } = data.data.result[0];
       const object = {};
 
       variables[0].resultat.forEach((resultat) => {
@@ -154,7 +156,8 @@ export const fetchEvolutionData = (map) => {
     let mapObject = { ...map, resultat: {} };
 
     result.forEach((data) => {
-      const { decoupage, variables } = data.data;
+      const { decoupage } = data.data.req;
+      const { variables } = data.data.result[0];
       const object = {};
 
       variables[0].resultat.forEach((resultat) => {
@@ -179,7 +182,8 @@ export const fetchCompareMap = (map) => {
     let mapObject = { ...map, resultat: {} };
 
     result.forEach((data) => {
-      const { decoupage, variables } = data.data;
+      const { decoupage } = data.data.req;
+      const { variables } = data.data.result[0];
       const object = {};
 
       variables[0].resultat.forEach((resultat) => {

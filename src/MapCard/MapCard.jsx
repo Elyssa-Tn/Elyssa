@@ -1,39 +1,47 @@
 import { useEffect, useRef, useState } from "react";
-// import {  Card,  IconButton,  CardActions,  CardContent,  Box,  Typography,} from "@mui/material";
 import {
   Card,
   IconButton,
-  CardActions,
-  CardContent,
   Box,
   Typography,
+  Divider,
+  Chip,
+  Sheet,
+  Input,
+  Button,
+  ButtonGroup,
+  Stack,
 } from "@mui/joy";
 // import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import styled from "@emotion/styled";
-import MapComponent2 from "./MapComponents/MapComponent2";
+import * as L from "leaflet";
+import MapComponent from "./MapComponents/MapComponent";
 import ExpandedResults from "./MapComponents/ExpandedResults";
-// import useDataFetch from "../Utility/useDataFetch";
-// import { SyncLoader } from "react-spinners";
-import CircularProgress from "@mui/material/CircularProgress";
 import Legend2 from "./MapComponents/Legend2";
 import Legend from "./MapComponents/Legend";
-// import ChartElement from "./ChartElement";
-// import ExpandedChartResults from "./MapComponents/ExpandedChartResults";
-// import geojson from "../assets/Circonscripton2022-vfinal.json";
-// import geojson from "../assets/secteurs-2022.json";
 
 // import * as htmlToImage from "html-to-image";
 import DownloadIcon from "@mui/icons-material/Download";
+import CircularProgress from "@mui/joy/CircularProgress";
+
 import InfoIcon from "@mui/icons-material/Info";
-import ExploreIcon from "@mui/icons-material/Explore";
+import PanoramaIcon from "@mui/icons-material/Panorama";
 import TableChartIcon from "@mui/icons-material/TableChart";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import ExploreIcon from "@mui/icons-material/Explore";
 import { toSvg } from "html-to-image";
 import { useDispatch, useSelector } from "react-redux";
 import { TabList, TabPanel, Tabs, Tab } from "@mui/joy";
 import InfoPanel from "./MapComponents/InfoPanel";
-import { deleteMap } from "../reducers/mapReducer";
+import { deleteMap, fetchEvolutionData } from "../reducers/mapReducer";
 import { getGeoJSON } from "../services/geojson";
+import {
+  setModalCompareFlag,
+  setModalOpen,
+  toggleCompare,
+} from "../reducers/interfaceReducer";
+import ChartComponent from "./MapComponents/ChartComponent";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -42,229 +50,141 @@ const ExpandMore = styled((props) => {
   marginLeft: "auto",
 }));
 
-// function MapCard({ map, removeMap, updateMaps }) {
-function MapCard({ id, map, electionInfo }) {
-  const [displayMode, setDisplayMode] = useState(1);
+function MapCard({ ID, bounds, geojson }) {
+  const compare = useSelector((state) => state.interface.compareToggle);
+  const chartMode = useSelector((state) => state.interface.chartMode[ID]);
+  const map = useSelector((state) => state.maps[ID]);
+  const elections = useSelector((state) => state.elections.init.elections);
+
   const dispatch = useDispatch();
+
+  const [displayMode, setDisplayMode] = useState(1);
+
   const mapRef = useRef(null);
-  // const mapFiles = {
-  //   secteur: () => import("../assets/secteurs-2022.json"),
-  //   commune: () => import("../assets/commune.json"),
-  //   delegation: () => import("../assets/delegation.json"),
-  //   circonscription: (electioncode) => {
-  //     if (electioncode === "tnleg2022")
-  //       return import("../assets/circonscription2022.json");
-  //     if (electioncode === "TNAC2011")
-  //       return import("../assets/circonscription2011-2019.json");
-  //     else {
-  //       return import("../assets/commune.json");
-  //     }
-  //   },
-  //   // electioncode === "tnleg2022"
-  //   //   ? import("../assets/circonscription2022.json")
-  //   //   : import("../assets/circonscription2011-2019.json"),
-  //   // circonscription: () => import("../assets/commune.json"),
-  //   gouvernorat: () => import("../assets/gouvernorat.json"),
-  // };
 
   const colors = ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"];
   const colors2 = ["#ffffff", "#a8281e"];
   const colors3 = ["#00ffd5", "#00806b", "#3f4540", "#663d14", "#bf6100"];
 
-  const nomenclature = {
-    secteur: { code: "REF_TN_COD", name: "NAME_FR" },
-    commune: { code: "CODEMUN_2", name: "NAME_FR_2" },
-    // delegation: { code: "CODEDELEGA", name: "NOMDELEGAT" },
-    delegation: { code: "circo_id", name: "NOMDELEGAT" },
-    circonscription: { code: "CODE_CIRCO", name: "NAME_FR" },
-    // circonscription: { code: "CODEMUN_2", name: "NAME_FR_2" },
-    gouvernorat: { code: "code_gouvernorat", name: "nom_gouvernorat" },
-  };
+  const Heatmap4 = [
+    "#ffffff",
+    "#ffe3aa",
+    "#ffc655",
+    "#ffaa00",
+    "#ff7100",
+    "#ff3900",
+    "#ff0000",
+    "#d50621",
+    "#aa0b43",
+    "#801164",
+    "#551785",
+    "#2b1ca7",
+    "#0022c8",
+  ];
+
+  const Heatmap4Converted = [
+    [255, 255, 255, 255],
+    [255, 227, 170, 255],
+    [255, 198, 85, 255],
+    [255, 170, 0, 255],
+    [255, 113, 0, 255],
+    [255, 57, 0, 255],
+    [255, 0, 0, 255],
+    [213, 6, 33, 255],
+    [170, 11, 67, 255],
+    [128, 17, 100, 255],
+    [85, 23, 133, 255],
+    [43, 28, 167, 255],
+    [0, 34, 200, 255],
+  ];
 
   const [expanded, setExpanded] = useState(false);
-  const [geojson, setGeojson] = useState(null);
+  // const [geojson, setGeojson] = useState({});
+  const [boundaries, setBoundaries] = useState({});
   const [request, setRequest] = useState(null);
-  const [target, setTarget] = useState(null);
-  // const [level, setLevel] = useState(
-  //   map.decoupage ? map.decoupage : "gouvernorat"
-  // );
-  // const [level, setLevel] = useState(
-  //   map.data ? map.data.decoupage : "gouvernorats"
-  // );
-  const [level, setLevel] = useState(map.data.decoupage);
 
-  // const geojson = useSelector((state) => state.elections.init.maps[level]);
-  useEffect(() => {
-    const fetchAndUseGeoJSON = async () => {
-      try {
-        const map = await getGeoJSON(level);
-        setGeojson(map);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
+  const handleCompareToggle = () => {
+    dispatch(toggleCompare());
+  };
 
-    fetchAndUseGeoJSON();
-  }, [level]);
+  // useEffect(() => {
+  //   const fetchAndUseGeoJSON = async (level) => {
+  //     try {
+  //       const map = await getGeoJSON(level);
+  //       return { [level]: map };
+  //     } catch (error) {
+  //       console.error("Error:", error);
+  //       throw error;
+  //     }
+  //   };
 
-  if (!geojson) {
+  //   const levelsToFetch = ["gouvernorat", "delegation"];
+
+  //   Promise.all(levelsToFetch.map(fetchAndUseGeoJSON))
+  //     .then((results) => {
+  //       const formattedResults = {};
+  //       results.forEach((entry) => {
+  //         const key = Object.keys(entry)[0];
+  //         formattedResults[key] = entry[key];
+  //       });
+  //       setGeojson(formattedResults);
+  //     })
+  //     .catch((error) => {
+  //       console.error("An error occurred:", error);
+  //     });
+  // }, []);
+
+  // useEffect(() => {
+  //   const boundsObject = {};
+
+  //   for (const mapName in geojson) {
+  //     if (geojson.hasOwnProperty(mapName)) {
+  //       boundsObject[mapName] = {};
+
+  //       const geoJSON = geojson[mapName];
+
+  //       geoJSON.features.forEach((feature) => {
+  //         const code = feature.properties[nomenclature[mapName].code];
+
+  //         const geometryType = feature.geometry.type;
+  //         let bounds;
+
+  //         const polygons =
+  //           geometryType === "Polygon"
+  //             ? [feature.geometry.coordinates]
+  //             : feature.geometry.coordinates;
+
+  //         const latLngs = [];
+  //         for (const polygon of polygons) {
+  //           for (const ring of polygon) {
+  //             latLngs.push(
+  //               ...ring.map((coord) => L.latLng(coord[1], coord[0]))
+  //             );
+  //           }
+  //         }
+
+  //         // Calculate the bounds using latLngs array.
+  //         bounds = L.latLngBounds(latLngs);
+
+  //         // Store the bounds in the object.
+  //         boundsObject[mapName][code] = bounds;
+  //       });
+  //     }
+  //   }
+  // }, [geojson]);
+
+  if (!geojson || !map || !bounds) {
     return (
       <CircularProgress
         style={{
           position: "relative",
-          bottom: "20%",
-          left: "50%",
+          // bottom: "20%",
+          // left: "50%",
           transform: "translate(-50%, -50%)",
         }}
       />
     );
   }
-
-  // useEffect(() => {
-  //   const loadGeojson = async () => {
-  //     if (level) {
-  //       const importFunction = mapFiles[level];
-  //       if (importFunction) {
-  //         setGeojson(null);
-  //         const { default: geojson } = await importFunction(
-  //           map.data.code_election
-  //         );
-  //         setGeojson(geojson);
-  //       }
-  //     }
-  //   };
-  //   loadGeojson();
-  // }, [level]);
-
-  const getDivisionNames = (geojson) => {
-    const divisionsMap = {};
-
-    for (var i = 0; i < geojson.features.length; i++) {
-      const feature = geojson.features[i];
-      const name = feature.properties[nomenclature[level].name];
-      const code = feature.properties[nomenclature[level].code];
-
-      divisionsMap[code] = name;
-    }
-
-    return divisionsMap;
-  };
-
-  const getPartiNames = () => {
-    const partiNames = {};
-  };
-
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
-
-  const removeMap = (id) => {
-    dispatch(deleteMap(id));
-  };
-
-  // const formatFilter = ({ bounds, delegation }) => {
-  //   const currentLevel = level;
-  //   const levels = Object.keys(nomenclature);
-  //   const currentIndex = levels.indexOf(currentLevel);
-
-  //   const newLevel = currentIndex > 0 ? levels[currentIndex - 1] : currentLevel;
-
-  //   const updatedMap = {
-  //     ...map,
-  //     level: { code: newLevel },
-  //     filtre: { decoupage: currentLevel, valeur: delegation },
-  //     target: bounds,
-  //   };
-
-  //   updateMaps({ index, map: updatedMap });
-  // };
-
-  // const { data, loading } = useDataFetch(requestFormatter());
-
-  // if (loading) {
-  //   return (
-  // <SyncLoader
-  //   style={{
-  //     position: "absolute",
-  //     bottom: "20%",
-  //     left: "50%",
-  //     transform: "translate(-50%, -50%)",
-  //   }}
-  // />
-  //   );
-  // }
-
-  // if (data.errors) {
-  //   return <span>{data.errors[0].message}</span>;
-  // }
-
-  // if (map.chart && data) {
-  //   return (
-  //     <Card
-  //       key={(map, level)}
-  //       style={{
-  //         margin: "4px",
-  //         borderRadius: "16px",
-  //         position: "relative",
-  //         paddingRight: "44px",
-  //       }}
-  //     >
-  //       <Box
-  //         style={{
-  //           display: "flex",
-  //           flex: "row",
-  //           justifyContent: "space-between",
-  //         }}
-  //       >
-  //         <Typography
-  //           align="center"
-  //           style={{ padding: 8, marginTop: 8, maxWidth: 240 }}
-  //         >
-  //           {map.data.code_election}
-  //         </Typography>
-  //         <CardActions
-  //           style={{
-  //             padding: 0,
-  //           }}
-  //           disableSpacing
-  //         >
-  //           <IconButton onClick={() => removeMap(map.key)}>
-  //             <HighlightOffIcon />
-  //           </IconButton>
-  //           <ExpandMore
-  //             expand={expanded}
-  //             onClick={handleExpandClick}
-  //             aria-expanded={expanded}
-  //             aria-label="Voir les donnees"
-  //           >
-  //             <DoubleArrowIcon
-  //               style={{
-  //                 transform: !expanded ? "rotate(0deg)" : "rotate(180deg)",
-  //                 // marginLeft: "auto",
-  //               }}
-  //             />
-  //           </ExpandMore>
-  //         </CardActions>
-  //       </Box>
-  //       <CardContent
-  //         style={{
-  //           display: "flex",
-  //           paddingBottom: "8px",
-  //         }}
-  //       >
-  //         <ChartElement data={data.data.variables} />
-  //         <Collapse
-  //           orientation="horizontal"
-  //           in={expanded}
-  //           timeout="auto"
-  //           unmountOnExit
-  //         >
-  //           <ExpandedChartResults results={data.data.variables} />
-  //         </Collapse>
-  //       </CardContent>
-  //     </Card>
-  //   );
-  // }
 
   const handleDownload = async () => {
     if (mapRef.current) {
@@ -276,156 +196,261 @@ function MapCard({ id, map, electionInfo }) {
     }
   };
 
-  if (geojson && map) {
-    const names = getDivisionNames(geojson);
+  //TODO: Remove this part eventually when the server will have more data for better handling
 
+  const findElectionByCode = (electionCode) => {
+    const foundElection = elections.find(
+      (election) => election.code_election === electionCode
+    );
+    return foundElection;
+  };
+
+  const Election_1 = findElectionByCode("TNAC2011");
+  const Election_2 = findElectionByCode("tnmun2018");
+
+  const selectElectionForEvolution = (election) => {
+    const currentElectionCode = election.code_election;
+
+    const otherElectionCode =
+      currentElectionCode === Election_1.code_election
+        ? Election_2.code_election
+        : Election_1.code_election;
+    return findElectionByCode(otherElectionCode);
+  };
+
+  //END OF TEMPORARY CODE
+
+  const handleEvolutionDisplay = () => {
+    const targetElection = selectElectionForEvolution(map.election);
+    const request = { election: targetElection, parti: map.parti };
+
+    dispatch(fetchEvolutionData(request));
+  };
+  console.log(map);
+  if (Object.keys(geojson).length === 2 && map) {
     return (
       <>
         {geojson && map && (
           <Card
-            key={(map, level)}
+            variant="soft"
+            // key={map}
+            key={ID}
             style={{
-              width: "460px",
-              margin: "4px",
-              borderRadius: "16px",
+              display: "flex",
+              flexDirection: compare ? "column" : "row",
               position: "relative",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              borderRadius: 0,
+              borderTop: "none",
+              borderBottom: "none",
             }}
             ref={mapRef}
           >
             <Box
               style={{
-                display: "flex",
-                flex: "row",
-                justifyContent: "space-between",
+                paddingBottom: "0.5rem",
               }}
             >
-              <Typography style={{ padding: 8, marginTop: 8 }}>
-                {electionInfo.election.nom}
-                {electionInfo.parti
-                  ? ` - ${electionInfo.parti.denomination_fr}`
-                  : null}
-                {electionInfo.variable
-                  ? `- ${electionInfo.variable.nom}`
-                  : null}
-              </Typography>
-              <CardActions
-                style={{
-                  padding: 0,
-                }}
-              >
-                {/* <IconButton onClick={() => dispatch(deleteMap(id))}>
-                  <HighlightOffIcon />
-                </IconButton> */}
-                {/* <ExpandMore
-                  expand={expanded}
-                  onClick={handleExpandClick}
-                  aria-expanded={expanded}
-                  aria-label="Voir les donnees"
-                >
-                  <DoubleArrowIcon
-                    style={{
-                      transform: !expanded ? "rotate(0deg)" : "rotate(180deg)",
-                      // marginLeft: "auto",
+              {chartMode ? (
+                <ChartComponent ID={ID} data={map.resultat} bounds={bounds} />
+              ) : (
+                <>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-between",
                     }}
-                  />
-                </ExpandMore> */}
-                {/* <button onClick={handleDownload}>
-                  <DownloadIcon />
-                </button> */}
-              </CardActions>
-            </Box>
-            <CardContent
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                paddingBottom: "8px",
-              }}
-            >
-              <Tabs defaultValue={0}>
-                <TabList>
-                  <Tab>
-                    <InfoIcon />
-                  </Tab>
-                  <Tab>
-                    <ExploreIcon />
-                  </Tab>
-                  <Tab>
-                    <TableChartIcon />
-                  </Tab>
-                </TabList>
-                <TabPanel>
-                  <InfoPanel electionInfo={electionInfo.election} />
-                </TabPanel>
-                <TabPanel value={1}>
-                  {/* <div style={{ display: "flex", flexDirection: "column" }}> */}
-                  {/* <button
-                      onClick={() => setDisplayMode(1)}
-                      style={{
-                        position: "absolute",
-                        top: "120px",
-                        left: "0px",
-                        borderRadius: "5px",
-                      }}
-                    >
-                      1
-                    </button>
-                    <button
-                      onClick={() => setDisplayMode(2)}
-                      style={{
-                        position: "absolute",
-                        top: "180px",
-                        left: "0px",
-                        borderRadius: "5px",
-                      }}
-                    >
-                      2
-                    </button> */}
-                  <MapComponent2
-                    naming={nomenclature[level]}
-                    data={map.data.variables[0].resultat}
+                  >
+                    {map.type === "simple" && (
+                      <Legend2 ID={ID} colors={Heatmap4} />
+                    )}
+                    {map.type === "evolution" && (
+                      <Legend ID={ID} colors={colors2} />
+                    )}
+                    {map.type === "comparaison" && (
+                      <Legend ID={ID} colors={colors2} />
+                    )}
+                    <Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignContent: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Typography>
+                          {map.type === "evolution"
+                            ? "Evolution Nationale: "
+                            : "Moyenne Nationale: "}
+                        </Typography>
+                        <Chip>
+                          {/* {map.type === "simple"
+                            ? `${map.resultat["gouvernorat"]["prc"]["Total"]}%`
+                            : `${(
+                                map.resultat["gouvernorat"]["prc"]["Total"][
+                                  "newValue"
+                                ] -
+                                map.resultat["gouvernorat"]["prc"]["Total"][
+                                  "oldValue"
+                                ]
+                              ).toFixed(1)}%`} */}
+                        </Chip>
+                      </Box>
+                      <Divider />
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignContent: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Typography>
+                          {map.type === "simple"
+                            ? "Total des voix: "
+                            : "Nombre de voix: "}
+                        </Typography>
+                        <Chip>
+                          {/* {map.type === "simple"
+                            ? `${map.resultat["gouvernorat"]["voix"]["Total"]}`
+                            : `${
+                                map.resultat["gouvernorat"]["voix"]["Total"][
+                                  "newValue"
+                                ] -
+                                map.resultat["gouvernorat"]["voix"]["Total"][
+                                  "oldValue"
+                                ]
+                              }`} */}
+                        </Chip>
+                      </Box>
+                    </Box>
+                  </Box>
+                  <Divider />
+                  <MapComponent
+                    ID={ID}
+                    data={map.resultat}
+                    type={map.type}
                     geojson={geojson}
-                    level={level}
-                    setLevel={setLevel}
-                    // filter={formatFilter}
-                    target={target}
-                    setTarget={setTarget}
-                    colors={colors}
+                    // colors={colors}
+                    colors={Heatmap4Converted}
                     colors2={colors2}
                     displayMode={displayMode}
+                    bounds={bounds}
                   />
-                  {displayMode === 1 && (
-                    <Legend2
-                      data={map.data.variables[0].resultat}
-                      colors={colors}
-                    />
+                </>
+              )}
+            </Box>
+            <Divider orientation="vertical" />
+            <Sheet
+              sx={{
+                display: "flex",
+                flexDirection: compare ? "row" : "column",
+                justifyContent: "space-between",
+                alignContent: "center",
+                height: "100%",
+                maxWidth: compare ? "30rem" : "16rem",
+              }}
+            >
+              <Box>
+                <Typography>Rechercher un gouvernorat:</Typography>
+                <Input placeholder="ex: Ariana" color="primary" />
+              </Box>
+              <Divider orientation={compare ? "vertical" : "horizontal"} />
+              {!compare && (
+                <Box>
+                  {map.type === "evolution" ? (
+                    <Box>
+                      <Typography>Afficher la carte de:</Typography>
+                      <ButtonGroup>
+                        <Button>{map.election[0].fin}</Button>
+                        <Button>{map.election[1].fin}</Button>
+                      </ButtonGroup>
+                    </Box>
+                  ) : (
+                    <Box>
+                      <Typography>
+                        Afficher l'evolution de cet indicateur?
+                      </Typography>
+                      <Button onClick={handleEvolutionDisplay}>Afficher</Button>
+                    </Box>
                   )}
-                  {displayMode === 2 && (
-                    <Legend
-                      data={map.data.variables[0].resultat}
-                      colors={colors2}
-                    />
+                </Box>
+              )}
+              <Divider />
+              {!compare ? (
+                <Stack>
+                  <Typography>Comparez avec un autre indicateur:</Typography>
+                  <Button
+                    onClick={() => {
+                      dispatch(setModalCompareFlag(true));
+                      dispatch(setModalOpen(true));
+                    }}
+                    endDecorator={<AddCircleOutlineIcon />}
+                    disabled={map.type === "evolution"}
+                  >
+                    <Typography>Sur la même carte</Typography>
+                  </Button>
+                  <Typography>Ou</Typography>
+                  <Button
+                    onClick={() => dispatch(setModalOpen(true))}
+                    endDecorator={<AddCircleOutlineIcon />}
+                  >
+                    <Typography>Sur une deuxième carte</Typography>
+                  </Button>
+                </Stack>
+              ) : (
+                <Box>
+                  <Typography>Annuler la comparaison</Typography>
+                  <Button onClick={() => dispatch(deleteMap(ID))}>
+                    Annulez
+                  </Button>
+                </Box>
+              )}
+
+              <Divider orientation={compare ? "vertical" : "horizontal"} />
+              <ButtonGroup orientation="vertical">
+                <Button
+                  sx={{
+                    justifyContent: "space-between",
+                  }}
+                  size="sm"
+                  endDecorator={compare ? null : <InfoIcon />}
+                >
+                  {compare ? (
+                    <InfoIcon />
+                  ) : (
+                    <Typography>Méthodologie</Typography>
                   )}
-                  {/* </div> */}
-                </TabPanel>
-                <TabPanel value={2}>
-                  <ExpandedResults
-                    results={map.data}
-                    level={level}
-                    names={names}
-                  />
-                </TabPanel>
-              </Tabs>
-              {/* <MapComponent2
-                naming={nomenclature[level]}
-                data={map.data.variables[0].resultat}
-                geojson={geojson}
-                level={level}
-                setLevel={setLevel}
-                // filter={formatFilter}
-                target={map.target}
-                colors={colors}
-              /> */}
-            </CardContent>
+                </Button>
+                <Button
+                  sx={{
+                    justifyContent: "space-between",
+                  }}
+                  size="sm"
+                  endDecorator={compare ? null : <TableChartIcon />}
+                >
+                  {compare ? (
+                    <TableChartIcon />
+                  ) : (
+                    <Typography>Télécharger les données</Typography>
+                  )}
+                </Button>
+                <Button
+                  sx={{
+                    justifyContent: "space-between",
+                  }}
+                  size="sm"
+                  endDecorator={compare ? null : <PanoramaIcon />}
+                >
+                  {compare ? (
+                    <PanoramaIcon />
+                  ) : (
+                    <Typography>Télécharger la carte</Typography>
+                  )}
+                </Button>
+              </ButtonGroup>
+            </Sheet>
           </Card>
         )}
       </>

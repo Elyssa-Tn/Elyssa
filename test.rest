@@ -28,9 +28,9 @@ Content-Type: application/json
 {
 "req":{
   "type":"data",
-  "code_election": "tnac2011",
+  "code_election": "*",
   "pays":"tunisie",
-  "decoupage":"delegation",
+  "decoupage":"gouvernorat",
    "variables": [
      {"code_variable":"tp"}
    ]
