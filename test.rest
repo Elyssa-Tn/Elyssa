@@ -5,7 +5,7 @@ Content-Type: application/json
 {
   "req":{
     "type":"init",
-    "pays":"Tunisie"
+    "pays":"tunisie"
   }
 }
 
@@ -62,7 +62,7 @@ Content-Type: application/json
   "type": "data",
   "pays":"tunisie",
   "code_election": "tnmun2018",
-  "decoupage": "pays",
+  "decoupage": "gouvernorat",
   "variables": [
     {"code_variable":"prc","code_parti":"*"}
   ]
@@ -109,7 +109,24 @@ Content-Type: application/json
 {
   "req":{
     "type":"map_decoupage",
-    "decoupages":["secteur"]
+    "pays":"tunisie",
+    "version":"10",
+    "decoupages":["regions"]
+  }
+}
+
+### Request an indicator
+POST https://elyssa.tsaas.tn/api
+Content-Type: application/json
+
+{
+  "req":{
+    "type":"indic",
+    "pays":"tunisie",
+    "ans":[2014],
+    "decoupage":["delegation"],
+    "filtre":{"decoupage":"region","valeur":"1"},
+    "indicateurs":["tnemp_actif_15p_ens_sup"]
   }
 }
 

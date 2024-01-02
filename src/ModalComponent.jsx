@@ -278,7 +278,160 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
           </Modal>
         </TabPanel>
         <TabPanel value={1}>
-          <Typography>Indicateurs socio-économiques</Typography>
+          <Box sx={{ display: "flex", flexDirection: "row" }}>
+            <Link
+              variant="plain"
+              size="sm"
+              onClick={() => setSelectedElection(null)}
+            >
+              <Home />
+            </Link>
+          </Box>
+          <Divider />
+          {!selectedElection && (
+            <Sheet
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                height: "20rem",
+                overflow: "auto",
+              }}
+            >
+              <List
+                sx={{
+                  width: "24rem",
+                  maxWidth: "24rem",
+                }}
+              >
+                {init.indicateurs.map((indicateur) => (
+                  <Sheet key={indicateur.code_indicateur}>
+                    <ListItemButton
+                      variant="plain"
+                      onClick={() => electionSelection(indicateur)}
+                      onMouseOver={() => setHoveredElection(indicateur)}
+                    >
+                      <ListItemContent>
+                        {indicateur.nom_indicateur}
+                      </ListItemContent>
+                      <KeyboardArrowRight />
+                    </ListItemButton>
+                    <ListDivider />
+                  </Sheet>
+                ))}
+              </List>
+              <Divider orientation="vertical" />
+              {hoveredElection && (
+                <Card
+                  variant="plain"
+                  sx={{ width: "24rem", maxWidth: "24rem" }}
+                >
+                  <Typography level="h3">{hoveredElection.nom}</Typography>
+                  <Divider />
+                  <Typography level="body-md">
+                    Nombre de tours: {hoveredElection.nombre_tours}
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Typography level="body-md">Date debut:</Typography>
+                    <Typography level="body-sm">
+                      {hoveredElection.debut}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Typography>Date fin:</Typography>
+                    <Typography level="body-sm">
+                      {hoveredElection.fin}
+                    </Typography>
+                  </Box>
+
+                  <Divider />
+                  <Typography>
+                    Mode de scrutin: {hoveredElection.mode_scrutin}
+                  </Typography>
+                  <Typography>
+                    Type de scrutin: {hoveredElection.uninominal_liste}
+                  </Typography>
+                </Card>
+              )}
+            </Sheet>
+          )}
+          {selectedElection && (
+            <Sheet>
+              {loading ? (
+                <CircularProgress />
+              ) : (
+                <Sheet
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    height: "20rem",
+                    overflow: "auto",
+                  }}
+                >
+                  <List
+                    sx={{
+                      width: "24rem",
+                      maxWidth: "24rem",
+                    }}
+                  >
+                    {data[selectedElection.code_election].partis.map(
+                      (parti) => (
+                        <Sheet key={parti.code_parti}>
+                          <ListItemButton
+                            variant="plain"
+                            onClick={() => partiSelection(parti)}
+                            onMouseOver={() => setHoveredParti(parti)}
+                          >
+                            <ListItemContent>
+                              {parti.denomination_fr}
+                            </ListItemContent>
+                            <Chip>{parti.score}%</Chip>
+                            <KeyboardArrowRight />
+                          </ListItemButton>
+                          <ListDivider />
+                        </Sheet>
+                      )
+                    )}
+                  </List>
+                  <Divider orientation="vertical" />
+                  {hoveredParti && (
+                    <Card
+                      variant="plain"
+                      sx={{ width: "24rem", maxWidth: "24rem" }}
+                    >
+                      <Typography level="h3">
+                        {hoveredParti.denomination_fr}
+                      </Typography>
+                      <Divider />
+                    </Card>
+                  )}
+                </Sheet>
+              )}
+            </Sheet>
+          )}
+          <Modal
+            open={secondModalOpen}
+            onClose={() => setSecondModalOpen(false)}
+          >
+            <ModalDialog layout="center">
+              <Typography>Afficher l'évolution de cet indicateur?</Typography>
+              <DialogActions>
+                <Button variant="outlined" onClick={fetchPartiData}>
+                  Non
+                </Button>
+                <Button onClick={handleEvolutionDisplay}>Oui</Button>
+              </DialogActions>
+            </ModalDialog>
+          </Modal>
         </TabPanel>
       </Tabs>
     </ModalDialog>

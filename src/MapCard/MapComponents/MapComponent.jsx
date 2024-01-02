@@ -43,8 +43,6 @@ const PercentageBar = ({ value }) => {
       : 25 + (value / 50) * 25;
   };
 
-  console.log(value, normalizeValue(value));
-
   const calculateWidth = (percentage) => {
     return {
       width: `${normalizeValue(percentage)}%`,
@@ -427,84 +425,92 @@ const MapComponent = ({
                       display: "flex",
                       flexDirection: "row",
                       justifyContent: "space-between",
-                      paddingTop: "0.25rem",
                     }}
                   >
-                    <Typography level="body-md">
-                      {data[level][tooltip.code]["old_parti"]}
-                    </Typography>
-                    <Divider
-                      sx={{ margin: "0 0.25rem" }}
-                      orientation="vertical"
-                    />
                     <Box
                       sx={{
                         display: "flex",
-                        flexDirection: "row",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        paddingTop: "0.25rem",
                       }}
                     >
                       <Typography level="body-md">
-                        {data[level][tooltip.code]["oldvoix"]}
+                        {data[level][tooltip.code]["old_parti"]}
                       </Typography>
-                      <Typography level="body-sm">&nbsp;voix</Typography>
+                      <Divider
+                        sx={{ margin: "0 0.25rem" }}
+                        orientation="vertical"
+                      />
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "row",
+                        }}
+                      >
+                        <Typography level="body-md">
+                          {data[level][tooltip.code]["oldvoix"]}
+                        </Typography>
+                        <Typography level="body-sm">&nbsp;voix</Typography>
+                      </Box>
+                      <Divider
+                        sx={{ margin: "0 0.25rem" }}
+                        orientation="vertical"
+                      />
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "row",
+                        }}
+                      >
+                        <Typography>
+                          &nbsp;
+                          {data[level][tooltip.code]["oldprc"].toFixed(1)}%
+                        </Typography>
+                      </Box>
                     </Box>
-                    <Divider
-                      sx={{ margin: "0 0.25rem" }}
-                      orientation="vertical"
-                    />
+                    <Divider orientation="vertical" />
                     <Box
                       sx={{
                         display: "flex",
-                        flexDirection: "row",
-                      }}
-                    >
-                      <Typography>
-                        &nbsp;
-                        {data[level][tooltip.code]["oldprc"].toFixed(1)}%
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <Divider />
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      paddingTop: "0.25rem",
-                    }}
-                  >
-                    <Typography level="body-md">
-                      {data[level][tooltip.code]["new_parti"]}
-                    </Typography>
-                    <Divider
-                      sx={{ margin: "0 0.25rem" }}
-                      orientation="vertical"
-                    />
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "row",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        paddingTop: "0.25rem",
                       }}
                     >
                       <Typography level="body-md">
-                        {data[level][tooltip.code]["newvoix"]}
+                        {data[level][tooltip.code]["new_parti"]}
                       </Typography>
-                      <Typography level="body-sm">&nbsp;voix</Typography>
-                    </Box>
-                    <Divider
-                      sx={{ margin: "0 0.25rem" }}
-                      orientation="vertical"
-                    />
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "row",
-                      }}
-                    >
-                      <Typography>
-                        &nbsp;
-                        {data[level][tooltip.code]["newprc"].toFixed(1)}%
-                      </Typography>
+                      <Divider
+                        sx={{ margin: "0 0.25rem" }}
+                        orientation="vertical"
+                      />
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "row",
+                        }}
+                      >
+                        <Typography level="body-md">
+                          {data[level][tooltip.code]["newvoix"]}
+                        </Typography>
+                        <Typography level="body-sm">&nbsp;voix</Typography>
+                      </Box>
+                      <Divider
+                        sx={{ margin: "0 0.25rem" }}
+                        orientation="vertical"
+                      />
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "row",
+                        }}
+                      >
+                        <Typography>
+                          &nbsp;
+                          {data[level][tooltip.code]["newprc"].toFixed(1)}%
+                        </Typography>
+                      </Box>
                     </Box>
                   </Box>
                   <Divider />
