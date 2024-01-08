@@ -226,7 +226,7 @@ function MapCard({ ID, bounds, geojson }) {
 
     dispatch(fetchEvolutionData(request));
   };
-  console.log(map);
+
   if (Object.keys(geojson).length === 2 && map) {
     return (
       <>
@@ -263,13 +263,11 @@ function MapCard({ ID, bounds, geojson }) {
                       justifyContent: "space-between",
                     }}
                   >
-                    {map.type === "simple" && (
+                    {(map.type === "simple" || map.type === "indicator") && (
                       <Legend2 ID={ID} colors={Heatmap4} />
                     )}
-                    {map.type === "evolution" && (
-                      <Legend ID={ID} colors={colors2} />
-                    )}
-                    {map.type === "comparaison" && (
+                    {(map.type === "evolution" ||
+                      map.type === "comparaison") && (
                       <Legend ID={ID} colors={colors2} />
                     )}
                     <Box>

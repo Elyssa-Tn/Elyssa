@@ -1,7 +1,7 @@
-import { Box, CircularProgress, Typography } from "@mui/joy";
+import { Box, Typography } from "@mui/joy";
 import { useSelector } from "react-redux";
 
-const Legend2 = ({ ID, colors, hover }) => {
+const Legend2 = ({ ID, colors }) => {
   const level = useSelector((state) => state.interface.level);
   const compare = useSelector((state) => state.interface.compareToggle);
   const classNumber = useSelector((state) =>
@@ -28,11 +28,6 @@ const Legend2 = ({ ID, colors, hover }) => {
     selectedColors.push(colors[index]);
   }
 
-  const calculateIndicatorPosition = (value) => {
-    const indicatorPosition = ((value - min) / (max - min)) * 100;
-    return indicatorPosition;
-  };
-
   const containerStyle = {
     position: "relative",
     display: "flex",
@@ -52,19 +47,6 @@ const Legend2 = ({ ID, colors, hover }) => {
         maxWidth: "50%",
       }}
     >
-      <Box
-        sx={{
-          display: `${hover ? "inline-block" : "none"}`,
-          position: "absolute",
-          top: "2.5rem",
-          borderLeft: "0.5rem solid transparent",
-          borderRight: "0.5rem solid transparent",
-          borderBottom: "0.5rem solid blue",
-          transform: "translate(-50%,-75%)",
-          // left: `${calculateIndicatorPosition(data[hover])}%`,
-          zIndex: 2,
-        }}
-      ></Box>
       <Box className="legendContainer" sx={containerStyle}>
         <Box
           style={{
@@ -91,7 +73,6 @@ const Legend2 = ({ ID, colors, hover }) => {
             <Typography
               style={{ fontSize: "0.75rem", transform: "translateX(-25%)" }}
             >
-              {/* {(singleColorRange * index + min).toFixed(1)} */}
               {Math.round(singleColorRange * index + min)}
             </Typography>
             <Typography
@@ -108,7 +89,6 @@ const Legend2 = ({ ID, colors, hover }) => {
         <Typography
           style={{ fontSize: "0.75rem", transform: "translateX(-50%)" }}
         >
-          {/* {max.toFixed(1)} */}
           {Math.round(max)}
         </Typography>
       </Box>

@@ -158,6 +158,19 @@ const getRequestResults = async (map) => {
   }
 };
 
+const getIndicatorResults = async (req) => {
+  const request = { type: "indic", pays: "tunisie", ...req };
+
+  try {
+    const response = await axios.post(url, request, {
+      cache: { methods: ["get", "post"] },
+    });
+    return response.data;
+  } catch (error) {
+    return error;
+  }
+};
+
 //TODO: End of temporary map fetching code
 
 const electionServices = {
@@ -165,6 +178,7 @@ const electionServices = {
   getElectionInfo,
   getPartiScores,
   getRequestResults,
+  getIndicatorResults,
 };
 
 export default electionServices;

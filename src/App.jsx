@@ -25,6 +25,7 @@ import theme from "./theme";
 import { getGeoJSON } from "./services/geojson";
 import {
   setClassNumber,
+  setLevel,
   setMinMax,
   setModalOpen,
   setReady,
@@ -52,7 +53,7 @@ function App() {
 
   const maps = useSelector((state) => state.maps);
 
-  function findMinMaxValues(maps) {
+  function findMinMaxValues(maps, valueProperty) {
     const result = {};
     for (const key in maps) {
       if (maps[key] && maps[key].resultat) {
@@ -69,53 +70,7 @@ function App() {
         const data = maps[key].resultat;
         for (const level in data) {
           for (const code in data[level]) {
-            const value = data[level][code].prc;
-            if (value < result[key][level].min) {
-              result[key][level].min = value;
-            }
-            if (value > result[key][level].max) {
-              result[key][level].max = value;
-            }
-          }
-        }
-      }
-    }
-
-    if (result[1] && result[2]) {
-      result[3] = {
-        delegation: {
-          min: Math.min(result[1].delegation.min, result[2].delegation.min),
-          max: Math.max(result[1].delegation.max, result[2].delegation.max),
-        },
-        gouvernorat: {
-          min: Math.min(result[1].gouvernorat.min, result[2].gouvernorat.min),
-          max: Math.max(result[1].gouvernorat.max, result[2].gouvernorat.max),
-        },
-      };
-    }
-
-    return result;
-  }
-
-  //TODO:REMOVE THIS
-  function findMinMaxValuesInEvolutionMap(maps) {
-    const result = {};
-    for (const key in maps) {
-      if (maps[key] && maps[key].resultat) {
-        result[key] = {
-          delegation: {
-            min: Infinity,
-            max: -Infinity,
-          },
-          gouvernorat: {
-            min: Infinity,
-            max: -Infinity,
-          },
-        };
-        const data = maps[key].resultat;
-        for (const level in data) {
-          for (const code in data[level]) {
-            const value = data[level][code].percent;
+            const value = data[level][code][valueProperty];
             if (!isNaN(value)) {
               if (value < result[key][level].min) {
                 result[key][level].min = value;
@@ -166,42 +121,39 @@ function App() {
   };
 
   useEffect(() => {
-    //TODO: This is bad, needs massive improving
-    if (maps[1] || maps[2] !== null) {
-      if (maps[1] && maps[1].type === "simple") {
-        const minMax = findMinMaxValues(maps);
+    const processMap = (map, property) => {
+      if (map) {
+        const minMax = findMinMaxValues(maps, property);
         const classNumber = calculateClasses(minMax);
+        if (map.type === "indicator") dispatch(setLevel("delegation"));
         dispatch(setClassNumber(classNumber));
         dispatch(setMinMax(minMax));
       }
-      if (
-        maps[1] &&
-        (maps[1].type === "evolution" || maps[1].type === "comparaison")
-      ) {
-        const minMax = findMinMaxValuesInEvolutionMap(maps);
-        const classNumber = calculateClasses(minMax);
-        dispatch(setClassNumber(classNumber));
-        dispatch(setMinMax(minMax));
-      }
-      if (maps[2] && maps[2].type === "simple") {
-        const minMax = findMinMaxValues(maps);
-        const classNumber = calculateClasses(minMax);
-        dispatch(setClassNumber(classNumber));
-        dispatch(setMinMax(minMax));
-      }
-      if (
-        maps[2] &&
-        (maps[2].type === "evolution" || maps[2].type === "comparaison")
-      ) {
-        const minMax = findMinMaxValuesInEvolutionMap(maps);
-        const classNumber = calculateClasses(minMax);
-        dispatch(setClassNumber(classNumber));
-        dispatch(setMinMax(minMax));
-      }
+    };
 
-      if (maps[1] && maps[2]) {
-        dispatch(toggleCompare(true));
-      } else dispatch(toggleCompare(false));
+    if (maps[1] || maps[2]) {
+      processMap(
+        maps[1],
+        maps[1]?.type === "simple"
+          ? "prc"
+          : maps[1]?.type === "evolution" || maps[1]?.type === "comparaison"
+          ? "percent"
+          : maps[1]?.type === "indicator"
+          ? "valeur"
+          : null
+      );
+      processMap(
+        maps[2],
+        maps[2]?.type === "simple"
+          ? "prc"
+          : maps[2]?.type === "evolution" || maps[2]?.type === "comparaison"
+          ? "percent"
+          : maps[2]?.type === "indicator"
+          ? "valeur"
+          : null
+      );
+
+      dispatch(toggleCompare(!!(maps[1] && maps[2])));
       dispatch(setReady(true));
     }
   }, [maps, dispatch]);
@@ -277,12 +229,15 @@ function App() {
         }
       }
     };
+
     if (geojson) calculateBounds();
   }, [geojson]);
 
   useEffect(() => {
     dispatch(initializeElections());
   }, [dispatch]);
+
+  // console.log(maps[1]);
 
   if (init)
     return (
@@ -313,6 +268,7 @@ function App() {
                 <MapTitle
                   electionInfo={maps[1]["election"]}
                   parti={maps[1]["parti"]}
+                  indicator={maps[1]["indicator"]}
                 />
               )}
               {maps[2] && (

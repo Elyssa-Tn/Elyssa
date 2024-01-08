@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/joy";
 
-function MapTitle({ electionInfo, parti }) {
+function MapTitle({ electionInfo, parti, indicator }) {
   return (
     <Box sx={{ display: "inline-block", width: "50%" }}>
       <Typography
@@ -10,7 +10,7 @@ function MapTitle({ electionInfo, parti }) {
         }}
         level="h2"
       >
-        {parti.denomination_fr}
+        {parti ? parti.denomination_fr : indicator.nom_indicateur}
       </Typography>
       <Typography
         style={{

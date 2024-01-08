@@ -123,9 +123,8 @@ Content-Type: application/json
   "req":{
     "type":"indic",
     "pays":"tunisie",
-    "ans":[2014],
-    "decoupage":["delegation"],
-    "filtre":{"decoupage":"region","valeur":"1"},
+    "ans":["2014"],
+    "decoupage":"delegation",
     "indicateurs":["tnemp_actif_15p_ens_sup"]
   }
 }

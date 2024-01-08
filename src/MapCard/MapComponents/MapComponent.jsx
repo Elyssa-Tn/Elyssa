@@ -90,6 +90,9 @@ const MapComponent = ({
 
   const compare = useSelector((state) => state.interface.compareToggle);
 
+  //TODO: HACK SOLUTION, FIX THIS:
+  const formatting = { simple: "prc", indicator: "valeur" };
+
   //CHANGE COLOR GENERATION ITS BAD
 
   const classNumber = useSelector((state) =>
@@ -113,11 +116,6 @@ const MapComponent = ({
   const maxValueColor = colors[1];
 
   const [singleValue, setSingleValue] = useState(false);
-
-  // useEffect(() => {
-  //   if (Object.keys(data["prc"]).length === 2) setSingleValue(true);
-  // }, [data]);
-  // console.log(singleValue);
 
   const singleColorRange = (max - min) / classNumber;
   const stepSize = Math.floor(colors.length / classNumber);
@@ -179,6 +177,14 @@ const MapComponent = ({
       return getColorForValue(value);
     }
 
+    if (type === "indicator") {
+      if (!data[level][feature.properties[`code_${level}`]])
+        return [211, 211, 211, 200];
+      const value = data[level][feature.properties[`code_${level}`]]["valeur"];
+      if (!value) return [211, 211, 211, 200];
+      return getColorForValue(value);
+    }
+
     if (type === "evolution" || type === "comparaison") {
       if (!data[level][feature.properties[`code_${level}`]])
         return [211, 211, 211, 200];
@@ -214,6 +220,11 @@ const MapComponent = ({
     dispatch(setClickedTarget(null));
   };
 
+  const handleDeleteClick = () => {
+    handleResetClick();
+    dispatch(deleteMap(ID));
+  };
+
   const handleMousover = (object, x, y) => {
     if (object) {
       if (object.properties) {
@@ -235,8 +246,8 @@ const MapComponent = ({
             },
             code,
             prc: data[level][code]
-              ? type === "simple"
-                ? data[level][code]["prc"]
+              ? type === "simple" || type === "indicator"
+                ? data[level][code][formatting[type]]
                 : data[level][code]["percent"]
               : null,
           })
@@ -264,7 +275,6 @@ const MapComponent = ({
     handleMouseout();
     const code = object.properties[`code_${level}`];
     dispatch(setCurrentTarget(code));
-
     const { _southWest, _northEast } = bounds[level][code].bounds;
 
     const boundaries = [
@@ -413,7 +423,38 @@ const MapComponent = ({
                     </Typography>
                   </Box>
                 </Box>
-              ) : (
+              ) : type === "indicator" ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    paddingTop: "0.25rem",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Typography
+                      style={{
+                        background: rgbaToCssString(
+                          getColorForValue(data[level][tooltip.code]["valeur"])
+                        ),
+                        width: "1.5rem",
+                        height: "1.5rem",
+                        border: "1px solid #333",
+                      }}
+                    ></Typography>
+                    <Typography>
+                      &nbsp;
+                      {data[level][tooltip.code]["valeur"].toFixed(2)}%
+                    </Typography>
+                  </Box>
+                </Box>
+              ) : type === "comparaison" || type === "evolution" ? (
                 <Box
                   sx={{
                     display: "flex",
@@ -520,7 +561,7 @@ const MapComponent = ({
                     value={data[level][tooltip.code]["percent"]}
                   />
                 </Box>
-              )
+              ) : null
             ) : (
               <Typography>Données pas disponibles.</Typography>
             )}
@@ -556,7 +597,7 @@ const MapComponent = ({
 
       <ButtonGroup orientation="vertical" size="sm" sx={{ padding: "0.25rem" }}>
         <Tooltip placement="top" arrow title="Fermer">
-          <Button onClick={() => dispatch(deleteMap(ID))}>
+          <Button onClick={handleDeleteClick}>
             <CloseIcon />
           </Button>
         </Tooltip>
