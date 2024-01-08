@@ -28,7 +28,7 @@ Content-Type: application/json
 {
 "req":{
   "type":"data",
-  "code_election": "*",
+  "code_election": "tnmun2018",
   "pays":"tunisie",
   "decoupage":"gouvernorat",
    "variables": [

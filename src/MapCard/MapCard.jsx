@@ -66,6 +66,17 @@ function MapCard({ ID, bounds, geojson }) {
   const colors2 = ["#ffffff", "#a8281e"];
   const colors3 = ["#00ffd5", "#00806b", "#3f4540", "#663d14", "#bf6100"];
 
+  const DivergingColors = [
+    "#d53e4f",
+    "#f46d43",
+    "#fdae61",
+    "#fee08b",
+    "#ffffbf",
+    "#e6f598",
+    "#abdda4",
+    "#66c2a5",
+    "#3288bd",
+  ];
   const Heatmap4 = [
     "#ffffff",
     "#ffe3aa",
@@ -263,7 +274,9 @@ function MapCard({ ID, bounds, geojson }) {
                       justifyContent: "space-between",
                     }}
                   >
-                    {(map.type === "simple" || map.type === "indicator") && (
+                    {(map.type === "simple" ||
+                      map.type === "indicator" ||
+                      map.type == "TP") && (
                       <Legend2 ID={ID} colors={Heatmap4} />
                     )}
                     {(map.type === "evolution" ||

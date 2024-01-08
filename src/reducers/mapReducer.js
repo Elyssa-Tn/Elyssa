@@ -187,4 +187,30 @@ export const fetchIndicatorMap = (map) => {
   };
 };
 
+export const fetchTpMap = (map) => {
+  return async (dispatch) => {
+    const result = await electionServices.getTpResult(map);
+
+    let mapObject = { ...map, resultat: {} };
+
+    result.forEach((data) => {
+      const { decoupage } = data.data.req;
+      const { variables } = data.data.result[0];
+      const object = {};
+
+      variables[0].resultat.forEach((resultat) => {
+        const { code_unite, ...data } = resultat;
+        object[code_unite] = data;
+      });
+
+      mapObject = {
+        ...mapObject,
+        resultat: { ...mapObject.resultat, [decoupage]: object },
+        type: "TP",
+      };
+    });
+    dispatch(createMap(mapObject));
+  };
+};
+
 export default mapSlice.reducer;
