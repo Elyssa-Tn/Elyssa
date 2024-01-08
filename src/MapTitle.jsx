@@ -10,7 +10,11 @@ function MapTitle({ electionInfo, parti, indicator }) {
         }}
         level="h2"
       >
-        {parti ? parti.denomination_fr : indicator.nom_indicateur}
+        {parti
+          ? parti.denomination_fr
+          : indicator
+          ? indicator.nom_indicateur
+          : null}
       </Typography>
       <Typography
         style={{

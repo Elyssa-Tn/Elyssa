@@ -140,6 +140,8 @@ function App() {
           ? "percent"
           : maps[1]?.type === "indicator"
           ? "valeur"
+          : maps[1]?.type === "TP"
+          ? "tp"
           : null
       );
       processMap(

@@ -91,7 +91,7 @@ const MapComponent = ({
   const compare = useSelector((state) => state.interface.compareToggle);
 
   //TODO: HACK SOLUTION, FIX THIS:
-  const formatting = { simple: "prc", indicator: "valeur" };
+  const formatting = { simple: "prc", indicator: "valeur", TP: "tp" };
 
   //CHANGE COLOR GENERATION ITS BAD
 
@@ -176,6 +176,13 @@ const MapComponent = ({
       if (!value) return [211, 211, 211, 200];
       return getColorForValue(value);
     }
+    if (type === "TP") {
+      if (!data[level][feature.properties[`code_${level}`]])
+        return [211, 211, 211, 200];
+      const value = data[level][feature.properties[`code_${level}`]]["tp"];
+      if (!value) return [211, 211, 211, 200];
+      return getColorForValue(value);
+    }
 
     if (type === "indicator") {
       if (!data[level][feature.properties[`code_${level}`]])
@@ -246,7 +253,7 @@ const MapComponent = ({
             },
             code,
             prc: data[level][code]
-              ? type === "simple" || type === "indicator"
+              ? type === "simple" || type === "indicator" || type === "TP"
                 ? data[level][code][formatting[type]]
                 : data[level][code]["percent"]
               : null,
@@ -288,7 +295,6 @@ const MapComponent = ({
       boundaries,
       { width: 408, height: 500 }
     );
-    // console.log(ID, levelLock);
     if (!levelLock) {
       dispatch(setLevel(levels[1]));
     }
@@ -301,7 +307,6 @@ const MapComponent = ({
         zoom,
       })
     );
-    // dispatch(setClickedTarget(boundaries));
   };
 
   const layers = Object.keys(geojson)
@@ -562,6 +567,43 @@ const MapComponent = ({
                   />
                 </Box>
               ) : null
+            ) : type === "TP" ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  paddingTop: "0.25rem",
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <Typography level="body-md">
+                    {data[level][tooltip.code]["inscrits"]}
+                  </Typography>
+                  <Typography level="body-sm">&nbsp;inscrits</Typography>
+                  <Divider
+                    sx={{ margin: "0 0.25rem" }}
+                    orientation="vertical"
+                  />
+                  <Typography level="body-md">
+                    {data[level][tooltip.code]["votes"]}
+                  </Typography>
+                  <Typography level="body-sm">&nbsp;voix</Typography>
+                  <Divider
+                    sx={{ margin: "0 0.25rem" }}
+                    orientation="vertical"
+                  />
+                  <Typography>
+                    &nbsp;
+                    {data[level][tooltip.code]["tp"].toFixed(2)}%
+                  </Typography>
+                </Box>
+              </Box>
             ) : (
               <Typography>Données pas disponibles.</Typography>
             )}

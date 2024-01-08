@@ -158,8 +158,40 @@ const getRequestResults = async (map) => {
   }
 };
 
+const getTpResult = async (map) => {
+  const quickFetch = async (level) => {
+    const req = {
+      req: {
+        type: "data",
+        pays: "Tunisie",
+        code_election: map.election.code_election,
+        decoupage: level,
+        variables: [{ code_variable: "tp" }],
+      },
+    };
+    try {
+      const response = await axios.post(url, req, {
+        cache: { methods: ["get", "post"] },
+      });
+      return response.data;
+    } catch (error) {
+      return error;
+    }
+  };
+
+  const levels = ["gouvernorat", "delegation"];
+
+  try {
+    const results = await Promise.all(levels.map(quickFetch));
+    return results;
+  } catch (error) {
+    console.error("An error occurred:", error);
+    throw error;
+  }
+};
+
 const getIndicatorResults = async (req) => {
-  const request = { type: "indic", pays: "tunisie", ...req };
+  const request = { type: "indic", pays: "Tunisie", ...req };
 
   try {
     const response = await axios.post(url, request, {
@@ -178,6 +210,7 @@ const electionServices = {
   getElectionInfo,
   getPartiScores,
   getRequestResults,
+  getTpResult,
   getIndicatorResults,
 };
 

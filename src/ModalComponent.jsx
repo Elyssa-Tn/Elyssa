@@ -1,18 +1,17 @@
 import { Home, KeyboardArrowRight } from "@mui/icons-material";
 import {
   Box,
-  Button,
   Card,
   Chip,
   CircularProgress,
-  DialogActions,
   Divider,
   Link,
   List,
   ListDivider,
+  ListItem,
   ListItemButton,
   ListItemContent,
-  Modal,
+  ListSubheader,
   ModalDialog,
   Sheet,
   Tab,
@@ -26,9 +25,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchElectionData } from "./reducers/electionReducer";
 import {
   fetchCompareMap,
-  fetchEvolutionData,
   fetchIndicatorMap,
   fetchMapData,
+  fetchTpMap,
 } from "./reducers/mapReducer";
 import {
   setModalCompareFlag,
@@ -39,11 +38,9 @@ import {
 const ModalComponent = React.forwardRef(function ModalComponent() {
   const [selectedElection, setSelectedElection] = useState(null);
   const [hoveredElection, setHoveredElection] = useState(null);
-  const [selectedParti, setSelectedParti] = useState(null);
   const [hoveredParti, setHoveredParti] = useState(null);
 
   const init = useSelector((state) => state.elections.init);
-  const maps = useSelector((state) => state.maps);
   const loading = useSelector((state) => state.elections.loading);
   const data = useSelector((state) => state.elections.data);
   const modalCompareFlag = useSelector(
@@ -59,7 +56,6 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
   };
 
   const partiSelection = (parti) => {
-    setSelectedParti(parti);
     const request = { election: selectedElection, parti };
     dispatch(setReady(false));
     dispatch(setModalOpen(false));
@@ -86,6 +82,15 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
 
     dispatch(setModalOpen(false));
     dispatch(fetchIndicatorMap(request));
+  };
+
+  const tpSelection = () => {
+    const request = {
+      election: selectedElection,
+    };
+
+    dispatch(setModalOpen(false));
+    dispatch(fetchTpMap(request));
   };
 
   return (
@@ -210,26 +215,49 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
                     sx={{
                       width: "24rem",
                       maxWidth: "24rem",
+                      "--List-nestedInsetStart": "1rem",
                     }}
                   >
-                    {data[selectedElection.code_election].partis.map(
-                      (parti) => (
-                        <Sheet key={parti.code_parti}>
-                          <ListItemButton
-                            variant="plain"
-                            onClick={() => partiSelection(parti)}
-                            onMouseOver={() => setHoveredParti(parti)}
-                          >
-                            <ListItemContent>
-                              {parti.denomination_fr}
-                            </ListItemContent>
-                            <Chip>{parti.score}%</Chip>
-                            <KeyboardArrowRight />
-                          </ListItemButton>
-                          <ListDivider />
-                        </Sheet>
-                      )
-                    )}
+                    <ListItem nested>
+                      <ListSubheader>Resultats</ListSubheader>
+                      <List>
+                        <ListItemButton variant="plain" onClick={tpSelection}>
+                          <ListItemContent>
+                            Taux de participations
+                          </ListItemContent>
+                          <KeyboardArrowRight />
+                        </ListItemButton>
+                        <ListDivider />
+                        <ListItemButton>
+                          <ListItemContent>Partis gagnants</ListItemContent>
+                          <KeyboardArrowRight />
+                        </ListItemButton>
+                        <ListDivider />
+                      </List>
+                    </ListItem>
+                    <ListItem nested>
+                      <ListSubheader>Partis</ListSubheader>
+                      <List>
+                        {data[selectedElection.code_election].partis.map(
+                          (parti) => (
+                            <Box key={parti.code_parti}>
+                              <ListItemButton
+                                variant="plain"
+                                onClick={() => partiSelection(parti)}
+                                onMouseOver={() => setHoveredParti(parti)}
+                              >
+                                <ListItemContent>
+                                  {parti.denomination_fr}
+                                </ListItemContent>
+                                <Chip>{parti.score}%</Chip>
+                                <KeyboardArrowRight />
+                              </ListItemButton>
+                              <ListDivider />
+                            </Box>
+                          )
+                        )}
+                      </List>
+                    </ListItem>
                   </List>
                   <Divider orientation="vertical" />
                   {hoveredParti && (
