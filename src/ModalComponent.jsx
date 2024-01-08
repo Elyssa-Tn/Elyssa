@@ -140,7 +140,7 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
                 }}
               >
                 {init.elections.map((election) => (
-                  <Sheet key={election.code}>
+                  <Sheet key={election.code_election}>
                     <ListItemButton
                       variant="plain"
                       onClick={() => electionSelection(election)}

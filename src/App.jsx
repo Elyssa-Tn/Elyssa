@@ -33,10 +33,17 @@ import {
 } from "./reducers/interfaceReducer";
 import ModalComponent from "./ModalComponent";
 
-// import delegation from "./assets/delegation.json";
-// import gouvernorat from "./assets/gouvernorat.json";
+import delegation from "./assets/delegation.json";
+import gouvernorat from "./assets/gouvernorat.json";
+import secteur from "./assets/secteur.json";
 
 function App() {
+  const a = delegation;
+  const b = gouvernorat;
+  const c = secteur;
+  console.log(a);
+  console.log(b);
+  console.log(c);
   const materialTheme = materialExtendTheme();
 
   const dispatch = useDispatch();
