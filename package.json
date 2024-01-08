@@ -2,6 +2,9 @@
   "name": "elyssa-redux",
   "private": true,
   "version": "0.0.0",
+  "engines": {
+    "node": "20.2.0"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
