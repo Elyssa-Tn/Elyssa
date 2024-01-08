@@ -1,4 +1,4 @@
-import { Box, Sheet, Typography } from "@mui/joy";
+import { Box, Typography } from "@mui/joy";
 import { useSelector } from "react-redux";
 
 const Legend = ({ ID }) => {
@@ -9,15 +9,6 @@ const Legend = ({ ID }) => {
     (state) => state.interface.minMax[ID][level]
   );
   const midValue = ((parseFloat(max) + parseFloat(min)) / 2).toFixed(1);
-
-  const legendStyle = {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "10px",
-    background: "lightgray",
-    margin: "10px",
-  };
 
   const barStyle = {
     width: "14rem",

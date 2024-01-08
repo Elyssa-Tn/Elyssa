@@ -27,6 +27,7 @@ import { fetchElectionData } from "./reducers/electionReducer";
 import {
   fetchCompareMap,
   fetchEvolutionData,
+  fetchIndicatorMap,
   fetchMapData,
 } from "./reducers/mapReducer";
 import {
@@ -49,8 +50,6 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
     (state) => state.interface.modalCompareFlag
   );
 
-  const [secondModalOpen, setSecondModalOpen] = useState(false);
-
   const dispatch = useDispatch();
 
   const electionSelection = (election) => {
@@ -62,16 +61,6 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
   const partiSelection = (parti) => {
     setSelectedParti(parti);
     const request = { election: selectedElection, parti };
-
-    if (
-      (maps[1] || maps[2]) &&
-      (maps[1]?.parti.code_parti === parti.code_parti ||
-        maps[2]?.parti.code_parti === parti.code_parti)
-    ) {
-      setSecondModalOpen(true);
-      return;
-    }
-
     dispatch(setReady(false));
     dispatch(setModalOpen(false));
 
@@ -83,24 +72,20 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
     }
   };
 
-  const fetchPartiData = () => {
-    const request = { election: selectedElection, parti: selectedParti };
-    dispatch(setReady(false));
-    dispatch(setModalOpen(false));
+  const indicatorSelection = (indicator) => {
+    const { code_indicateur, nom_indicateur } = indicator;
+    const year = Object.keys(indicator.ans)[0];
+    const decoupage = indicator.ans[year].decoupages[0];
 
-    if (modalCompareFlag) {
-      dispatch(setModalCompareFlag(false));
-      dispatch(fetchCompareMap(request));
-    } else {
-      dispatch(fetchMapData(request));
-    }
-  };
+    const request = {
+      indicateurs: code_indicateur,
+      nom_indicateur,
+      ans: year,
+      decoupage,
+    };
 
-  const handleEvolutionDisplay = () => {
-    const request = { election: selectedElection, parti: selectedParti };
-    dispatch(fetchEvolutionData(request));
-    setSecondModalOpen(false);
     dispatch(setModalOpen(false));
+    dispatch(fetchIndicatorMap(request));
   };
 
   return (
@@ -262,20 +247,6 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
               )}
             </Sheet>
           )}
-          <Modal
-            open={secondModalOpen}
-            onClose={() => setSecondModalOpen(false)}
-          >
-            <ModalDialog layout="center">
-              <Typography>Afficher l'évolution de cet indicateur?</Typography>
-              <DialogActions>
-                <Button variant="outlined" onClick={fetchPartiData}>
-                  Non
-                </Button>
-                <Button onClick={handleEvolutionDisplay}>Oui</Button>
-              </DialogActions>
-            </ModalDialog>
-          </Modal>
         </TabPanel>
         <TabPanel value={1}>
           <Box sx={{ display: "flex", flexDirection: "row" }}>
@@ -288,150 +259,61 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
             </Link>
           </Box>
           <Divider />
-          {!selectedElection && (
-            <Sheet
+          <Sheet
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              height: "20rem",
+              overflow: "auto",
+            }}
+          >
+            <List
               sx={{
-                display: "flex",
-                flexDirection: "row",
-                height: "20rem",
-                overflow: "auto",
+                width: "24rem",
+                maxWidth: "24rem",
               }}
             >
-              <List
-                sx={{
-                  width: "24rem",
-                  maxWidth: "24rem",
-                }}
-              >
-                {init.indicateurs.map((indicateur) => (
-                  <Sheet key={indicateur.code_indicateur}>
-                    <ListItemButton
-                      variant="plain"
-                      onClick={() => electionSelection(indicateur)}
-                      onMouseOver={() => setHoveredElection(indicateur)}
-                    >
-                      <ListItemContent>
-                        {indicateur.nom_indicateur}
-                      </ListItemContent>
-                      <KeyboardArrowRight />
-                    </ListItemButton>
-                    <ListDivider />
-                  </Sheet>
-                ))}
-              </List>
-              <Divider orientation="vertical" />
-              {hoveredElection && (
-                <Card
-                  variant="plain"
-                  sx={{ width: "24rem", maxWidth: "24rem" }}
-                >
-                  <Typography level="h3">{hoveredElection.nom}</Typography>
-                  <Divider />
-                  <Typography level="body-md">
-                    Nombre de tours: {hoveredElection.nombre_tours}
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                    }}
+              {init.indicateurs.map((indicateur) => (
+                <Sheet key={indicateur.code_indicateur}>
+                  <ListItemButton
+                    variant="plain"
+                    onClick={() => indicatorSelection(indicateur)}
+                    onMouseOver={() => setHoveredElection(indicateur)}
                   >
-                    <Typography level="body-md">Date debut:</Typography>
-                    <Typography level="body-sm">
-                      {hoveredElection.debut}
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                    }}
-                  >
-                    <Typography>Date fin:</Typography>
-                    <Typography level="body-sm">
-                      {hoveredElection.fin}
-                    </Typography>
-                  </Box>
-
-                  <Divider />
-                  <Typography>
-                    Mode de scrutin: {hoveredElection.mode_scrutin}
-                  </Typography>
-                  <Typography>
-                    Type de scrutin: {hoveredElection.uninominal_liste}
-                  </Typography>
-                </Card>
-              )}
-            </Sheet>
-          )}
-          {selectedElection && (
-            <Sheet>
-              {loading ? (
-                <CircularProgress />
-              ) : (
-                <Sheet
+                    <ListItemContent>
+                      {indicateur.nom_indicateur}
+                    </ListItemContent>
+                    <KeyboardArrowRight />
+                  </ListItemButton>
+                  <ListDivider />
+                </Sheet>
+              ))}
+            </List>
+            <Divider orientation="vertical" />
+            {hoveredElection && (
+              <Card variant="plain" sx={{ width: "24rem", maxWidth: "24rem" }}>
+                <Typography level="h3">
+                  {hoveredElection.nom_indicateur}
+                </Typography>
+                <Divider />
+                <Typography level="body-md">
+                  Source: {hoveredElection.source}
+                </Typography>
+                <Divider />
+                <Box
                   sx={{
                     display: "flex",
                     flexDirection: "row",
-                    height: "20rem",
-                    overflow: "auto",
                   }}
                 >
-                  <List
-                    sx={{
-                      width: "24rem",
-                      maxWidth: "24rem",
-                    }}
-                  >
-                    {data[selectedElection.code_election].partis.map(
-                      (parti) => (
-                        <Sheet key={parti.code_parti}>
-                          <ListItemButton
-                            variant="plain"
-                            onClick={() => partiSelection(parti)}
-                            onMouseOver={() => setHoveredParti(parti)}
-                          >
-                            <ListItemContent>
-                              {parti.denomination_fr}
-                            </ListItemContent>
-                            <Chip>{parti.score}%</Chip>
-                            <KeyboardArrowRight />
-                          </ListItemButton>
-                          <ListDivider />
-                        </Sheet>
-                      )
-                    )}
-                  </List>
-                  <Divider orientation="vertical" />
-                  {hoveredParti && (
-                    <Card
-                      variant="plain"
-                      sx={{ width: "24rem", maxWidth: "24rem" }}
-                    >
-                      <Typography level="h3">
-                        {hoveredParti.denomination_fr}
-                      </Typography>
-                      <Divider />
-                    </Card>
-                  )}
-                </Sheet>
-              )}
-            </Sheet>
-          )}
-          <Modal
-            open={secondModalOpen}
-            onClose={() => setSecondModalOpen(false)}
-          >
-            <ModalDialog layout="center">
-              <Typography>Afficher l'évolution de cet indicateur?</Typography>
-              <DialogActions>
-                <Button variant="outlined" onClick={fetchPartiData}>
-                  Non
-                </Button>
-                <Button onClick={handleEvolutionDisplay}>Oui</Button>
-              </DialogActions>
-            </ModalDialog>
-          </Modal>
+                  <Typography level="body-md">Description:</Typography>
+                  <Typography level="body-sm">
+                    {hoveredElection.description}
+                  </Typography>
+                </Box>
+              </Card>
+            )}
+          </Sheet>
         </TabPanel>
       </Tabs>
     </ModalDialog>

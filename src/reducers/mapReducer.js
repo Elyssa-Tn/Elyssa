@@ -121,84 +121,69 @@ export const {
   createComparaisonMap,
 } = mapSlice.actions;
 
-//TODO:Combine all three into a single function, this is BAD
+//TODO: refactor this
+
+const fetchDataAndDispatch = async (map, dispatch, createAction) => {
+  const result = await electionServices.getRequestResults(map);
+
+  let mapObject = { ...map, resultat: {} };
+
+  result.forEach((data) => {
+    const { decoupage } = data.data.req;
+    const { variables } = data.data.result[0];
+    const object = {};
+
+    variables[0].resultat.forEach((resultat) => {
+      const { code_unite, ...data } = resultat;
+      object[code_unite] = data;
+    });
+
+    mapObject = {
+      ...mapObject,
+      resultat: { ...mapObject.resultat, [decoupage]: object },
+      type: "simple",
+    };
+  });
+
+  dispatch(createAction(mapObject));
+};
 
 export const fetchMapData = (map) => {
   return async (dispatch) => {
-    const result = await electionServices.getRequestResults(map);
-
-    let mapObject = { ...map, resultat: {} };
-
-    result.forEach((data) => {
-      const { decoupage } = data.data.req;
-      const { variables } = data.data.result[0];
-      const object = {};
-
-      variables[0].resultat.forEach((resultat) => {
-        const { code_unite, ...data } = resultat;
-        object[code_unite] = data;
-      });
-
-      mapObject = {
-        ...mapObject,
-        resultat: { ...mapObject.resultat, [decoupage]: object },
-        type: "simple",
-      };
-    });
-
-    dispatch(createMap(mapObject));
+    await fetchDataAndDispatch(map, dispatch, createMap);
   };
 };
 
 export const fetchEvolutionData = (map) => {
   return async (dispatch) => {
-    const result = await electionServices.getRequestResults(map);
-    let mapObject = { ...map, resultat: {} };
-
-    result.forEach((data) => {
-      const { decoupage } = data.data.req;
-      const { variables } = data.data.result[0];
-      const object = {};
-
-      variables[0].resultat.forEach((resultat) => {
-        const { code_unite, ...data } = resultat;
-        object[code_unite] = data;
-      });
-
-      mapObject = {
-        ...mapObject,
-        resultat: { ...mapObject.resultat, [decoupage]: object },
-        type: "simple",
-      };
-    });
-
-    dispatch(createEvolutionMap(mapObject));
+    await fetchDataAndDispatch(map, dispatch, createEvolutionMap);
   };
 };
 
 export const fetchCompareMap = (map) => {
   return async (dispatch) => {
-    const result = await electionServices.getRequestResults(map);
-    let mapObject = { ...map, resultat: {} };
+    await fetchDataAndDispatch(map, dispatch, createComparaisonMap);
+  };
+};
 
-    result.forEach((data) => {
-      const { decoupage } = data.data.req;
-      const { variables } = data.data.result[0];
-      const object = {};
+export const fetchIndicatorMap = (map) => {
+  return async (dispatch) => {
+    const { data } = await electionServices.getIndicatorResults(map);
+    const { decoupage } = data.req;
+    const object = {};
 
-      variables[0].resultat.forEach((resultat) => {
-        const { code_unite, ...data } = resultat;
-        object[code_unite] = data;
-      });
-
-      mapObject = {
-        ...mapObject,
-        resultat: { ...mapObject.resultat, [decoupage]: object },
-        type: "simple",
-      };
+    data.result.forEach((resultat) => {
+      const { code_unite, ...data } = resultat;
+      object[code_unite] = data;
     });
 
-    dispatch(createComparaisonMap(mapObject));
+    const mapObject = {
+      indicator: { ...map },
+      resultat: { [decoupage]: object },
+      type: "indicator",
+    };
+
+    dispatch(createMap(mapObject));
   };
 };
 
