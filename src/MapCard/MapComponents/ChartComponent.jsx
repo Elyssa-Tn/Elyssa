@@ -97,18 +97,31 @@ const ChartComponent = ({ ID, data, bounds }) => {
 
   useEffect(() => {
     if (currentTarget) {
-      if (map.type === "comparaison") {
-        setLocalAverage(
-          data[currentTarget.targetLevel][
-            currentTarget.targetCode
-          ].oldprc.toFixed(1)
-        );
-      } else
-        setLocalAverage(
-          data[currentTarget.targetLevel][currentTarget.targetCode].prc.toFixed(
-            1
-          )
-        );
+      // if (map.type === "comparaison") {
+      //   setLocalAverage(
+      //     data[currentTarget.targetLevel][
+      //       currentTarget.targetCode
+      //     ].oldprc.toFixed(1)
+      //   );
+      // } else
+      //   setLocalAverage(
+      //     data[currentTarget.targetLevel][
+      //       currentTarget.targetCode
+      //     ]?.prc.toFixed(1)
+      //   );
+      setLocalAverage(
+        map.type === "comparaison"
+          ? data[currentTarget.targetLevel][
+              currentTarget.targetCode
+            ].oldprc.toFixed(1)
+          : map.type === "TP"
+          ? data[currentTarget.targetLevel][
+              currentTarget.targetCode
+            ]?.tp.toFixed(1)
+          : data[currentTarget.targetLevel][
+              currentTarget.targetCode
+            ]?.prc.toFixed(1)
+      );
     }
     if (!currentTarget) {
       setDisplayAverage(false);
@@ -132,7 +145,6 @@ const ChartComponent = ({ ID, data, bounds }) => {
   };
 
   const displayedVariable = map.type === "TP" ? "tp" : "prc";
-
   if (!codes) return <span>loading</span>;
   return (
     <Box>
@@ -212,7 +224,7 @@ const ChartComponent = ({ ID, data, bounds }) => {
                           label: "Pourcentage",
                           data: codes.map((code) =>
                             data[level][code]
-                              ? data[level][code].displayedVariable
+                              ? data[level][code][displayedVariable]
                               : null
                           ),
                           backgroundColor: "rgba(54, 162, 235, 0.6)",

@@ -51,61 +51,6 @@ function App() {
 
   const maps = useSelector((state) => state.maps);
 
-  // function findMinMaxValues(maps, valueProperty) {
-  //   const result = {};
-  //   for (const key in maps) {
-  //     if (maps[key] && maps[key].resultat) {
-  //       result[key] = {
-  //         delegation: {
-  //           min: Infinity,
-  //           max: -Infinity,
-  //         },
-  //         gouvernorat: {
-  //           min: Infinity,
-  //           max: -Infinity,
-  //         },
-  //         region: {
-  //           min: Infinity,
-  //           max: -Infinity,
-  //         },
-  //       };
-  //       const data = maps[key].resultat;
-  //       for (const level in data) {
-  //         for (const code in data[level]) {
-  //           const value = data[level][code][valueProperty];
-  //           if (!isNaN(value)) {
-  //             if (value < result[key][level].min) {
-  //               result[key][level].min = value;
-  //             }
-  //             if (value > result[key][level].max) {
-  //               result[key][level].max = value;
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   if (result[1] && result[2]) {
-  //     result[3] = {
-  //       delegation: {
-  //         min: Math.min(result[1].delegation.min, result[2].delegation.min),
-  //         max: Math.max(result[1].delegation.max, result[2].delegation.max),
-  //       },
-  //       gouvernorat: {
-  //         min: Math.min(result[1].gouvernorat.min, result[2].gouvernorat.min),
-  //         max: Math.max(result[1].gouvernorat.max, result[2].gouvernorat.max),
-  //       },
-  //       region: {
-  //         min: Math.min(result[1].region.min, result[2].region.min),
-  //         max: Math.max(result[1].region.max, result[2].region.max),
-  //       },
-  //     };
-  //   }
-
-  //   return result;
-  // }
-
   function findMinMaxValues(maps, valueProperty, levels) {
     const result = {};
     for (const key in maps) {
@@ -200,6 +145,8 @@ function App() {
           ? "percent"
           : maps[2]?.type === "indicator"
           ? "valeur"
+          : maps[2]?.type === "TP"
+          ? "tp"
           : null
       );
 

@@ -62,12 +62,14 @@ const ExpandMore = styled((props) => {
 function MapCard({ ID, bounds, autocompleteOptions, geojson }) {
   const compare = useSelector((state) => state.interface.compareToggle);
   const levels = useSelector((state) => state.interface.levels);
-  const level = useSelector((state) => state.interface.level);
+  let level = useSelector((state) => state.interface.level);
   const chartMode = useSelector((state) => state.interface.chartMode[ID]);
   const tableMode = useSelector((state) => state.interface.tableMode[ID]);
   const map = useSelector((state) => state.maps[ID]);
   const elections = useSelector((state) => state.elections.init.elections);
   const currentTarget = useSelector((state) => state.interface.currentTarget);
+
+  if (map.type === "indicator") level = "delegation";
 
   const dispatch = useDispatch();
 
@@ -362,7 +364,7 @@ function MapCard({ ID, bounds, autocompleteOptions, geojson }) {
                           <Chip>{map.parti[1].prc}%</Chip>
                         </Box>
                       </Box>
-                    ) : (
+                    ) : map.type === "indicator" ? null : (
                       <Box>
                         <Box
                           sx={{
@@ -403,7 +405,7 @@ function MapCard({ ID, bounds, autocompleteOptions, geojson }) {
                             <Typography level="body-sm">Votes:</Typography>
                             <Chip>{map.tp.votes.toLocaleString()}</Chip>
                             <Typography level="body-sm">Inscrits:</Typography>
-                            <Chip>{map.tp.inscrits.toLocaleString()}</Chip>
+                            <Chip>{map.tp?.inscrits?.toLocaleString()}</Chip>
                           </Box>
                         ) : (
                           <Box
@@ -420,7 +422,7 @@ function MapCard({ ID, bounds, autocompleteOptions, geojson }) {
                             </Typography>
                             <Chip>
                               {map.type === "simple"
-                                ? `${map.parti.voix}`
+                                ? `${map.parti.voix.toLocaleString()}`
                                 : `${
                                     map.resultat["gouvernorat"]["voix"][
                                       "Total"
@@ -458,7 +460,12 @@ function MapCard({ ID, bounds, autocompleteOptions, geojson }) {
                 justifyContent: "space-between",
                 alignContent: "center",
                 height: "100%",
-                maxWidth: compare ? "30rem" : "16rem",
+                minHeight: !compare ? "35rem" : "null",
+                minWidth: compare ? "26rem" : "16rem",
+                maxWidth: compare ? "40rem" : "16rem",
+                borderRadius: "0.5rem",
+                padding: "0.5rem",
+                margin: "0",
               }}
             >
               <Stack spacing={1}>

@@ -53,7 +53,7 @@ const getGeoJSONFromIndexedDB = async (db, key) => {
 
 const clearIndexedDB = async (db) => {
   return new Promise((resolve, reject) => {
-    const request = window.indexedDB.deleteDatabase("geojsonStore");
+    const request = window.indexedDB.deleteDatabase("geojsonDB");
 
     request.onsuccess = () => {
       resolve();
