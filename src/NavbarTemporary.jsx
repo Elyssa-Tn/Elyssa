@@ -5,10 +5,28 @@ import ModeToggle from "./ModeToggle";
 import ModalComponent from "./ModalComponent";
 import { useDispatch, useSelector } from "react-redux";
 import { setModalOpen } from "./reducers/interfaceReducer";
+import dbAccess from "./services/db";
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const modalOpen = useSelector((state) => state.interface.modalOpen);
+
+  const refreshIndexedDB = async () => {
+    const userConfirmed = window.confirm(
+      "Are you sure you want to refresh the data? This will clear all existing data."
+    );
+
+    if (userConfirmed) {
+      try {
+        await dbAccess.clearIndexedDB();
+      } catch (error) {
+        console.error("Error clearing IndexedDB:", error);
+        throw error;
+      }
+    } else {
+      console.log("User canceled the refresh operation.");
+    }
+  };
 
   return (
     <>
@@ -29,6 +47,7 @@ const Navbar = () => {
         >
           Open
         </Button>
+        {/* <Button onClick={() => refreshIndexedDB()}>Refresh DB</Button> */}
         <Modal open={modalOpen} onClose={() => dispatch(setModalOpen(false))}>
           <ModalComponent />
         </Modal>

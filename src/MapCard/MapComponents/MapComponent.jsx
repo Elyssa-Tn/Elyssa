@@ -168,6 +168,7 @@ const MapComponent = ({
         return [211, 211, 211, 200];
       const value = data[level][feature.properties[`code_${level}`]]["tp"];
       if (!value) return [211, 211, 211, 200];
+      console.log(value);
       return getColorForValue(value);
     }
 
@@ -179,7 +180,7 @@ const MapComponent = ({
       return getColorForValue(value);
     }
 
-    if (type === "evolution" || type === "comparaison") {
+    if ((type === "evolution" || type === "comparaison") && type !== "TP") {
       if (!data[level][feature.properties[`code_${level}`]])
         return [211, 211, 211, 200];
       const value = data[level][feature.properties[`code_${level}`]]["percent"];

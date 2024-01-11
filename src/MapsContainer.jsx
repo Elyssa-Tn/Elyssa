@@ -4,6 +4,7 @@ import { Box, Sheet, Typography } from "@mui/joy";
 
 function MapsContainer({ geojson, bounds, autocompleteOptions, ID }) {
   const map = useSelector((state) => state.maps[ID]);
+  console.log(map);
   return (
     <Sheet>
       {map.type === "comparaison" ? (
@@ -26,6 +27,18 @@ function MapsContainer({ geojson, bounds, autocompleteOptions, ID }) {
             {map.election ? map.election.nom : null}
           </Typography>
         </Box>
+      ) : map.type === "indicator" ? (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            minHeight: "5.5rem",
+            padding: "0.25rem",
+          }}
+        >
+          <Typography level="h1">{map.indicator.nom_indicateur}</Typography>
+          <Typography level="h3">{map.indicator.ans}</Typography>
+        </Box>
       ) : (
         <Box
           sx={{ display: "flex", flexDirection: "column", padding: "0.25rem" }}
@@ -34,6 +47,9 @@ function MapsContainer({ geojson, bounds, autocompleteOptions, ID }) {
             {map.parti
               ? `${map.parti.denomination_fr} - ${map.parti.code_parti}`
               : null}
+          </Typography>
+          <Typography level="h1">
+            {map.type === "TP" ? "Taux de participation" : null}
           </Typography>
           <Typography level="h3">
             {map.election ? map.election.nom : null}
