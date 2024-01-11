@@ -12,7 +12,6 @@ export const getGeoJSON = async (level) => {
     } else {
       try {
         const response = await fetchGeojson(level);
-        console.log(response);
         if (response) {
           const map = response.map[level];
           await dbAccess.saveGeoJSONToIndexedDB(db, level, map);

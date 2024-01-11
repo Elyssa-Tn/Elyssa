@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   Card,
   IconButton,
@@ -7,10 +7,17 @@ import {
   Divider,
   Chip,
   Sheet,
-  Input,
   Button,
   ButtonGroup,
   Stack,
+  FormControl,
+  FormLabel,
+  Autocomplete,
+  FormHelperText,
+  Dropdown,
+  MenuButton,
+  Menu,
+  MenuItem,
 } from "@mui/joy";
 // import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
@@ -32,16 +39,18 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ExploreIcon from "@mui/icons-material/Explore";
 import { toSvg } from "html-to-image";
 import { useDispatch, useSelector } from "react-redux";
-import { TabList, TabPanel, Tabs, Tab } from "@mui/joy";
-import InfoPanel from "./MapComponents/InfoPanel";
 import { deleteMap, fetchEvolutionData } from "../reducers/mapReducer";
-import { getGeoJSON } from "../services/geojson";
 import {
+  resetViewport,
+  setCurrentTarget,
+  setLevel,
   setModalCompareFlag,
   setModalOpen,
   toggleCompare,
 } from "../reducers/interfaceReducer";
 import ChartComponent from "./MapComponents/ChartComponent";
+import { ArrowDropDown } from "@mui/icons-material";
+import TableComponent from "./MapComponents/TableComponent";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -50,11 +59,15 @@ const ExpandMore = styled((props) => {
   marginLeft: "auto",
 }));
 
-function MapCard({ ID, bounds, geojson }) {
+function MapCard({ ID, bounds, autocompleteOptions, geojson }) {
   const compare = useSelector((state) => state.interface.compareToggle);
+  const levels = useSelector((state) => state.interface.levels);
+  const level = useSelector((state) => state.interface.level);
   const chartMode = useSelector((state) => state.interface.chartMode[ID]);
+  const tableMode = useSelector((state) => state.interface.tableMode[ID]);
   const map = useSelector((state) => state.maps[ID]);
   const elections = useSelector((state) => state.elections.init.elections);
+  const currentTarget = useSelector((state) => state.interface.currentTarget);
 
   const dispatch = useDispatch();
 
@@ -66,19 +79,24 @@ function MapCard({ ID, bounds, geojson }) {
   const colors2 = ["#ffffff", "#a8281e"];
   const colors3 = ["#00ffd5", "#00806b", "#3f4540", "#663d14", "#bf6100"];
 
-  const DivergingColors = [
-    "#d53e4f",
-    "#f46d43",
-    "#fdae61",
-    "#fee08b",
-    "#ffffbf",
-    "#e6f598",
-    "#abdda4",
-    "#66c2a5",
-    "#3288bd",
+  const divergingColors = [
+    "rgb(215,25,28)",
+    "rgb(253,174,97)",
+    "rgb(255,255,191)",
+    "rgb(166,217,106)",
+    "rgb(26,150,65)",
   ];
+
+  const convertedDivergingColors = [
+    [215, 25, 28, 255],
+    [253, 174, 97, 255],
+    [255, 255, 191, 255],
+    [166, 217, 106, 255],
+    [26, 150, 65, 255],
+  ];
+
   const Heatmap4 = [
-    "#ffffff",
+    // "#ffffff",
     "#ffe3aa",
     "#ffc655",
     "#ffaa00",
@@ -94,7 +112,7 @@ function MapCard({ ID, bounds, geojson }) {
   ];
 
   const Heatmap4Converted = [
-    [255, 255, 255, 255],
+    // [255, 255, 255, 255],
     [255, 227, 170, 255],
     [255, 198, 85, 255],
     [255, 170, 0, 255],
@@ -113,6 +131,7 @@ function MapCard({ ID, bounds, geojson }) {
   // const [geojson, setGeojson] = useState({});
   const [boundaries, setBoundaries] = useState({});
   const [request, setRequest] = useState(null);
+  const [autocompleteValue, setAutocompleteValue] = useState(null);
 
   const handleCompareToggle = () => {
     dispatch(toggleCompare());
@@ -238,7 +257,35 @@ function MapCard({ ID, bounds, geojson }) {
     dispatch(fetchEvolutionData(request));
   };
 
-  if (Object.keys(geojson).length === 2 && map) {
+  const handleTargetSelection = (target) => {
+    setAutocompleteValue(target);
+    if (target) {
+      // dispatch(setLevel(levels[1]));
+      dispatch(setLevel("delegation"));
+      dispatch(
+        setCurrentTarget({
+          targetCode: target.key,
+          targetName: target.label,
+          targetLevel: target.level,
+        })
+      );
+    }
+    if (!target) {
+      dispatch(resetViewport());
+      dispatch(setCurrentTarget(null));
+      dispatch(setLevel(levels[0]));
+    }
+  };
+
+  const capitalize = (word) => {
+    return word[0].toUpperCase() + word.slice(1);
+  };
+
+  const handleLevelDropdown = (selectedLevel) => {
+    dispatch(setLevel(selectedLevel));
+  };
+  console.log(map);
+  if (Object.keys(geojson).length === levels.length && map) {
     return (
       <>
         {geojson && map && (
@@ -265,6 +312,8 @@ function MapCard({ ID, bounds, geojson }) {
             >
               {chartMode ? (
                 <ChartComponent ID={ID} data={map.resultat} bounds={bounds} />
+              ) : tableMode ? (
+                <TableComponent ID={ID} />
               ) : (
                 <>
                   <Box
@@ -281,61 +330,110 @@ function MapCard({ ID, bounds, geojson }) {
                     )}
                     {(map.type === "evolution" ||
                       map.type === "comparaison") && (
-                      <Legend ID={ID} colors={colors2} />
+                      <Legend ID={ID} colors={divergingColors} />
                     )}
-                    <Box>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignContent: "center",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <Typography>
-                          {map.type === "evolution"
-                            ? "Evolution Nationale: "
-                            : "Moyenne Nationale: "}
-                        </Typography>
-                        <Chip>
-                          {/* {map.type === "simple"
-                            ? `${map.resultat["gouvernorat"]["prc"]["Total"]}%`
-                            : `${(
-                                map.resultat["gouvernorat"]["prc"]["Total"][
-                                  "newValue"
-                                ] -
-                                map.resultat["gouvernorat"]["prc"]["Total"][
-                                  "oldValue"
-                                ]
-                              ).toFixed(1)}%`} */}
-                        </Chip>
+                    {map.type === "comparaison" ? (
+                      <Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignContent: "center",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Typography>
+                            {map.parti[0].code_parti} -{" "}
+                            {map.election[0].nom.slice(-4)}:
+                          </Typography>
+                          <Chip>{map.parti[0].prc}%</Chip>
+                        </Box>
+                        <Divider />
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignContent: "center",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Typography>
+                            {map.parti[1].code_parti} -{" "}
+                            {map.election[1].nom.slice(-4)}:
+                          </Typography>
+                          <Chip>{map.parti[1].prc}%</Chip>
+                        </Box>
                       </Box>
-                      <Divider />
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignContent: "center",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <Typography>
-                          {map.type === "simple"
-                            ? "Total des voix: "
-                            : "Nombre de voix: "}
-                        </Typography>
-                        <Chip>
-                          {/* {map.type === "simple"
-                            ? `${map.resultat["gouvernorat"]["voix"]["Total"]}`
-                            : `${
-                                map.resultat["gouvernorat"]["voix"]["Total"][
-                                  "newValue"
-                                ] -
-                                map.resultat["gouvernorat"]["voix"]["Total"][
-                                  "oldValue"
-                                ]
-                              }`} */}
-                        </Chip>
+                    ) : (
+                      <Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignContent: "center",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Typography level="body-sm">
+                            {map.type === "evolution"
+                              ? "Evolution Nationale: "
+                              : "Moyenne Nationale: "}
+                          </Typography>
+                          <Chip>
+                            {map.type === "simple"
+                              ? `${map.parti.prc}%`
+                              : map.type === "TP"
+                              ? `${map.tp.tp}%`
+                              : `${(
+                                  map.resultat["gouvernorat"]["prc"]["Total"][
+                                    "newValue"
+                                  ] -
+                                  map.resultat["gouvernorat"]["prc"]["Total"][
+                                    "oldValue"
+                                  ]
+                                ).toFixed(1)}%`}
+                          </Chip>
+                        </Box>
+                        <Divider />
+                        {map.type === "TP" ? (
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignContent: "center",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <Typography level="body-sm">Votes:</Typography>
+                            <Chip>{map.tp.votes.toLocaleString()}</Chip>
+                            <Typography level="body-sm">Inscrits:</Typography>
+                            <Chip>{map.tp.inscrits.toLocaleString()}</Chip>
+                          </Box>
+                        ) : (
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignContent: "center",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <Typography>
+                              {map.type === "simple"
+                                ? "Total des voix: "
+                                : "Nombre de voix: "}
+                            </Typography>
+                            <Chip>
+                              {map.type === "simple"
+                                ? `${map.parti.voix}`
+                                : `${
+                                    map.resultat["gouvernorat"]["voix"][
+                                      "Total"
+                                    ]["newValue"] -
+                                    map.resultat["gouvernorat"]["voix"][
+                                      "Total"
+                                    ]["oldValue"]
+                                  }`}
+                            </Chip>
+                          </Box>
+                        )}
                       </Box>
-                    </Box>
+                    )}
                   </Box>
                   <Divider />
                   <MapComponent
@@ -345,7 +443,7 @@ function MapCard({ ID, bounds, geojson }) {
                     geojson={geojson}
                     // colors={colors}
                     colors={Heatmap4Converted}
-                    colors2={colors2}
+                    divergingColors={convertedDivergingColors}
                     displayMode={displayMode}
                     bounds={bounds}
                   />
@@ -363,11 +461,47 @@ function MapCard({ ID, bounds, geojson }) {
                 maxWidth: compare ? "30rem" : "16rem",
               }}
             >
-              <Box>
-                <Typography>Rechercher un gouvernorat:</Typography>
-                <Input placeholder="ex: Ariana" color="primary" />
-              </Box>
-              <Divider orientation={compare ? "vertical" : "horizontal"} />
+              <Stack spacing={1}>
+                <Typography level="h4" sx={{ pb: 1 }}>
+                  Choisir un niveau:
+                </Typography>
+                <Dropdown>
+                  <MenuButton endDecorator={<ArrowDropDown />}>
+                    {capitalize(level)}
+                  </MenuButton>
+                  <Menu>
+                    {levels.map((levelEntry) => (
+                      <MenuItem
+                        sx={{ justifyContent: "space-between" }}
+                        key={levelEntry}
+                        selected={level === levelEntry}
+                        onClick={() => handleLevelDropdown(levelEntry)}
+                      >
+                        {capitalize(levelEntry)}
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </Dropdown>
+                <Typography level="h4" sx={{ pb: 1 }}>
+                  Sélectionnez un espace d'étude:
+                </Typography>
+                <FormControl>
+                  {/* <FormLabel>Label</FormLabel> */}
+                  <Autocomplete
+                    placeholder="ex: Ariana Ville"
+                    options={autocompleteOptions}
+                    groupBy={(option) => option.level}
+                    getOptionKey={(option) => option.code}
+                    onChange={(event, newValue) =>
+                      handleTargetSelection(newValue)
+                    }
+                  />
+                  {/* <FormHelperText>
+                    A description for the combo box.
+                  </FormHelperText> */}
+                </FormControl>
+              </Stack>
+              {/* <Divider orientation={compare ? "vertical" : "horizontal"} />
               {!compare && (
                 <Box>
                   {map.type === "evolution" ? (
@@ -387,8 +521,14 @@ function MapCard({ ID, bounds, geojson }) {
                     </Box>
                   )}
                 </Box>
-              )}
+              )} */}
               <Divider />
+              {currentTarget && (
+                <Typography level="title-lg">
+                  {capitalize(currentTarget.targetLevel)} de{" "}
+                  {currentTarget.targetName}
+                </Typography>
+              )}
               {!compare ? (
                 <Stack>
                   <Typography>Comparez avec un autre indicateur:</Typography>
@@ -410,18 +550,11 @@ function MapCard({ ID, bounds, geojson }) {
                     <Typography>Sur une deuxième carte</Typography>
                   </Button>
                 </Stack>
-              ) : (
-                <Box>
-                  <Typography>Annuler la comparaison</Typography>
-                  <Button onClick={() => dispatch(deleteMap(ID))}>
-                    Annulez
-                  </Button>
-                </Box>
-              )}
+              ) : null}
 
               <Divider orientation={compare ? "vertical" : "horizontal"} />
               <ButtonGroup orientation="vertical">
-                <Button
+                {/* <Button
                   sx={{
                     justifyContent: "space-between",
                   }}
@@ -433,7 +566,7 @@ function MapCard({ ID, bounds, geojson }) {
                   ) : (
                     <Typography>Méthodologie</Typography>
                   )}
-                </Button>
+                </Button> */}
                 <Button
                   sx={{
                     justifyContent: "space-between",

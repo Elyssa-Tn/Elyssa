@@ -20,4 +20,26 @@ Reorganize election types
 
 a way to filter parties by receiving their scores first
 
-Indicators not added
+## Indicators not added
+
+---
+
+Compare tables with colors for compare mode
+
+add coloring according to difference between delegation and its containing area
+
+Fix table mode display \\ works for simple
+
+Verify Evolution/Comparaison map
+
+Fix chart mode \\ 50% done, check for the other modes
+
+Substract from prc for comparaisons and evolutions, and have the schematic scale balance at 0
+
+---
+
+Present the tech
+present the resulting interface - general single level simple results - display the level change and what it could high in a certain case
+
+Fix the chart in comparaison mode
+Fix TP chart

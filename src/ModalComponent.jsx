@@ -157,7 +157,7 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
               {hoveredElection && (
                 <Card
                   variant="plain"
-                  sx={{ width: "24rem", maxWidth: "24rem" }}
+                  sx={{ minWidth: "24rem", maxWidth: "24rem" }}
                 >
                   <Typography level="h3">{hoveredElection.nom}</Typography>
                   <Divider />
@@ -199,7 +199,13 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
             </Sheet>
           )}
           {selectedElection && (
-            <Sheet>
+            <Sheet
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               {loading ? (
                 <CircularProgress />
               ) : (
@@ -228,11 +234,11 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
                           <KeyboardArrowRight />
                         </ListItemButton>
                         <ListDivider />
-                        <ListItemButton>
+                        {/* <ListItemButton>
                           <ListItemContent>Partis gagnants</ListItemContent>
                           <KeyboardArrowRight />
                         </ListItemButton>
-                        <ListDivider />
+                        <ListDivider /> */}
                       </List>
                     </ListItem>
                     <ListItem nested>
@@ -247,9 +253,11 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
                                 onMouseOver={() => setHoveredParti(parti)}
                               >
                                 <ListItemContent>
-                                  {parti.denomination_fr}
+                                  {parti.denomination_fr
+                                    ? parti.denomination_fr
+                                    : parti.denomination_ar}
                                 </ListItemContent>
-                                <Chip>{parti.score}%</Chip>
+                                <Chip>{parti.prc}%</Chip>
                                 <KeyboardArrowRight />
                               </ListItemButton>
                               <ListDivider />
@@ -260,17 +268,23 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
                     </ListItem>
                   </List>
                   <Divider orientation="vertical" />
-                  {hoveredParti && (
-                    <Card
-                      variant="plain"
-                      sx={{ width: "24rem", maxWidth: "24rem" }}
-                    >
-                      <Typography level="h3">
-                        {hoveredParti.denomination_fr}
-                      </Typography>
-                      <Divider />
-                    </Card>
-                  )}
+
+                  <Card
+                    variant="plain"
+                    sx={{ width: "24rem", maxWidth: "24rem" }}
+                  >
+                    {hoveredParti && (
+                      <Box>
+                        <Typography level="h3">
+                          {hoveredParti.denomination_fr
+                            ? hoveredParti.denomination_fr
+                            : hoveredParti.denomination_ar}
+                        </Typography>
+
+                        <Divider />
+                      </Box>
+                    )}
+                  </Card>
                 </Sheet>
               )}
             </Sheet>

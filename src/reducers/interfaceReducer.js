@@ -8,8 +8,12 @@ const initialState = {
     latitude: 33.9989,
     longitude: 10.1658,
     zoom: 5,
+    minZoom: 5,
     bearing: 0,
+    minBearing: 0,
+    maxBearing: 0,
     pitch: 0,
+    maxPitch: 0,
   },
   hover: null,
   tooltip: null,
@@ -22,6 +26,7 @@ const initialState = {
   bounds: null,
   levelLock: { 1: false, 2: false },
   chartMode: { 1: false, 2: false },
+  tableMode: { 1: false, 2: false },
   ready: false,
   modalOpen: true,
   modalCompareFlag: false,
@@ -84,6 +89,14 @@ const interfaceSlice = createSlice({
       };
       state.chartMode = updatedChartMode;
     },
+    setTableMode: (state, action) => {
+      const id = action.payload;
+      const updatedTableMode = {
+        ...state.tableMode,
+        [id]: !state.tableMode[id],
+      };
+      state.tableMode = updatedTableMode;
+    },
     setReady: (state, action) => {
       state.ready = action.payload;
     },
@@ -111,6 +124,7 @@ export const {
   setBounds,
   setLevelLock,
   setChartMode,
+  setTableMode,
   setReady,
   setModalOpen,
   setModalCompareFlag,
