@@ -82,10 +82,7 @@ const mapSlice = createSlice({
           let percent;
 
           if (oldValues && newValues)
-            percent = (
-              ((newValues.prc - oldValues.prc) / oldValues.prc) *
-              100
-            ).toFixed(1);
+            percent = (newValues.prc - oldValues.prc).toFixed(1);
 
           combinedData[level][code] = {
             old_parti: oldValues.code_parti,
@@ -209,6 +206,14 @@ export const fetchTpMap = (map) => {
         type: "TP",
       };
     });
+
+    const { data } = await electionServices.getTotalTpResult(map);
+    if (data)
+      mapObject = {
+        ...mapObject,
+        tp: data.result[0].variables[0].resultat[0],
+      };
+
     dispatch(createMap(mapObject));
   };
 };

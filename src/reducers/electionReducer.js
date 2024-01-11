@@ -48,16 +48,22 @@ export const fetchElectionData = (election) => {
     if (electionData.data) {
       if (electionData.data.partis && electionData.data.partis.length !== 0) {
         const { data } = await electionServices.getPartiScores(election);
+
         const partiScores = data.result[0].variables[0].resultat;
 
         electionData.data.partis.forEach((parti) => {
           const partiScore = partiScores.find(
             (partiScore) => partiScore.code_parti === parti.code_parti
           );
-          if (partiScore) parti.score = Number(partiScore.prc.toFixed(1));
+          if (partiScore) {
+            parti.prc = Number(partiScore.prc.toFixed(1));
+            parti.voix = Number(partiScore.voix.toFixed(1));
+            parti.votes = Number(partiScore.votes.toFixed(1));
+          }
         });
+
         const sortedPartis = [...electionData.data.partis].sort(
-          (a, b) => b.score - a.score
+          (a, b) => (b.prc || 0) - (a.prc || 0)
         );
 
         electionData.data = { ...electionData.data, partis: sortedPartis };

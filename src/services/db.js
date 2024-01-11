@@ -50,10 +50,26 @@ const getGeoJSONFromIndexedDB = async (db, key) => {
     };
   });
 };
+
+const clearIndexedDB = async (db) => {
+  return new Promise((resolve, reject) => {
+    const request = window.indexedDB.deleteDatabase("geojsonStore");
+
+    request.onsuccess = () => {
+      resolve();
+    };
+
+    request.onerror = (event) => {
+      reject(event.target.error);
+    };
+  });
+};
+
 const dbAccess = {
   openIndexedDB,
   saveGeoJSONToIndexedDB,
   getGeoJSONFromIndexedDB,
+  clearIndexedDB,
 };
 
 export default dbAccess;

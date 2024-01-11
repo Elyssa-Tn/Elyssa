@@ -1,53 +1,67 @@
 import { Box, Typography } from "@mui/joy";
-import { useSelector } from "react-redux";
 
-const Legend = ({ ID }) => {
-  const level = useSelector((state) => state.interface.level);
-  const map = useSelector((state) => state.maps[ID]);
+const Legend = ({ ID, colors }) => {
+  const thresholds = [-10, -5, 0, 5, 10];
 
-  const { min, max } = useSelector(
-    (state) => state.interface.minMax[ID][level]
-  );
-  const midValue = ((parseFloat(max) + parseFloat(min)) / 2).toFixed(1);
+  const containerStyle = {
+    position: "relative",
+    display: "flex",
+    flexDirection: "row",
+  };
 
-  const barStyle = {
-    width: "14rem",
-    height: "20px",
-    background: `linear-gradient(to right, red, green)`,
+  const rangeStyle = {
+    display: "flex",
+    flexDirection: "column",
   };
 
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
+        position: "relative",
+        display: "inline-block",
+        maxWidth: "50%",
       }}
     >
-      {map.type === "comparaison" ? (
+      <Box className="legendContainer" sx={containerStyle}>
         <Box
-          sx={{
+          style={{
             display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
+            flexDirection: "column",
+            alignItems: "center",
+            marginRight: "0.75rem",
           }}
         >
-          <Typography>{map.parti[0].denomination_fr}</Typography>
-          <Typography>{map.parti[1].denomination_fr}</Typography>
+          <Typography style={{ fontSize: "0.75rem" }}>N/A</Typography>
+          <Typography
+            style={{
+              background: "#d3d3d3",
+              display: "inline-block",
+              width: "2.5rem",
+              height: "1.25rem",
+              marginRight: "0.25rem",
+              border: "1px solid #fff",
+            }}
+          ></Typography>
         </Box>
-      ) : (
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography>{min}</Typography>
-          <Typography>{midValue}</Typography>
-          <Typography>{max}</Typography>
-        </Box>
-      )}
-      <Box style={barStyle}></Box>
+        {colors.map((color, index) => (
+          <Box key={index} style={rangeStyle}>
+            <Typography
+              style={{ fontSize: "0.75rem", transform: "translateX(+25%)" }}
+            >
+              {thresholds[index]}
+            </Typography>
+            <Typography
+              style={{
+                background: color,
+                display: "inline-block",
+                width: "30px",
+                height: "20px",
+                border: `1px solid #333`,
+              }}
+            ></Typography>
+          </Box>
+        ))}
+      </Box>
     </Box>
   );
 };

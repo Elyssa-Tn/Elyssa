@@ -4,7 +4,8 @@ import FileDownloadOffOutlinedIcon from "@mui/icons-material/FileDownloadOffOutl
 import LayersOutlinedIcon from "@mui/icons-material/LayersOutlined";
 import EqualizerOutlinedIcon from "@mui/icons-material/EqualizerOutlined";
 import CloseIcon from "@mui/icons-material/Close";
-import { useState } from "react";
+import CenterFocusStrongIcon from "@mui/icons-material/CenterFocusStrong";
+import { useEffect, useState } from "react";
 import custom from "../../assets/custom(3).json";
 import {
   Box,
@@ -24,11 +25,13 @@ import {
   setHover,
   setLevel,
   setLevelLock,
+  setTableMode,
   setTooltip,
   setViewport,
 } from "../../reducers/interfaceReducer";
 import { DeckGL, GeoJsonLayer, WebMercatorViewport } from "deck.gl";
 import { deleteMap } from "../../reducers/mapReducer";
+import { FeaturedVideoRounded, TableChart } from "@mui/icons-material";
 
 const PercentageBar = ({ value }) => {
   const normalizeValue = (value) => {
@@ -75,11 +78,11 @@ const MapComponent = ({
   type,
   geojson,
   colors,
-  colors2,
+  divergingColors,
   displayMode,
   bounds,
 }) => {
-  const target = useSelector((state) => state.interface.target);
+  const currentTarget = useSelector((state) => state.interface.currentTarget);
   const level = useSelector((state) => state.interface.level);
   const levels = useSelector((state) => state.interface.levels);
   const viewport = useSelector((state) => state.interface.viewport);
@@ -128,36 +131,20 @@ const MapComponent = ({
   }
 
   const getColorOnScale = (value) => {
-    const factor = (value - min) / (max - min);
+    const thresholds = [-10, -5, 0, 5, 10];
 
-    const color = [
-      Math.round(255 * (1 - factor)),
-      Math.round(255 * factor),
-      0,
-      255,
-    ];
+    if (value <= thresholds[0]) {
+      return divergingColors[0];
+    } else if (value >= thresholds[thresholds.length - 1]) {
+      return divergingColors[divergingColors.length - 1];
+    }
 
-    return color;
+    for (let i = 1; i < thresholds.length; i++) {
+      if (thresholds[i - 1] < value && value <= thresholds[i]) {
+        return colors[i];
+      }
+    }
   };
-
-  function getColorForPercentileValue(value) {
-    const color1 = colors2[0];
-    const color2 = colors2[1];
-    const factor = value / 100;
-    const r1 = parseInt(color1.slice(1, 3), 16);
-    const g1 = parseInt(color1.slice(3, 5), 16);
-    const b1 = parseInt(color1.slice(5, 7), 16);
-
-    const r2 = parseInt(color2.slice(1, 3), 16);
-    const g2 = parseInt(color2.slice(3, 5), 16);
-    const b2 = parseInt(color2.slice(5, 7), 16);
-
-    const r = Math.round(r1 + factor * (r2 - r1));
-    const g = Math.round(g1 + factor * (g2 - g1));
-    const b = Math.round(b1 + factor * (b2 - b1));
-
-    return `rgb(${r}, ${g}, ${b})`;
-  }
 
   const getColorForValue = (value) => {
     const interval = Math.floor((value - min) / singleColorRange);
@@ -227,6 +214,13 @@ const MapComponent = ({
     dispatch(setClickedTarget(null));
   };
 
+  const handleCenterClick = () => {
+    dispatch(resetViewport());
+    dispatch(setCurrentTarget(null));
+    // dispatch(setLevel(levels[0]));
+    dispatch(setClickedTarget(null));
+  };
+
   const handleDeleteClick = () => {
     handleResetClick();
     dispatch(deleteMap(ID));
@@ -278,11 +272,54 @@ const MapComponent = ({
     dispatch(setChartMode(ID));
   };
 
+  const handleTableButton = () => {
+    dispatch(setTableMode(ID));
+  };
+
   const handleClick = (object) => {
     handleMouseout();
     const code = object.properties[`code_${level}`];
-    dispatch(setCurrentTarget(code));
-    const { _southWest, _northEast } = bounds[level][code].bounds;
+    const name = object.properties[`nom_${level}`];
+    dispatch(
+      setCurrentTarget({
+        targetName: name,
+        targetCode: code,
+        targetLevel: level,
+      })
+    );
+    // const { _southWest, _northEast } = bounds[level][code].bounds;
+
+    // const boundaries = [
+    //   [_southWest.lng, _southWest.lat],
+    //   [_northEast.lng, _northEast.lat],
+    // ];
+
+    // const viewportWebMercator = new WebMercatorViewport(viewport);
+
+    // const { longitude, latitude, zoom } = viewportWebMercator.fitBounds(
+    //   boundaries,
+    //   { width: 408, height: 500 }
+    // );
+    // if (!levelLock) {
+    //   dispatch(setLevel(levels[1]));
+    // }
+
+    // dispatch(
+    //   setViewport({
+    //     ...viewport,
+    //     latitude,
+    //     longitude,
+    //     zoom,
+    //   })
+    // );
+  };
+
+  useEffect(() => {
+    if (currentTarget) moveViewport(currentTarget);
+  }, [currentTarget]);
+
+  const moveViewport = ({ targetCode, targetLevel }) => {
+    const { _southWest, _northEast } = bounds[targetLevel][targetCode].bounds;
 
     const boundaries = [
       [_southWest.lng, _southWest.lat],
@@ -295,8 +332,14 @@ const MapComponent = ({
       boundaries,
       { width: 408, height: 500 }
     );
+
+    //TODO: Remove this
     if (!levelLock) {
-      dispatch(setLevel(levels[1]));
+      dispatch(
+        level === levels[levels.length - 1]
+          ? dispatch(setLevel(level))
+          : dispatch(setLevel(levels[levels.indexOf(level) + 1]))
+      );
     }
 
     dispatch(
@@ -313,13 +356,16 @@ const MapComponent = ({
     .reverse()
     .map((mapLevel, index) => {
       const data = geojson[mapLevel];
-
-      //TODO: A BETTER WAY TO DISPLAY TARGETED subsections on level change
-
       return new GeoJsonLayer({
         key: mapLevel,
         id: mapLevel,
-        data,
+        data: currentTarget
+          ? data.features.filter((feature) =>
+              feature.properties[`code_${mapLevel}`]
+                .toString()
+                .startsWith(currentTarget.targetCode)
+            )
+          : data,
         pickable: mapLevel === level,
         // stroked: mapLevel === level,
         stroked: true,
@@ -351,7 +397,7 @@ const MapComponent = ({
             position: "absolute",
             transform: "translateX(-50%)",
             left: tooltip.position.x,
-            top: tooltip.position.y - 100,
+            top: tooltip.position.y - (type === "comparaison" ? 100 : 50),
             borderRadius: "0.25rem",
             padding: "0.25rem",
             zIndex: 999,
@@ -559,51 +605,51 @@ const MapComponent = ({
                       </Box>
                     </Box>
                   </Box>
-                  <Divider />
+                  {/* <Divider />
                   <PercentageBar
                     value1={data[level][tooltip.code]["oldprc"].toFixed(1)}
                     value2={data[level][tooltip.code]["newprc"].toFixed(1)}
                     value={data[level][tooltip.code]["percent"]}
-                  />
+                  /> */}
                 </Box>
-              ) : null
-            ) : type === "TP" ? (
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  paddingTop: "0.25rem",
-                }}
-              >
+              ) : type === "TP" ? (
                 <Box
                   sx={{
                     display: "flex",
                     flexDirection: "row",
+                    justifyContent: "space-between",
+                    paddingTop: "0.25rem",
                   }}
                 >
-                  <Typography level="body-md">
-                    {data[level][tooltip.code]["inscrits"]}
-                  </Typography>
-                  <Typography level="body-sm">&nbsp;inscrits</Typography>
-                  <Divider
-                    sx={{ margin: "0 0.25rem" }}
-                    orientation="vertical"
-                  />
-                  <Typography level="body-md">
-                    {data[level][tooltip.code]["votes"]}
-                  </Typography>
-                  <Typography level="body-sm">&nbsp;voix</Typography>
-                  <Divider
-                    sx={{ margin: "0 0.25rem" }}
-                    orientation="vertical"
-                  />
-                  <Typography>
-                    &nbsp;
-                    {data[level][tooltip.code]["tp"].toFixed(2)}%
-                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Typography level="body-md">
+                      {data[level][tooltip.code]["votes"].toLocaleString()}
+                    </Typography>
+                    <Typography level="body-sm">&nbsp;voix</Typography>
+                    <Divider
+                      sx={{ margin: "0 0.25rem" }}
+                      orientation="vertical"
+                    />
+                    <Typography level="body-md">
+                      {data[level][tooltip.code]["inscrits"].toLocaleString()}
+                    </Typography>
+                    <Typography level="body-sm">&nbsp;inscrits</Typography>
+                    <Divider
+                      sx={{ margin: "0 0.25rem" }}
+                      orientation="vertical"
+                    />
+                    <Typography>
+                      &nbsp;
+                      {data[level][tooltip.code]["tp"].toFixed(2)}%
+                    </Typography>
+                  </Box>
                 </Box>
-              </Box>
+              ) : null
             ) : (
               <Typography>Données pas disponibles.</Typography>
             )}
@@ -631,7 +677,7 @@ const MapComponent = ({
             data={custom}
             pickable={false}
             stroked={false}
-            filled={true}
+            filled={currentTarget ? false : true}
             getFillColor={[3, 3, 3, 25]}
           />
         </DeckGL>
@@ -651,7 +697,12 @@ const MapComponent = ({
             <UndoIcon />
           </Button>
         </Tooltip>
-        <Tooltip placement="top" arrow title="Rester sur ce niveau">
+        {/* <Tooltip placement="top" arrow title="Centrer">
+          <Button onClick={handleCenterClick}>
+            <CenterFocusStrongIcon />
+          </Button>
+        </Tooltip> */}
+        {/* <Tooltip placement="top" arrow title="Rester sur ce niveau">
           <Button onClick={handleLockChange}>
             {levelLock ? (
               <FileDownloadOffOutlinedIcon />
@@ -659,8 +710,8 @@ const MapComponent = ({
               <SaveAltOutlinedIcon />
             )}
           </Button>
-        </Tooltip>
-        <Tooltip
+        </Tooltip> */}
+        {/* <Tooltip
           placement="top"
           arrow
           title={`Changer de niveau: ${
@@ -670,10 +721,15 @@ const MapComponent = ({
           <Button>
             <LayersOutlinedIcon />
           </Button>
-        </Tooltip>
+        </Tooltip> */}
         <Tooltip placement="top" arrow title="Afficher en graphique">
           <Button onClick={handleGraphButton}>
             <EqualizerOutlinedIcon />
+          </Button>
+        </Tooltip>
+        <Tooltip placement="top" arrow title="Afficher en tableau">
+          <Button onClick={handleTableButton}>
+            <TableChart />
           </Button>
         </Tooltip>
       </ButtonGroup>

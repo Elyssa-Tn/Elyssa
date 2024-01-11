@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import * as L from "leaflet";
 import {
   Button,
+  CircularProgress,
   CssBaseline,
   CssVarsProvider,
   Divider,
@@ -19,7 +20,7 @@ import {
 
 import Layout from "./Layout";
 import MapCard from "./MapCard/MapCard";
-import Navbar from "./Navbar";
+import Navbar from "./NavbarTemporary";
 import MapTitle from "./MapTitle";
 import theme from "./theme";
 import { getGeoJSON } from "./services/geojson";
@@ -27,11 +28,10 @@ import {
   setClassNumber,
   setLevel,
   setMinMax,
-  setModalOpen,
   setReady,
   toggleCompare,
 } from "./reducers/interfaceReducer";
-import ModalComponent from "./ModalComponent";
+import MapsContainer from "./MapsContainer";
 
 function App() {
   const materialTheme = materialExtendTheme();
@@ -39,41 +39,95 @@ function App() {
   const dispatch = useDispatch();
 
   const init = useSelector((state) => state.elections.init);
-
   const levels = useSelector((state) => state.interface.levels);
   const ready = useSelector((state) => state.interface.ready);
   const modalOpen = useSelector((state) => state.interface.modalOpen);
   const classNumber = useSelector((state) => state.interface.classNumber);
-
   const compare = useSelector((state) => state.interface.compareToggle);
+
   const [bounds, setBounds] = useState(null);
+  const [autocompleteOptions, setAutocompleteOptions] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const maps = useSelector((state) => state.maps);
 
-  function findMinMaxValues(maps, valueProperty) {
+  // function findMinMaxValues(maps, valueProperty) {
+  //   const result = {};
+  //   for (const key in maps) {
+  //     if (maps[key] && maps[key].resultat) {
+  //       result[key] = {
+  //         delegation: {
+  //           min: Infinity,
+  //           max: -Infinity,
+  //         },
+  //         gouvernorat: {
+  //           min: Infinity,
+  //           max: -Infinity,
+  //         },
+  //         region: {
+  //           min: Infinity,
+  //           max: -Infinity,
+  //         },
+  //       };
+  //       const data = maps[key].resultat;
+  //       for (const level in data) {
+  //         for (const code in data[level]) {
+  //           const value = data[level][code][valueProperty];
+  //           if (!isNaN(value)) {
+  //             if (value < result[key][level].min) {
+  //               result[key][level].min = value;
+  //             }
+  //             if (value > result[key][level].max) {
+  //               result[key][level].max = value;
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+
+  //   if (result[1] && result[2]) {
+  //     result[3] = {
+  //       delegation: {
+  //         min: Math.min(result[1].delegation.min, result[2].delegation.min),
+  //         max: Math.max(result[1].delegation.max, result[2].delegation.max),
+  //       },
+  //       gouvernorat: {
+  //         min: Math.min(result[1].gouvernorat.min, result[2].gouvernorat.min),
+  //         max: Math.max(result[1].gouvernorat.max, result[2].gouvernorat.max),
+  //       },
+  //       region: {
+  //         min: Math.min(result[1].region.min, result[2].region.min),
+  //         max: Math.max(result[1].region.max, result[2].region.max),
+  //       },
+  //     };
+  //   }
+
+  //   return result;
+  // }
+
+  function findMinMaxValues(maps, valueProperty, levels) {
     const result = {};
     for (const key in maps) {
       if (maps[key] && maps[key].resultat) {
-        result[key] = {
-          delegation: {
+        result[key] = {};
+        levels.forEach((level) => {
+          result[key][level] = {
             min: Infinity,
             max: -Infinity,
-          },
-          gouvernorat: {
-            min: Infinity,
-            max: -Infinity,
-          },
-        };
+          };
+        });
+
         const data = maps[key].resultat;
-        for (const level in data) {
-          for (const code in data[level]) {
-            const value = data[level][code][valueProperty];
+        for (const currentLevel in data) {
+          for (const code in data[currentLevel]) {
+            const value = data[currentLevel][code][valueProperty];
             if (!isNaN(value)) {
-              if (value < result[key][level].min) {
-                result[key][level].min = value;
+              if (value < result[key][currentLevel].min) {
+                result[key][currentLevel].min = value;
               }
-              if (value > result[key][level].max) {
-                result[key][level].max = value;
+              if (value > result[key][currentLevel].max) {
+                result[key][currentLevel].max = value;
               }
             }
           }
@@ -82,16 +136,13 @@ function App() {
     }
 
     if (result[1] && result[2]) {
-      result[3] = {
-        delegation: {
-          min: Math.min(result[1].delegation.min, result[2].delegation.min),
-          max: Math.max(result[1].delegation.max, result[2].delegation.max),
-        },
-        gouvernorat: {
-          min: Math.min(result[1].gouvernorat.min, result[2].gouvernorat.min),
-          max: Math.max(result[1].gouvernorat.max, result[2].gouvernorat.max),
-        },
-      };
+      result[3] = {};
+      levels.forEach((level) => {
+        result[3][level] = {
+          min: Math.min(result[1][level].min, result[2][level].min),
+          max: Math.max(result[1][level].max, result[2][level].max),
+        };
+      });
     }
 
     return result;
@@ -120,7 +171,7 @@ function App() {
   useEffect(() => {
     const processMap = (map, property) => {
       if (map) {
-        const minMax = findMinMaxValues(maps, property);
+        const minMax = findMinMaxValues(maps, property, levels);
         const classNumber = calculateClasses(minMax);
         if (map.type === "indicator") dispatch(setLevel("delegation"));
         dispatch(setClassNumber(classNumber));
@@ -178,9 +229,11 @@ function App() {
           formattedResults[key] = entry[key];
         });
         setGeojson(formattedResults);
+        setLoading(false);
       })
       .catch((error) => {
         console.error("An error occurred:", error);
+        setLoading(false);
       });
   }, []);
 
@@ -227,6 +280,29 @@ function App() {
           setBounds(boundsObject);
         }
       }
+
+      //TODO: Remove this eventually
+      const flattenBounds = (bounds) => {
+        const flattenedOptions = [];
+
+        for (const levelKey in bounds) {
+          const level = bounds[levelKey];
+
+          for (const optionKey in level) {
+            const option = level[optionKey];
+            flattenedOptions.push({
+              label: option.name,
+              key: optionKey,
+              level: levelKey,
+            });
+          }
+        }
+
+        return flattenedOptions;
+      };
+
+      const flattenedBounds = flattenBounds(boundsObject);
+      setAutocompleteOptions(flattenedBounds);
     };
 
     if (geojson) calculateBounds();
@@ -236,7 +312,21 @@ function App() {
     dispatch(initializeElections());
   }, [dispatch]);
 
-  // console.log(maps[1]);
+  if (loading)
+    return (
+      <Sheet
+        variant="soft"
+        sx={{
+          height: "100vh",
+          width: "100vw",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress />
+      </Sheet>
+    );
 
   if (init)
     return (
@@ -247,7 +337,7 @@ function App() {
             <Layout.Header>
               <Navbar />
             </Layout.Header>
-            <Layout.TopPanel>
+            {/* <Layout.TopPanel>
               {maps[1] || maps[2] ? null : (
                 <Button
                   variant="outlined"
@@ -276,10 +366,9 @@ function App() {
                   parti={maps[2]["parti"]}
                 />
               )}
-            </Layout.TopPanel>
+            </Layout.TopPanel> */}
             <Layout.Main>
               <Sheet
-                className="map container"
                 sx={{
                   display: "flex",
                   flexDirection: "row",
@@ -287,11 +376,18 @@ function App() {
                 }}
               >
                 {maps[1] && classNumber[1] && (
-                  <MapCard
-                    // map={map[1]}
-                    // electionInfo={map[1]["election"]}
+                  // <MapCard
+                  //   // map={map[1]}
+                  //   // electionInfo={map[1]["election"]}
+                  //   geojson={geojson}
+                  //   bounds={bounds}
+                  //   autocompleteOptions={autocompleteOptions}
+                  //   ID={1}
+                  // />
+                  <MapsContainer
                     geojson={geojson}
                     bounds={bounds}
+                    autocompleteOptions={autocompleteOptions}
                     ID={1}
                   />
                 )}
@@ -299,11 +395,18 @@ function App() {
                 {maps[2] && classNumber[2] && (
                   <>
                     <Divider orientation="vertical" />
-                    <MapCard
+                    {/* <MapCard
                       // map={map[2]}
                       // electionInfo={map[2]["election"]}
                       geojson={geojson}
                       bounds={bounds}
+                      autocompleteOptions={autocompleteOptions}
+                      ID={2}
+                    /> */}
+                    <MapsContainer
+                      geojson={geojson}
+                      bounds={bounds}
+                      autocompleteOptions={autocompleteOptions}
                       ID={2}
                     />
                   </>

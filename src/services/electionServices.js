@@ -3,6 +3,8 @@ import { setupCache } from "axios-cache-interceptor";
 
 const url = "https://elyssa.tsaas.tn/api";
 const axios = setupCache(Axios);
+//TODO: fix this eventually
+const levels = ["gouvernorat", "delegation"];
 
 const init = async () => {
   try {
@@ -147,8 +149,6 @@ const getRequestResults = async (map) => {
     }
   };
 
-  const levels = ["gouvernorat", "delegation"];
-
   try {
     const results = await Promise.all(levels.map(quickFetch));
     return results;
@@ -179,10 +179,37 @@ const getTpResult = async (map) => {
     }
   };
 
-  const levels = ["gouvernorat", "delegation"];
-
   try {
     const results = await Promise.all(levels.map(quickFetch));
+    return results;
+  } catch (error) {
+    console.error("An error occurred:", error);
+    throw error;
+  }
+};
+const getTotalTpResult = async (map) => {
+  const quickFetch = async (level) => {
+    const req = {
+      req: {
+        type: "data",
+        pays: "Tunisie",
+        code_election: map.election.code_election,
+        decoupage: level,
+        variables: [{ code_variable: "tp" }],
+      },
+    };
+    try {
+      const response = await axios.post(url, req, {
+        cache: { methods: ["get", "post"] },
+      });
+      return response.data;
+    } catch (error) {
+      return error;
+    }
+  };
+
+  try {
+    const results = await quickFetch("pays");
     return results;
   } catch (error) {
     console.error("An error occurred:", error);
@@ -211,6 +238,7 @@ const electionServices = {
   getPartiScores,
   getRequestResults,
   getTpResult,
+  getTotalTpResult,
   getIndicatorResults,
 };
 
@@ -231,6 +259,7 @@ export const fetchGeojson = async (level) => {
     });
     return response.data;
   } catch (error) {
+    console.log(error);
     return error;
   }
 };

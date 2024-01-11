@@ -7,7 +7,7 @@ const Root = (props) => {
       sx={[
         {
           display: "grid",
-          gridTemplateRows: "5rem 10rem 1fr",
+          gridTemplateRows: "4rem 1fr",
           minHeight: "100vh",
         },
         ...(Array.isArray(props.sx) ? props.sx : [props.sx]),
