@@ -14,11 +14,9 @@ POST https://elyssa.tsaas.tn/api
 Content-Type: application/json
 
 {
-  "req":{
     "type":"election",
     "pays":"tunisie",
     "code_election":"TNAC2011"
-  }
 }
 
 ###
@@ -62,9 +60,9 @@ Content-Type: application/json
   "type": "data",
   "pays":"tunisie",
   "code_election": "tnmun2018",
-  "decoupage": "pays",
+  "decoupage": "gouvernorat",
   "variables": [
-    {"code_variable":"prc","code_parti":"*"}
+    {"code_variable":"prc","code_parti":"NIDA"}
   ]
 }
 } 
@@ -111,7 +109,7 @@ Content-Type: application/json
     "type":"map_decoupage",
     "pays":"Tunisie",
     "version":"10",
-    "decoupages":["region"]
+    "decoupages":["gouvernorat"]
   }
 }
 

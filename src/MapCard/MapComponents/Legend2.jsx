@@ -46,6 +46,7 @@ const Legend2 = ({ ID, colors }) => {
         display: "inline-block",
         maxWidth: "50%",
       }}
+      id="legend-el"
     >
       <Box className="legendContainer" sx={containerStyle}>
         <Box

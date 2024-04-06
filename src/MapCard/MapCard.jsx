@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import html2canvas from "html2canvas";
 import {
   Card,
   IconButton,
@@ -11,9 +12,7 @@ import {
   ButtonGroup,
   Stack,
   FormControl,
-  FormLabel,
   Autocomplete,
-  FormHelperText,
   Dropdown,
   MenuButton,
   Menu,
@@ -22,9 +21,7 @@ import {
 // import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import styled from "@emotion/styled";
-import * as L from "leaflet";
 import MapComponent from "./MapComponents/MapComponent";
-import ExpandedResults from "./MapComponents/ExpandedResults";
 import Legend2 from "./MapComponents/Legend2";
 import Legend from "./MapComponents/Legend";
 
@@ -51,6 +48,13 @@ import {
 import ChartComponent from "./MapComponents/ChartComponent";
 import { ArrowDropDown } from "@mui/icons-material";
 import TableComponent from "./MapComponents/TableComponent";
+import DownloadButton from "./DownloadButton";
+import {
+  downloadCSV,
+  downloadJPG,
+  downloadPNG,
+  downloadXLS,
+} from "../utils/downloader";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -205,6 +209,8 @@ function MapCard({ ID, bounds, autocompleteOptions, geojson }) {
   //   }
   // }, [geojson]);
 
+  const deckRef = useRef(null);
+
   if (!geojson || !map || !bounds) {
     return (
       <CircularProgress
@@ -217,40 +223,6 @@ function MapCard({ ID, bounds, autocompleteOptions, geojson }) {
       />
     );
   }
-
-  const handleDownload = async () => {
-    if (mapRef.current) {
-      const mapImage = await toSvg(mapRef.current);
-      const link = document.createElement("a");
-      link.href = mapImage;
-      link.download = "map.svg";
-      link.click();
-    }
-  };
-
-  //TODO: Remove this part eventually when the server will have more data for better handling
-
-  const findElectionByCode = (electionCode) => {
-    const foundElection = elections.find(
-      (election) => election.code_election === electionCode
-    );
-    return foundElection;
-  };
-
-  const Election_1 = findElectionByCode("TNAC2011");
-  const Election_2 = findElectionByCode("tnmun2018");
-
-  const selectElectionForEvolution = (election) => {
-    const currentElectionCode = election.code_election;
-
-    const otherElectionCode =
-      currentElectionCode === Election_1.code_election
-        ? Election_2.code_election
-        : Election_1.code_election;
-    return findElectionByCode(otherElectionCode);
-  };
-
-  //END OF TEMPORARY CODE
 
   const handleEvolutionDisplay = () => {
     const targetElection = selectElectionForEvolution(map.election);
@@ -286,12 +258,42 @@ function MapCard({ ID, bounds, autocompleteOptions, geojson }) {
   const handleLevelDropdown = (selectedLevel) => {
     dispatch(setLevel(selectedLevel));
   };
-  console.log(map);
+
+  // const downloadSVG = async () => {
+  //   if (mapRef.current) {
+  //     const mapImage = await toSvg(mapRef.current);
+  //     const link = document.createElement("a");
+  //     link.href = mapImage;
+  //     link.download = "map.svg";
+  //     link.click();
+  //   }
+  // };
+
+  const downloadIMG = () => {
+    deckRef?.current.redraw();
+    const image = deckRef?.current?.deck?.getCanvas()?.toDataURL("img/png");
+    const a = document.createElement("a");
+    a.href = image;
+    a.download = "screenshot.png";
+    a.click();
+  };
+
+  const dataDownloadOptions = [
+    { format: ".csv", downloadFunction: downloadCSV, data: { map, level } },
+    { format: ".xls", downloadFunction: downloadXLS, data: { map, level } },
+  ];
+
+  const imageDownloadOptions = [
+    { format: ".svg", downloadFunction: downloadIMG },
+    { format: ".png", downloadFunction: downloadIMG },
+  ];
+
   if (Object.keys(geojson).length === levels.length && map) {
     return (
       <>
         {geojson && map && (
           <Card
+            id="map-card"
             variant="soft"
             // key={map}
             key={ID}
@@ -448,6 +450,7 @@ function MapCard({ ID, bounds, autocompleteOptions, geojson }) {
                     divergingColors={convertedDivergingColors}
                     displayMode={displayMode}
                     bounds={bounds}
+                    deckRef={deckRef}
                   />
                 </>
               )}
@@ -561,45 +564,18 @@ function MapCard({ ID, bounds, autocompleteOptions, geojson }) {
 
               <Divider orientation={compare ? "vertical" : "horizontal"} />
               <ButtonGroup orientation="vertical">
-                {/* <Button
-                  sx={{
-                    justifyContent: "space-between",
-                  }}
-                  size="sm"
-                  endDecorator={compare ? null : <InfoIcon />}
-                >
-                  {compare ? (
-                    <InfoIcon />
-                  ) : (
-                    <Typography>Méthodologie</Typography>
-                  )}
-                </Button> */}
-                <Button
-                  sx={{
-                    justifyContent: "space-between",
-                  }}
-                  size="sm"
-                  endDecorator={compare ? null : <TableChartIcon />}
-                >
-                  {compare ? (
-                    <TableChartIcon />
-                  ) : (
-                    <Typography>Télécharger les données</Typography>
-                  )}
-                </Button>
-                <Button
-                  sx={{
-                    justifyContent: "space-between",
-                  }}
-                  size="sm"
-                  endDecorator={compare ? null : <PanoramaIcon />}
-                >
-                  {compare ? (
-                    <PanoramaIcon />
-                  ) : (
-                    <Typography>Télécharger la carte</Typography>
-                  )}
-                </Button>
+                <DownloadButton
+                  compare={compare}
+                  icon={<TableChartIcon />}
+                  text={"Télécharger les données"}
+                  options={dataDownloadOptions}
+                />
+                <DownloadButton
+                  compare={compare}
+                  icon={<PanoramaIcon />}
+                  text={"Télécharger la carte"}
+                  options={imageDownloadOptions}
+                />
               </ButtonGroup>
             </Sheet>
           </Card>

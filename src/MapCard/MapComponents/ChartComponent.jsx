@@ -89,14 +89,16 @@ const ChartComponent = ({ ID, data, bounds }) => {
       ? [map.parti[0].prc, map.parti[1].prc]
       : map.type === "TP"
       ? map.tp.tp
-      : map.parti.prc;
+      : map.tyoe === "simple"
+      ? map.parti.prc
+      : null;
 
   const handleGraphButton = () => {
     dispatch(setChartMode(ID));
   };
 
   useEffect(() => {
-    if (currentTarget) {
+    if (currentTarget && map.type !== "indicator") {
       // if (map.type === "comparaison") {
       //   setLocalAverage(
       //     data[currentTarget.targetLevel][
@@ -217,6 +219,18 @@ const ChartComponent = ({ ID, data, bounds }) => {
                               : null
                           ),
                           backgroundColor: "rgba(75, 192, 192, 0.6)",
+                        },
+                      ]
+                    : map.type === "indicator"
+                    ? [
+                        {
+                          label: "Pourcentage",
+                          data: codes.map((code) =>
+                            data[level][code]
+                              ? data[level][code]["valeur"]
+                              : null
+                          ),
+                          backgroundColor: "rgba(54, 162, 235, 0.6)",
                         },
                       ]
                     : [

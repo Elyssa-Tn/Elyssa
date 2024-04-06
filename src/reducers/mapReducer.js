@@ -120,8 +120,8 @@ export const {
 
 //TODO: refactor this
 
-const fetchDataAndDispatch = async (map, dispatch, createAction) => {
-  const result = await electionServices.getRequestResults(map);
+const fetchDataAndDispatch = async (map, dispatch, createAction, service) => {
+  const result = await service(map);
 
   let mapObject = { ...map, resultat: {} };
 
@@ -147,19 +147,34 @@ const fetchDataAndDispatch = async (map, dispatch, createAction) => {
 
 export const fetchMapData = (map) => {
   return async (dispatch) => {
-    await fetchDataAndDispatch(map, dispatch, createMap);
+    await fetchDataAndDispatch(
+      map,
+      dispatch,
+      createMap,
+      electionServices.getRequestResults
+    );
   };
 };
 
 export const fetchEvolutionData = (map) => {
   return async (dispatch) => {
-    await fetchDataAndDispatch(map, dispatch, createEvolutionMap);
+    await fetchDataAndDispatch(
+      map,
+      dispatch,
+      createEvolutionMap,
+      electionServices.getRequestResults
+    );
   };
 };
 
 export const fetchCompareMap = (map) => {
   return async (dispatch) => {
-    await fetchDataAndDispatch(map, dispatch, createComparaisonMap);
+    await fetchDataAndDispatch(
+      map,
+      dispatch,
+      createComparaisonMap,
+      electionServices.getRequestResults
+    );
   };
 };
 

@@ -4,7 +4,6 @@ import { Box, Sheet, Typography } from "@mui/joy";
 
 function MapsContainer({ geojson, bounds, autocompleteOptions, ID }) {
   const map = useSelector((state) => state.maps[ID]);
-  console.log(map);
   return (
     <Sheet>
       {map.type === "comparaison" ? (

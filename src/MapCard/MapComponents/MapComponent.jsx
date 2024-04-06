@@ -81,6 +81,7 @@ const MapComponent = ({
   divergingColors,
   displayMode,
   bounds,
+  deckRef,
 }) => {
   const currentTarget = useSelector((state) => state.interface.currentTarget);
   const level = useSelector((state) => state.interface.level);
@@ -391,6 +392,7 @@ const MapComponent = ({
         justifyContent: "space-between",
         alignItems: "flex-start",
       }}
+      id="map-component-el"
     >
       {tooltip && (
         <Sheet
@@ -668,6 +670,7 @@ const MapComponent = ({
         }}
       >
         <DeckGL
+          ref={deckRef}
           controller={true}
           initialViewState={viewport}
           layers={layers}
