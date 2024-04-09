@@ -169,7 +169,6 @@ const MapComponent = ({
         return [211, 211, 211, 200];
       const value = data[level][feature.properties[`code_${level}`]]["tp"];
       if (!value) return [211, 211, 211, 200];
-      console.log(value);
       return getColorForValue(value);
     }
 

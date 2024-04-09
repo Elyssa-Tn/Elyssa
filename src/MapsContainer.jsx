@@ -35,7 +35,19 @@ function MapsContainer({ geojson, bounds, autocompleteOptions, ID }) {
             padding: "0.25rem",
           }}
         >
-          <Typography level="h1">{map.indicator.nom_indicateur}</Typography>
+          <Typography
+            sx={{
+              display: "inline-block",
+              maxWidth: "506px",
+              marginTop: "0.5rem",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+            level="h2"
+          >
+            {map.indicator.nom_indicateur}
+          </Typography>
           <Typography level="h3">{map.indicator.ans}</Typography>
         </Box>
       ) : (
