@@ -5,8 +5,13 @@ function MapTitle({ electionInfo, parti, indicator }) {
     <Box sx={{ display: "inline-block", width: "50%" }}>
       <Typography
         style={{
+          display: "inline-block",
+          maxWidth: "100%",
           padding: "0.5rem 0.5rem 0.5rem  2.5rem ",
           marginTop: "0.5rem",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
         }}
         level="h2"
       >
