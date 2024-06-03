@@ -1,0 +1,45 @@
+Zoom lock button
+
+When a map is displayed, offer a way to compare on a temporal scale on the same map, or on a different one.
+
+Neighborhood and upper level comparaison
+
+Graph view.
+
+Dual map zoom
+
+Map linking lock/unlock feature
+
+Button panel to contain all map controls
+
+Filter between big parties and small parties with less than 5% for example
+
+Reorganize indicators from variables
+
+Reorganize election types
+
+a way to filter parties by receiving their scores first
+
+## Indicators not added
+
+---
+
+Compare tables with colors for compare mode
+
+add coloring according to difference between delegation and its containing area
+
+Fix table mode display \\ works for simple
+
+Verify Evolution/Comparaison map
+
+Fix chart mode \\ 50% done, check for the other modes
+
+Substract from prc for comparaisons and evolutions, and have the schematic scale balance at 0
+
+---
+
+Present the tech
+present the resulting interface - general single level simple results - display the level change and what it could high in a certain case
+
+Fix the chart in comparaison mode
+Fix TP chart

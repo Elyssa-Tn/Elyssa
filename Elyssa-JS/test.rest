@@ -1,0 +1,160 @@
+### INIT
+POST https://elyssa.tsaas.tn/api
+Content-Type: application/json
+
+{
+  "req":{
+    "type":"init",
+    "pays":"tunisie"
+  }
+}
+
+### More info concerning a single election
+POST https://elyssa.tsaas.tn/api
+Content-Type: application/json
+
+{
+    "type":"election",
+    "pays":"tunisie",
+    "code_election":"TNAC2011"
+}
+
+###
+POST https://elyssa.tsaas.tn/api
+Content-Type: application/json
+
+{
+"req":{
+  "type":"data",
+  "code_election": "tnmun2018",
+  "pays":"tunisie",
+  "decoupage":"pays",
+   "variables": [
+     {"code_variable":"tp"}
+   ]
+}
+}
+
+###
+POST https://elyssa.tsaas.tn/api
+Content-Type: application/json
+
+{
+"req":{
+  "type": "data",
+  "pays":"tunisie",
+  "code_election": "tnmun2018",
+  "decoupage": "circonscription",
+  "variables": [
+    {"code_variable":"prc","code_parti":"NIDA"}
+  ]
+}
+} 
+
+###
+POST https://elyssa.tsaas.tn/api
+Content-Type: application/json
+
+{
+"req":{
+  "type": "data",
+  "pays":"tunisie",
+  "code_election": "tnmun2018",
+  "decoupage": "delegation",
+  "variables": [
+    {"code_variable":"prc","code_parti":"NIDA"}
+  ]
+}
+} 
+
+###
+POST https://elyssa.tsaas.tn/api
+Content-Type: application/json
+
+{
+"req":{
+  "type": "data",
+  "pays":"tunisie",
+  "code_election": "tnac2011",
+  "decoupage": "circonscription",
+  "variables": [
+    {"code_variable":"prc","code_parti":"ARD"},
+     {"code_variable":"voix","code_parti":"ARD"}
+  ]
+}
+} 
+
+###
+POST https://elyssa.tsaas.tn/api
+Content-Type: application/json
+
+{
+"req":{
+  "type": "data",
+  "pays":"tunisie",
+  "code_election": "tnmun2018",
+  "decoupage": "gouvernorat",
+  "variables": [
+    {"code_variable":"tp"}
+  ]
+}
+}
+
+### Request a map
+POST https://elyssa.tsaas.tn/api
+Content-Type: application/json
+
+{
+  "req":{
+    "type":"map_decoupage",
+    "pays":"Tunisie",
+    "version":"10",
+    "decoupages":["gouvernorat"]
+  }
+}
+
+### Request an indicator
+POST https://elyssa.tsaas.tn/api
+Content-Type: application/json
+
+{
+  "req":{
+    "type":"indic",
+    "pays":"tunisie",
+    "ans":["2014"],
+    "decoupage":"delegation",
+    "indicateurs":["tnemp_actif_15p_ens_sup"]
+  }
+}
+
+### Filter
+POST https://elyssa.tsaas.tn/api
+Content-Type: application/json
+
+{
+"req":{
+  "type": "data",
+  "pays":"tunisie",
+  "code_election": "tnmun2018",
+  "decoupage": "delegation",
+  "filtre":{
+    "decoupage":"gouvernorat",
+    "valeur":"11"
+  },
+  "variables": [
+    {"code_variable":"prc","code_parti":"NIDA"}
+  ]
+}
+} 
+
+### Help
+POST https://elyssa.tsaas.tn/api
+Content-Type: application/json
+
+{
+  "req":
+  {
+    "type":"help",
+    "id_1":"help"
+  }
+}

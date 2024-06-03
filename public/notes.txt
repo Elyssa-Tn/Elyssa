@@ -1,5 +1,0 @@
-Le type "Elections législatives 2018" n'a aucune election associée.
-
-Chaque election devrait avoir les divisions disponnibles.
-
-Proxy et cors
