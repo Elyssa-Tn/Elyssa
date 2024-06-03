@@ -263,3 +263,15 @@ export const fetchGeojson = async (level) => {
     return error;
   }
 };
+
+export const getHelp = async (request) => {
+  try {
+    const response = await axios.post(url, request, {
+      cache: { interpretHeader: false, methods: ["get", "post"] },
+    });
+    return response.data.helps[0].texte;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
