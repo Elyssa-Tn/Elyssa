@@ -151,10 +151,8 @@ Content-Type: application/json
 POST https://elyssa.tsaas.tn/api
 Content-Type: application/json
 
-{
-  "req":
+
   {
     "type":"help",
     "id_1":"help"
   }
-}

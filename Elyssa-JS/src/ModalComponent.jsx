@@ -34,6 +34,7 @@ import {
   setModalOpen,
   setReady,
 } from "./reducers/interfaceReducer";
+import Help from "./components/Help/Help";
 
 const ModalComponent = React.forwardRef(function ModalComponent() {
   const [selectedElection, setSelectedElection] = useState(null);
@@ -102,10 +103,28 @@ const ModalComponent = React.forwardRef(function ModalComponent() {
         }}
       >
         <TabList>
-          <Tab key="Données électorales">Données électorales</Tab>
-          <Tab key="Indicateurs socio-économiques">
-            Indicateurs socio-économiques
-          </Tab>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                flexGrow: 1,
+              }}
+            >
+              <Tab key="Données électorales">Données électorales</Tab>
+              <Tab key="Indicateurs socio-économiques">
+                Indicateurs socio-économiques
+              </Tab>
+            </Box>
+            <Box>
+              <Help id_1="demarche_carte_principale" id_2="etape_1" />
+            </Box>
+          </Box>
         </TabList>
         <TabPanel value={0}>
           <Box sx={{ display: "flex", flexDirection: "row" }}>

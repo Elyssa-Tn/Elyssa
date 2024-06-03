@@ -6,27 +6,11 @@ import ModalComponent from "./ModalComponent";
 import { useDispatch, useSelector } from "react-redux";
 import { setModalOpen } from "./reducers/interfaceReducer";
 import dbAccess from "./services/db";
+import Help from "./components/Help/Help";
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const modalOpen = useSelector((state) => state.interface.modalOpen);
-
-  const refreshIndexedDB = async () => {
-    const userConfirmed = window.confirm(
-      "Are you sure you want to refresh the data? This will clear all existing data."
-    );
-
-    if (userConfirmed) {
-      try {
-        await dbAccess.clearIndexedDB();
-      } catch (error) {
-        console.error("Error clearing IndexedDB:", error);
-        throw error;
-      }
-    } else {
-      console.log("User canceled the refresh operation.");
-    }
-  };
 
   return (
     <>
@@ -107,7 +91,16 @@ const Navbar = () => {
         >
           Login
         </Link> */}
-        <ModeToggle />
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+          }}
+        >
+          <Help id_1="demarche_carte_principale" id_2="etape_0" />
+          <ModeToggle />
+        </Box>
       </Box>
     </>
   );
