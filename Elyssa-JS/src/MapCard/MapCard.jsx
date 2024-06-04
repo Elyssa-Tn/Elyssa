@@ -36,7 +36,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ExploreIcon from "@mui/icons-material/Explore";
 import { toSvg } from "html-to-image";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteMap, fetchEvolutionData } from "../reducers/mapReducer";
+import { fetchEvolutionData } from "../reducers/mapReducer";
 import {
   resetViewport,
   setCurrentTarget,
@@ -55,6 +55,7 @@ import {
   downloadPNG,
   downloadXLS,
 } from "../utils/downloader";
+import Help from "../components/Help/Help";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -406,9 +407,23 @@ function MapCard({ ID, bounds, autocompleteOptions, geojson }) {
               }}
             >
               <Stack spacing={1}>
-                <Typography level="h4" sx={{ pb: 1 }}>
-                  Choisir un niveau:
-                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "100%",
+                  }}
+                >
+                  <Typography level="h4" sx={{ pb: 1 }}>
+                    Choisir un niveau:
+                  </Typography>
+                  <Help
+                    id_1={"demarche_carte_principale"}
+                    id_2={"etape_2"}
+                    id_3={""}
+                  />
+                </Box>
+
                 <Dropdown>
                   <MenuButton endDecorator={<ArrowDropDown />}>
                     {capitalize(level)}

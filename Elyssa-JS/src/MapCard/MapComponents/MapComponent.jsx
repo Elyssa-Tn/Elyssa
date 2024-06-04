@@ -700,31 +700,6 @@ const MapComponent = ({
             <UndoIcon />
           </Button>
         </Tooltip>
-        {/* <Tooltip placement="top" arrow title="Centrer">
-          <Button onClick={handleCenterClick}>
-            <CenterFocusStrongIcon />
-          </Button>
-        </Tooltip> */}
-        {/* <Tooltip placement="top" arrow title="Rester sur ce niveau">
-          <Button onClick={handleLockChange}>
-            {levelLock ? (
-              <FileDownloadOffOutlinedIcon />
-            ) : (
-              <SaveAltOutlinedIcon />
-            )}
-          </Button>
-        </Tooltip> */}
-        {/* <Tooltip
-          placement="top"
-          arrow
-          title={`Changer de niveau: ${
-            level.charAt(0).toUpperCase() + level.slice(1)
-          }`}
-        >
-          <Button>
-            <LayersOutlinedIcon />
-          </Button>
-        </Tooltip> */}
         <Tooltip placement="top" arrow title="Afficher en graphique">
           <Button onClick={handleGraphButton}>
             <EqualizerOutlinedIcon />

@@ -33,7 +33,7 @@ const Help = ({ id_1, id_2, id_3 }) => {
           id_3: id_3 ? id_3 : "",
         };
         const data = await getHelp(request);
-        if (data.length === 0) {
+        if (data.length === 0 || !data) {
           setHelpContent("Pas d'aide disponible pour cette catégorie");
         } else setHelpContent(data);
 
