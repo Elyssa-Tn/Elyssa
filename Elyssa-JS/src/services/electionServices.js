@@ -1,7 +1,7 @@
 import Axios from "axios";
 import { setupCache } from "axios-cache-interceptor";
 
-const url = "https://elyssa.tsaas.tn/api";
+const url = "https://manager.elyssa-project.org/api";
 const axios = setupCache(Axios);
 //TODO: fix this eventually
 const levels = ["gouvernorat", "delegation"];

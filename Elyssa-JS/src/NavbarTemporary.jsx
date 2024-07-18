@@ -1,4 +1,12 @@
-import { Box, Button, IconButton, Input, Link, Modal } from "@mui/joy";
+import {
+  Box,
+  Button,
+  IconButton,
+  Input,
+  Link,
+  Modal,
+  Typography,
+} from "@mui/joy";
 import { Link as RouterLink } from "react-router-dom";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import ModeToggle from "./ModeToggle";
@@ -29,68 +37,12 @@ const Navbar = () => {
           color="neutral"
           onClick={() => dispatch(setModalOpen(true))}
         >
-          Open
+          Nouvelle Carte
         </Button>
-        {/* <Button onClick={() => refreshIndexedDB()}>Refresh DB</Button> */}
         <Modal open={modalOpen} onClose={() => dispatch(setModalOpen(false))}>
           <ModalComponent />
         </Modal>
-        {/* <Link
-          // style={{ color: "white" }}
-          component={RouterLink}
-          fontWeight="xl"
-          to="/"
-        >
-          Elyssa
-        </Link>
-        <Link
-          // style={{ color: "white" }}
-          component={RouterLink}
-          fontWeight="xl"
-          to="/"
-        >
-          Présentation de l’équipe
-        </Link>
-        <Link
-          // style={{ color: "white" }}
-          component={RouterLink}
-          fontWeight="xl"
-          to="/"
-        >
-          Bibliographie
-        </Link>
-      </Box>
-      <Input
-        size="sm"
-        variant="outlined"
-        placeholder="Recherche"
-        startDecorator={<SearchRoundedIcon color="primary" />}
-        sx={{
-          flexBasis: "500px",
-          display: {
-            xs: "none",
-            sm: "flex",
-          },
-          boxShadow: "sm",
-        }}
-      />
-      <Box sx={{ display: "flex", flexDirection: "row", gap: 1.5 }}>
-        <IconButton
-          size="sm"
-          variant="outlined"
-          color="neutral"
-          sx={{ display: { xs: "inline-flex", sm: "none" } }}
-        >
-          <SearchRoundedIcon />
-        </IconButton>
-        <Link
-          // style={{ color: "white" }}
-          component={RouterLink}
-          fontWeight="xl"
-          to="/login"
-        >
-          Login
-        </Link> */}
+        <Typography level="h2">Elyssa Project</Typography>
         <Box
           sx={{
             display: "flex",

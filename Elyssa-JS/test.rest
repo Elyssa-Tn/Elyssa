@@ -1,5 +1,5 @@
 ### INIT
-POST https://elyssa.tsaas.tn/api
+POST https://manager.elyssa-project.org/api
 Content-Type: application/json
 
 {
@@ -10,17 +10,17 @@ Content-Type: application/json
 }
 
 ### More info concerning a single election
-POST https://elyssa.tsaas.tn/api
+POST https://manager.elyssa-project.org/api
 Content-Type: application/json
 
 {
     "type":"election",
     "pays":"tunisie",
-    "code_election":"TNAC2011"
+    "code_election":"tnleg2019"
 }
 
-###
-POST https://elyssa.tsaas.tn/api
+### Participation rate
+POST https://manager.elyssa-project.org/api
 Content-Type: application/json
 
 {
@@ -35,40 +35,24 @@ Content-Type: application/json
 }
 }
 
-###
-POST https://elyssa.tsaas.tn/api
+### results of a single party for a singel election
+POST https://manager.elyssa-project.org/api
 Content-Type: application/json
 
 {
 "req":{
   "type": "data",
   "pays":"tunisie",
-  "code_election": "tnmun2018",
-  "decoupage": "circonscription",
+  "code_election": "tnleg2019",
+  "decoupage": "gouvernorat",
   "variables": [
-    {"code_variable":"prc","code_parti":"NIDA"}
+    {"code_variable":"prc","code_parti":"NAH"}
   ]
 }
 } 
 
-###
-POST https://elyssa.tsaas.tn/api
-Content-Type: application/json
-
-{
-"req":{
-  "type": "data",
-  "pays":"tunisie",
-  "code_election": "tnmun2018",
-  "decoupage": "delegation",
-  "variables": [
-    {"code_variable":"prc","code_parti":"NIDA"}
-  ]
-}
-} 
-
-###
-POST https://elyssa.tsaas.tn/api
+### Requesting several variables, such as percentage and number of votes a single party received
+POST https://manager.elyssa-project.org/api
 Content-Type: application/json
 
 {
@@ -79,29 +63,13 @@ Content-Type: application/json
   "decoupage": "circonscription",
   "variables": [
     {"code_variable":"prc","code_parti":"ARD"},
-     {"code_variable":"voix","code_parti":"ARD"}
+    {"code_variable":"voix","code_parti":"ARD"}
   ]
 }
 } 
 
-###
-POST https://elyssa.tsaas.tn/api
-Content-Type: application/json
-
-{
-"req":{
-  "type": "data",
-  "pays":"tunisie",
-  "code_election": "tnmun2018",
-  "decoupage": "gouvernorat",
-  "variables": [
-    {"code_variable":"tp"}
-  ]
-}
-}
-
 ### Request a map
-POST https://elyssa.tsaas.tn/api
+POST https://manager.elyssa-project.org/api
 Content-Type: application/json
 
 {
@@ -114,7 +82,7 @@ Content-Type: application/json
 }
 
 ### Request an indicator
-POST https://elyssa.tsaas.tn/api
+POST https://manager.elyssa-project.org/api
 Content-Type: application/json
 
 {
@@ -127,8 +95,8 @@ Content-Type: application/json
   }
 }
 
-### Filter
-POST https://elyssa.tsaas.tn/api
+### Filter by governorate
+POST https://manager.elyssa-project.org/api
 Content-Type: application/json
 
 {
@@ -147,8 +115,8 @@ Content-Type: application/json
 }
 } 
 
-### Help
-POST https://elyssa.tsaas.tn/api
+### Request a help entry
+POST https://manager.elyssa-project.org/api
 Content-Type: application/json
 
 
