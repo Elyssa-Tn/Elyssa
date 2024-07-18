@@ -14,14 +14,6 @@ const Help = ({ id_1, id_2, id_3 }) => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const getHelpContent = (id) => {
-    const helpContents = {
-      id1: "This is help content for id1.",
-      id2: "This is help content for id2.",
-    };
-    return helpContents[id] || "No help content available for this id.";
-  };
-
   useEffect(() => {
     if (open) {
       const fetchHelpContent = async () => {
