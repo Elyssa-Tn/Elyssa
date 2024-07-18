@@ -425,7 +425,10 @@ function MapCard({ ID, bounds, autocompleteOptions, geojson }) {
                 </Box>
 
                 <Dropdown>
-                  <MenuButton endDecorator={<ArrowDropDown />}>
+                  <MenuButton
+                    endDecorator={<ArrowDropDown />}
+                    disabled={map.type === "indicator"}
+                  >
                     {capitalize(level)}
                   </MenuButton>
                   <Menu>
