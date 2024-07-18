@@ -237,7 +237,7 @@ function MapCard({ ID, bounds, autocompleteOptions, geojson }) {
               flexDirection: compare ? "column" : "row",
               position: "relative",
               justifyContent: "space-between",
-              alignItems: "flex-start",
+              alignItems: ID % 2 ? "flex-start" : "flex-end",
               borderRadius: 0,
               borderTop: "none",
               borderBottom: "none",
@@ -396,7 +396,6 @@ function MapCard({ ID, bounds, autocompleteOptions, geojson }) {
                 display: "flex",
                 flexDirection: compare ? "row" : "column",
                 justifyContent: "space-between",
-                alignContent: "center",
                 height: "100%",
                 minHeight: !compare ? "35rem" : "null",
                 minWidth: compare ? "26rem" : "16rem",
@@ -404,6 +403,7 @@ function MapCard({ ID, bounds, autocompleteOptions, geojson }) {
                 borderRadius: "0.5rem",
                 padding: "0.5rem",
                 margin: "0",
+                // marginLeft: compare ? "10rem" : "null",
               }}
             >
               <Stack spacing={1}>
@@ -488,7 +488,7 @@ function MapCard({ ID, bounds, autocompleteOptions, geojson }) {
                   {currentTarget.targetName}
                 </Typography>
               )}
-              {!compare ? (
+              {/* {!compare ? (
                 <Stack>
                   <Typography>Comparez avec un autre indicateur:</Typography>
                   <Button
@@ -509,6 +509,14 @@ function MapCard({ ID, bounds, autocompleteOptions, geojson }) {
                     <Typography>Sur une deuxième carte</Typography>
                   </Button>
                 </Stack>
+              ) : null} */}
+              {!compare ? (
+                <Button
+                  onClick={() => dispatch(setModalOpen(true))}
+                  endDecorator={<AddCircleOutlineIcon />}
+                >
+                  <Typography>Comparez avec un autre indicateur</Typography>
+                </Button>
               ) : null}
 
               <Divider orientation={compare ? "vertical" : "horizontal"} />
